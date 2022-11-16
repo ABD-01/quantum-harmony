@@ -9,7 +9,7 @@ int main() {
     int workHours = 8;
     int workMinutes = 45;
     int warningMinutes = 15;
-    int startHour, startMinute, endHour, endMinute;
+    int startHour, startMinute, endHour, endMinute, totalMinutes;
 
     GetLocalTime(&currentTime);
 
