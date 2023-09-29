@@ -8,7 +8,7 @@ gboolean UpdateTimer(GtkLabel *timerLabel);
 
 // Function to show a warning dialog
 void ShowWarningDialog() {
-    GtkWidget *dialog;
+    GtkWidget *warningWindow;
     GdkScreen *screen;
 
     gtk_init(NULL, NULL);
@@ -16,25 +16,21 @@ void ShowWarningDialog() {
     // Get the screen
     screen = gdk_screen_get_default();
 
-    // Create a dialog with a message and OK button
-    dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_WARNING, GTK_BUTTONS_OK,
-        "Your working time is about to end.");
-
     // Set dialog window size to match the screen width and height (1/3 of screen height)
     int screenWidth = gdk_screen_get_width(screen);
     int screenHeight = gdk_screen_get_height(screen);
-    gtk_window_set_default_size(GTK_WINDOW(dialog), screenWidth, (int)(screenHeight / 3));
+
+    // Create a transient window (to appear as a popup)
+    warningWindow = gtk_window_new(GTK_WINDOW_POPUP);
+    gtk_window_set_default_size(GTK_WINDOW(warningWindow), screenWidth, (int)(screenHeight / 4));
+    gtk_window_move(GTK_WINDOW(warningWindow), 0, (int)(screenHeight / 3));
 
     // Increase font size
-    GtkLabel *label = GTK_LABEL(gtk_message_dialog_get_message_area(GTK_MESSAGE_DIALOG(dialog)));
+    GtkWidget *warningLabel = gtk_label_new("A quick brown fox jumped over the lazy dog.");
     PangoFontDescription *font_desc = pango_font_description_from_string("Verdana Bold 32");
-    gtk_widget_override_font(GTK_WIDGET(label), font_desc);
 
-    // Set the dialog's window type hint to resemble a system message
-    gtk_window_set_type_hint(GTK_WINDOW(dialog), GDK_WINDOW_TYPE_HINT_NOTIFICATION);
-
-    // Set dialog title and content area text
-    gtk_window_set_title(GTK_WINDOW(dialog), "Warning");
+    // Create a label with the warning message
+    gtk_widget_override_font(warningLabel, font_desc);
 
     // Set the dialog color to Windows blue (#357EC7) using CSS
     const gchar *css = "* { background-color: #357EC7; }";
@@ -42,35 +38,51 @@ void ShowWarningDialog() {
     gtk_css_provider_load_from_data(provider, css, -1, NULL);
     gtk_style_context_add_provider_for_screen(screen, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-    // Show the dialog and wait for user response
-    gint result = gtk_dialog_run(GTK_DIALOG(dialog));
+    // Add the fixed container to the window
+    gtk_container_add(GTK_CONTAINER(warningWindow), warningLabel);
 
-    // Close the dialog
-    gtk_widget_destroy(dialog);
+    // Show the warning window
+    gtk_widget_show_all(warningWindow);
 
-    gtk_main_quit();
+    // Add a timer to close the warning window after 3 seconds
+    g_timeout_add_seconds(3, (GSourceFunc)gtk_widget_destroy, warningWindow);
 
-    // If the OK button is clicked, show a timer window in the top right corner
-    if (result == GTK_RESPONSE_OK) {
-        GtkWidget *timerWindow;
+    // Start the GTK main loop for the warning window
+    // gtk_main();
+}
 
-        gtk_init(NULL, NULL);
+void ShowTimerWindow() {
+    GtkWidget *timerWindow;
+    GdkScreen *screen;
 
-        timerWindow = gtk_window_new(GTK_WINDOW_POPUP);
-        gtk_window_set_default_size(GTK_WINDOW(timerWindow), 100, 50);
-        // Set initial position of the timer window (top left corner)
-        gtk_window_move(GTK_WINDOW(timerWindow), 50, 100);
+    // Create a new GTK application context for the timer window
+    gtk_init(NULL, NULL);
 
-        GtkWidget *timerLabel = gtk_label_new("15:00"); // Initial time (15 minutes)
+    // Get the screen
+    screen = gdk_screen_get_default();
 
-        gtk_container_add(GTK_CONTAINER(timerWindow), timerLabel);
+    timerWindow = gtk_window_new(GTK_WINDOW_POPUP);
+    gtk_window_set_default_size(GTK_WINDOW(timerWindow), 100, 50);
+    // Set initial position of the timer window (top left corner)
+    gtk_window_move(GTK_WINDOW(timerWindow), 50, 100);
 
-        gtk_widget_show_all(timerWindow);
+    GtkWidget *timerLabel = gtk_label_new("15:00"); // Initial time (15 minutes)
 
-        g_timeout_add_seconds(1, (GSourceFunc)UpdateTimer, timerLabel);
+    gtk_container_add(GTK_CONTAINER(timerWindow), timerLabel);
 
-        gtk_main();
-    }
+    // Set the background color of the window to blue
+    const gchar *css = "* { background-color: #357EC7; }";
+    GtkCssProvider *provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(provider, css, -1, NULL);
+    gtk_style_context_add_provider_for_screen(screen, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+
+    // Show the timer window
+    gtk_widget_show_all(timerWindow);
+
+    g_timeout_add_seconds(1, (GSourceFunc)UpdateTimer, timerLabel);
+
+    // Start the GTK main loop for the timer window
+    // gtk_main();
 }
 
 gboolean UpdateTimer(GtkLabel *timerLabel) {
@@ -110,10 +122,13 @@ gboolean UpdateTimer(GtkLabel *timerLabel) {
     return FALSE;
 }
 
-// int main() {
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
     // Show a warning dialog
     ShowWarningDialog();
+
+    ShowTimerWindow();
+
+    gtk_main();
 
     return 0;
 }
