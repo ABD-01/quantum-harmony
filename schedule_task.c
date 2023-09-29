@@ -29,24 +29,22 @@ int main() {
     }
 
     // Calculate the end time of working hours
-    endHour = startHour + workHours;
-    endMinute = startMinute + workMinutes - warningMinutes;
-
-    if (endMinute < 0) {
-        endHour--;
-        endMinute += 60;
-    }
+    totalMinutes = startMinute + workMinutes - warningMinutes;
+    endMinute = totalMinutes % 60;
+    endHour = startHour + workHours + (totalMinutes / 60);
 
     printf("Scheduled task will run at: %02d:%02d\n", endHour, endMinute);
 
     char schtaskCommand[200];
 
     // Create the schtasks command
-    sprintf(schtaskCommand, "schtasks /create /tn stop_tasks /tr C:\\path\\to\\stop_tasks.exe /sc ONCE /st %02d:%02d", endHour, endMinute);
+    sprintf(schtaskCommand, "schtasks /create /tn stop_tasks /tr C:\\Users\\Muhammed\\projects\\taskControlC\\bin\\stop_tasks.exe /sc ONCE /st %02d:%02d /F", endHour, endMinute);
 
     // Execute the schtasks command to create the scheduled task
-    // system(schtaskCommand);
+    system(schtaskCommand);
     printf("%s\n", schtaskCommand);
+
+    Sleep(2000);
 
     return 0;
 }
