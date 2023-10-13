@@ -19,6 +19,11 @@ int main() {
     char confirm;
     scanf(" %c", &confirm);
 
+    while (confirm != 'y' && confirm != 'Y' && confirm != 'n' && confirm != 'N') {
+        printf("Invalid input. Please enter 'y' or 'n': ");
+        scanf(" %c", &confirm);
+    }
+
     if (confirm == 'n' || confirm == 'N') {
         printf("Enter your start time (HH:MM): ");
         scanf("%s", startTime);
