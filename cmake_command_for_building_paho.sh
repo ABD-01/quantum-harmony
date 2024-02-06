@@ -1,0 +1,3 @@
+cmake -G "MSYS Makefiles" -DCMAKE_C_COMPILER=C:/msys64/ucrt64/bin/gcc.exe -DCMAKE_AR=C:/msys64/ucrt64/bin/ar.exe -DOPENSSL_LIB_SEARCH_PATH=C:/msys64/usr/local/lib64/ -DOPENSSL_INC_SEARCH_PATH=C:/msys64/usr/local/include -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain.win64.cmake -DCMAKE_INSTALL_PREFIX=./local -DPAHO_WITH_SSL=TRUE -DPAHO_BUILD_SHARED=TRUE -DPAHO_BUILD_STATIC=TRUE  ..
+cmake --build . --target install
+cmake --build . --target package

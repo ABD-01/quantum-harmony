@@ -1,0 +1,43 @@
+cmake_minimum_required(VERSION 3.27.0)
+project("MQTT Client using Paho" VERSION 0.1.0 LANGUAGES C)
+
+# Set the Vcpkg toolchain file
+set(VCPKG_PATH "C:/dev/vcpkg" CACHE STRING "")
+set(CMAKE_TOOLCHAIN_FILE "${VCPKG_PATH}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+# set(CMAKE_C_COMPILER "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/Llvm/bin/clang.exe")
+
+# Add your source files
+set(SOURCE_FILES
+    mqtt_client.c
+    hexdump/hexdump.c
+    hexdump/hexdump.h
+)
+
+# Add executable target
+add_executable(mqtt_client_sub ${SOURCE_FILES})
+
+# Set include directories
+target_include_directories(mqtt_client_sub PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/hexdump
+    "${VCPKG_PATH}/installed/x64-windows/include"
+)
+
+# Set library directories
+target_link_directories(mqtt_client_sub PRIVATE
+    "${VCPKG_PATH}/installed/x64-windows/lib"
+)
+
+# Link against paho-mqtt library
+target_link_libraries(mqtt_client_sub PRIVATE paho-mqtt3cs)
+
+# Copy necessary DLLs to the output directory (for Windows)
+if(WIN32)
+    add_custom_command(TARGET mqtt_client_sub POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${VCPKG_PATH}/installed/x64-windows/bin/paho-mqtt3cs.dll"
+            $<TARGET_FILE_DIR:mqtt_client_sub>)
+endif()
+
+
+# cmake .. -DCMAKE_C_COMPILER='C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/Llvm/bin/clang.exe'
+# cmake .. -G "MSYS Makefiles" -DCMAKE_C_COMPILER=C:/msys64/ucrt64/bin/gcc.exe -DCMAKE_AR=C:/msys64/ucrt64/bin/ar.exe

@@ -1,0 +1,120 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#include "MQTTClient.h"
+#include "hexdump.h"
+
+#define NOCOLOR "\033[0m"
+#define YELLOW  "\033[33m"
+#define CYAN "\033[0;36m"
+#define BOLD "\033[1m"
+#define RED "\033[0;31m"
+#define MAGENTA "\033[0;35m"
+
+#define ADDRESS     "ssl://test.mosquitto.org:8884"
+#define CLIENTID    "AEPL_Test_Client"
+#define TOPIC       "Accolade_Testing"
+
+
+#define QOS         1
+#define TIMEOUT     10000L
+
+#define CA_CERT     "ca.pem"
+#define CLIENT_CERT "cc.pem"
+#define CLIENT_KEY  "ck.pem"
+
+int static NUM_PACKETS = 0;
+float static TOTAL_KBYTES = 0;
+
+int messageArrived(void *context, char *topicName, int topicLen, MQTTClient_message *message) {
+    printf("Received Message on %s:\n", topicName);
+    printf("Hexdump:\n");
+    hexdump(message->payload, message->payloadlen);
+    printf(YELLOW"Size: %d bytes"NOCOLOR"\n", message->payloadlen);
+    NUM_PACKETS++;
+    TOTAL_KBYTES += message->payloadlen / 1024.0;
+    printf(BOLD""CYAN"Total packets received: %d"NOCOLOR"\n", NUM_PACKETS);
+    printf(BOLD""CYAN"Total Kilo Bytes received: %.2fk B"NOCOLOR"\n", TOTAL_KBYTES);
+    printf("\n");
+    MQTTClient_freeMessage(&message);
+    MQTTClient_free(topicName);
+    return 1;
+}
+
+void connectionLost(void *context, char *cause)
+{
+    printf(RED"\nConnection lost"NOCOLOR"\n");
+    printf(RED"     cause: %s"NOCOLOR"\n", cause);
+}
+
+int main(int argc, char* argv[]) {
+    MQTTClient client;
+    int rc = EXIT_SUCCESS;
+
+    if ((rc = MQTTClient_create(&client, ADDRESS, CLIENTID, MQTTCLIENT_PERSISTENCE_NONE, NULL)) != MQTTCLIENT_SUCCESS) {
+        printf(RED"Failed to create client, return code %d"NOCOLOR"\n", rc);
+        rc = EXIT_FAILURE;
+        goto exit;
+    }
+
+    MQTTClient_SSLOptions ssl_opts = MQTTClient_SSLOptions_initializer ;
+    // ssl_opts.verify = 1;
+    ssl_opts.trustStore = CA_CERT;
+    ssl_opts.keyStore = CLIENT_CERT;
+    ssl_opts.privateKey = CLIENT_KEY;
+
+    MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
+    conn_opts.keepAliveInterval = 3600;
+    conn_opts.cleansession = 1;
+    conn_opts.username = NULL;
+    conn_opts.password = NULL;
+    conn_opts.ssl = &ssl_opts;
+
+    if ((rc = MQTTClient_setCallbacks(client, NULL, connectionLost, messageArrived, NULL)) != MQTTCLIENT_SUCCESS) {
+        printf(RED"Failed to set callbacks, return code %d"NOCOLOR"\n", rc);
+        rc = EXIT_FAILURE;
+        goto destroy_exit;
+    }
+
+    if ((rc = MQTTClient_connect(client, &conn_opts)) != MQTTCLIENT_SUCCESS) {
+        printf(RED"Failed to connect, return code %d"NOCOLOR"\n", rc);
+        rc =  EXIT_FAILURE;
+        goto destroy_exit;
+    }
+
+    if ((rc = MQTTClient_subscribe(client, TOPIC, QOS)) != MQTTCLIENT_SUCCESS) {
+        printf(RED"Failed to subscribe to the topic, return code %d"NOCOLOR"\n", rc);
+        rc = EXIT_FAILURE;
+    }
+    else
+    {
+        printf(MAGENTA"Successfully subscribed to topic \"%s\""NOCOLOR"\n", TOPIC);
+    }
+
+    printf("Use q/Q to quit cleanly\n");
+    int ch;
+    do
+    {
+        ch = getchar();
+    } while (ch!='Q' && ch != 'q');
+
+    if ((rc = MQTTClient_unsubscribe(client, TOPIC)) != MQTTCLIENT_SUCCESS) {
+        printf(RED"Failed to unsubscribe, return code %d"NOCOLOR"\n", rc);
+        rc = EXIT_FAILURE;
+    }
+
+    if ((rc = MQTTClient_disconnect(client, 10000)) != MQTTCLIENT_SUCCESS) {
+        printf(RED"Failed to disconnect, return code %d"NOCOLOR"\n", rc);
+        rc - EXIT_FAILURE;
+    }
+
+destroy_exit:
+    MQTTClient_destroy(&client);
+exit:
+    return rc;
+}
+
+// gcc mqtt_client.c -I eclipse-paho-mqtt-c/include/ -I hexdump/ -L eclipse-paho-mqtt-c/lib/ hexdump/hexdump.o -lpaho-mqtt3cs-static
+// cl .\mqtt_client.c /I .\hexdump\ /I C:\dev\vcpkg\packages\paho-mqtt_x64-windows\include\ /I C:\dev\vcpkg\packages\openssl_x64-windows\include\ /link C:\dev\vcpkg\packages\paho-mqtt_x64-windows\lib\paho-mqtt3cs.lib .\hexdump\hexdump.o
+// clang .\mqtt_client.c -I 'C:\dev\vcpkg\packages\paho-mqtt_x64-windows\include\' -I .\hexdump\ -L C:\dev\vcpkg\packages\paho-mqtt_x64-windows\lib\ -l paho-mqtt3cs .\hexdump\hexdump.o -o .\mqtt_client.exe

@@ -1,0 +1,70 @@
+  459  git clone git clone https://github.com/eclipse/paho.mqtt.c.git
+  460  git clone https://github.com/eclipse/paho.mqtt.c.git
+  461  cd paho.mqtt.c/
+  462  ls
+  463  make
+  464  pacman -S mingw-w64-ucrt-x86_64-gcc
+  465  gcc --version
+  466  make --help
+  467  make
+  468  ld
+  469  pacman -S mingw-w64-ucrt-x86_64-toolchain
+  470  ssl
+  471  opennssl
+  472  cd ..
+  473  exit
+  474  gcc .\mqtt_client.c -I .\eclipse-paho-mqtt-c\include\ -I .\hexdump\ -L .\eclipse-paho-mqtt-c\lib\ -o .\mqtt_client.exe -lpaho-mqtt3cs-static
+  475  gcc mqtt_client.c -I eclipse-paho-mqtt-c/include/ -I hexdump/ -L eclipse-paho-mqtt-c/lib/ -o mqtt_client.exe -lpaho-mqtt3cs-static
+  476  gcc mqtt_client.c -I eclipse-paho-mqtt-c/include/ -I hexdump/ -L eclipse-paho-mqtt-c/lib/ -o mqtt_cl
+  477  gcc -g hexdump/hexdump.c -o hexdump/hexdump.o
+  478  gcc -g -c hexdump/hexdump.c -o hexdump/hexdump.o
+  479  gcc mkPktRand.c -I hexdump/ hexdump/hexdump.o -o mkPktRand.exe
+  480  ./mkPktRand.exe 
+  481  gcc mqtt_client.c -I eclipse-paho-mqtt-c/include/ -I hexdump/ -L eclipse-paho-mqtt-c/lib/ -o mqtt_client.exe
+  482  gcc mqtt_client.c -I eclipse-paho-mqtt-c/include/ -I hexdump/ -L eclipse-paho-mqtt-c/lib/ -o mqtt_client.exe hexdump/hexdump.o
+  483  gcc mqtt_client.c -I eclipse-paho-mqtt-c/include/ -I hexdump/ -L eclipse-paho-mqtt-c/lib/ -o mqtt_client.exe hexdump/hexdump.o -lpaho
+  484  gcc mqtt_client.c -I eclipse-paho-mqtt-c/include/ -I hexdump/ -L eclipse-paho-mqtt-c/lib/ -o mqtt_client.exe hexdump/hexdump.o -lpaho-mqtt
+  485  gcc mqtt_client.c -I eclipse-paho-mqtt-c/include/ -I hexdump/ -L eclipse-paho-mqtt-c/lib/ -o mqtt_client.exe hexdump/hexdump.o -lpaho-mqtt3cs
+  486  gcc mqtt_client.c -I eclipse-paho-mqtt-c/include/ -I hexdump/ -L eclipse-paho-mqtt-c/lib/ -o mqtt_client.exe hexdump/hexdump.o -lpaho-mqtt3cs-static
+  487  gcc mqtt_client.c -I eclipse-paho-mqtt-c/include/ -I hexdump/ -L eclipse-paho-mqtt-c/lib/ -o mqtt_client.exe hexdump/hexdump.o -lpaho-mqtt3cs > error.txt 
+  488  gcc mqtt_client.c -I eclipse-paho-mqtt-c/include/ -I hexdump/ -L eclipse-paho-mqtt-c/lib/ -o mqtt_client.exe hexdump/hexdump.o -lpaho-mqtt3cs 
+  489  gcc mqtt_client.c -I eclipse-paho-mqtt-c/include/ -I hexdump/ -L eclipse-paho-mqtt-c/lib/ -o mqtt_client.exe hexdump/hexdump.o -lpaho-mqtt3cs-static > error.txt 
+  490  gcc mqtt_client.c -I eclipse-paho-mqtt-c/include/ -I hexdump/ -L eclipse-paho-mqtt-c/lib/ -o mqtt_client.exe hexdump/hexdump.o -lpaho-mqtt3cs-static > error.txt 2>&1
+  491  gcc mqtt_client.c -I eclipse-paho-mqtt-c/include/ -I hexdump/ -L eclipse-paho-mqtt-c/lib/ -o mqtt_client.exe hexdump/hexdump.o -lpaho-mqtt3cs-static -lmsvcrt -lssl -lcrypto 
+  492  gcc -version
+  493  gcc --version
+  494  gcc -v
+  495  ld -v
+  496  ld --version
+  497  exit
+  498  ./Configure mingw64 ...
+  499  git clone https://github.com/openssl/openssl.git
+  500  cd openssl/
+  501  ls
+  502  ./Configure mingw64 ...
+  503  make
+  504  ls
+  505  ./Configure 
+  506  make
+  507  cd ..
+  508  cd openssl/
+  509  make test
+  510  ./Configure List
+  511  ./Configure List | grep mingw
+  512  ./Configure List | grep mingw > ../error.txt 
+  513  ./Configure List | grep mingw > ../error.txt 2>&1
+  514  ./Configure List
+  515  echo $OPENSSLDIR
+  516  eco $OPENSSLDIR
+  517  echo $OPENSSLDIR
+  518* ./Configure mingw64 --openssldir=/usr/local/ssl --prefix=/usr/
+  519  make
+  520  ls
+  521  cd /usr
+  522  ls
+  523  ls local/
+  524  history > history.txt
+  525  rm history.txt 
+  526  cd -
+  527  cd ..
+  528  history > history.txt
