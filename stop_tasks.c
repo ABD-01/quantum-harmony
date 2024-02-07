@@ -105,6 +105,7 @@ gboolean UpdateTimer(GtkLabel *timerLabel) {
         system("taskkill /F /IM Acrobat.exe");
         system("taskkill /F /IM nvim.exe");
         system("taskkill /F /IM WindowsTerminal.exe");
+        system("shutdown /s /t 005");
         // Add more applications as needed
 
         // Close the timer window

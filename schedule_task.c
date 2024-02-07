@@ -6,8 +6,8 @@
 int main() {
     SYSTEMTIME currentTime;
     char startTime[10];
-    int workHours = 8;
-    int workMinutes = 45;
+    int workHours = 9;
+    int workMinutes = 30;
     int warningMinutes = 15;
     int startHour, startMinute, endHour, endMinute, totalMinutes;
 
