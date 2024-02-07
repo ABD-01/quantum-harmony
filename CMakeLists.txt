@@ -9,43 +9,55 @@ set(PAHO_LIB_DIR "${eclipse-paho-mqtt-c_DIR}/lib")
 set(PAHO_INCLUDE_DIR "${eclipse-paho-mqtt-c_DIR}/include")
 set(PAHO_BIN_DIR "${eclipse-paho-mqtt-c_DIR}/bin")
 
+# Define NUMCOLS during the build (default value is 24)
+set(NUMCOLS 24 CACHE INTEGER "Number of columns in hexdump")
+
 # Add your source files
 set(SOURCE_FILES
     mqtt_client.c
     hexdump/hexdump.c
-    hexdump/hexdump.h
 )
 
-# Add executable target
-add_executable(mqtt_client_sub ${SOURCE_FILES})
+# Function to add an executable target and copy DLL
+function(add_mqtt_target target_name ssl_enabled)
+    add_executable(${target_name} ${SOURCE_FILES})
+    
+    # Include Paho headers
+    target_include_directories(${target_name} PRIVATE ${PAHO_INCLUDE_DIR})
+    
+    # Include hexdump header
+    target_include_directories(${target_name} PRIVATE hexdump)
 
-# Include Paho headers
-target_include_directories(mqtt_client_sub PRIVATE ${PAHO_INCLUDE_DIR})
+    # Set library directory
+    target_link_directories(${target_name} PRIVATE ${PAHO_LIB_DIR})
 
-# include hexdump header
-target_include_directories(mqtt_client_sub PRIVATE hexdump)
+    # Pass NUMCOLS as preprocessor definition
+    target_compile_definitions(${target_name} PRIVATE NUMCOLS=${NUMCOLS})
+    
+    # Link against Paho libraries based on SSL
+    if (${ssl_enabled})
+        target_link_libraries(${target_name} PRIVATE paho-mqtt3cs)
+        target_compile_definitions(${target_name} PRIVATE SSL_ENABLED)
+        add_custom_command(TARGET ${target_name} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${PAHO_BIN_DIR}/libpaho-mqtt3cs.dll"
+                $<TARGET_FILE_DIR:${target_name}>)
+    else()
+        target_link_libraries(${target_name} PRIVATE paho-mqtt3c)
+        add_custom_command(TARGET ${target_name} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${PAHO_BIN_DIR}/libpaho-mqtt3c.dll"
+                $<TARGET_FILE_DIR:${target_name}>)
+    endif()
+endfunction()
 
-# set library directory 
-target_link_directories(mqtt_client_sub PRIVATE ${PAHO_LIB_DIR})
+# Build with SSL support
+add_mqtt_target(mqtt_client_ssl TRUE)
 
-# Link against Paho libraries
-target_link_libraries(mqtt_client_sub PRIVATE
-    paho-mqtt3cs
-    # paho-mqtt3as
-    # Add other Paho libraries as needed
-)
-
-
-# Copy necessary DLLs to the output directory (for Windows)
-if(WIN32)
-    add_custom_command(TARGET mqtt_client_sub POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${PAHO_BIN_DIR}/libpaho-mqtt3cs.dll"
-            $<TARGET_FILE_DIR:mqtt_client_sub>)
-endif()
+# Build without SSL support
+add_mqtt_target(mqtt_client FALSE)
 
 message("Processing CMakeLists.txt")
-
 message("  C: '${CMAKE_C_COMPILER}'")
 message("  C++: '${CMAKE_CXX_COMPILER}'")
 
