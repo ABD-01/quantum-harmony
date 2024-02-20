@@ -97,5 +97,9 @@ int main(int argc, char **argv)
 
     free(buffer);
 
+    // Wait for user input before exiting
+    printf("\nPress enter to exit...");
+    getchar();
+
     return 0;
 }
