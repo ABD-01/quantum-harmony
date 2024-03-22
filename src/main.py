@@ -21,6 +21,9 @@ tested on python 3.11.8 on windows 11 x64
 
 # dependencies
 pip3 install tk
+
+# make the uds_stack available to python
+export PYTHONPATH="$PWD/src/uds_stack"
 '''
 
 import app_logic

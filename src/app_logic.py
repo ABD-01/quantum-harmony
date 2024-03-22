@@ -17,9 +17,23 @@ date        22 March 2024
 author      Eshwar J <eshwar.jorvekar@accoladeelectronics.com>
 '''
 
-import threading        # for threading
-import time             # for sleep
-import ui               # for using the GUI constructs to interact with FSM in thread
+import threading                    # for threading
+import time                         # for sleep
+import ui                           # for using the GUI constructs to interact with FSM in thread
+import PCAN_UDS_2013 as udsModule   # import uds library
+
+# import the dlls required for stack
+
+import os
+import sys
+from pathlib import Path
+
+dll_path = Path(__file__).resolve().parent / "uds_stack"
+sys.path.insert(0, str(dll_path))
+os.add_dll_directory(str(dll_path))
+
+# create uds library object
+objPCANUds = udsModule.PCAN_UDS_2013()
 
 class FsmThread(threading.Thread):
     def __init__(self, stop_event):
@@ -69,6 +83,7 @@ def stop_thread():
 def on_close():
     stop_thread()
     root.destroy()
+    print('thread: destroyed')
 
 root = ui.create_gui()
 
