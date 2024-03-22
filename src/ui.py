@@ -1,5 +1,4 @@
 '''\
-
 Copyright 2024-2025 Accolade Electronics Pvt. Ltd
 
 This program is free software; you can redistribute it and/or
@@ -16,7 +15,6 @@ brief       This is the source file for the GUI constructs
 
 date        22 March 2024
 author      Eshwar J <eshwar.jorvekar@accoladeelectronics.com>
-
 '''
 
 import tkinter as tk
