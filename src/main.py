@@ -27,7 +27,7 @@ pip3 install tk
 
 import threading        # for threading
 import time             # for sleep
-import tkinter as tk    # GUI library
+import ui               # for GUI constructs
 
 # this thread is responsible for UDS communication
 class FsmThread(threading.Thread):
@@ -74,36 +74,25 @@ def idle_thread():
 def stop_thread():
     fsm_thread.stop_thread()
 
+# Function to handle application exit
+def on_close():
+    stop_thread()
+    root.destroy()
+
+root = ui.create_gui()
+
 def main():
     # Start the thread
     fsm_thread.start()
 
-    # Create a tkinter GUI
-    root = tk.Tk()
-    root.title("Accolade Service Tool")
+    # Create GUI buttons and assign functions to call
+    ui.create_buttons(root, start_thread, idle_thread)
 
-# GUI constructs
-    # Set the size of the GUI window
-    root.geometry("600x400")
+    # Bind the closing event
+    ui.bind_close_event(root, on_close)
 
-    # Start button
-    start_button = tk.Button(root, text="Start", command=start_thread)
-    start_button.pack()
-
-    # Idle button
-    idle_button = tk.Button(root, text="Idle", command=idle_thread)
-    idle_button.pack()
-
-    # Function to handle application exit
-    def on_close():
-        stop_thread()
-        root.destroy()
-
-    # Bind the closing event to the function
-    root.protocol("WM_DELETE_WINDOW", on_close)
-
-    # Start the tkinter event loop
-    root.mainloop()
+    # Run the GUI
+    ui.run_gui(root)
 
 if __name__ == "__main__":
     main()
