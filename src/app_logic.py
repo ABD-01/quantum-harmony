@@ -19,7 +19,7 @@ author      Eshwar J <eshwar.jorvekar@accoladeelectronics.com>
 
 import threading                    # for threading
 import time                         # for sleep
-import ui                           # for using the GUI constructs to interact with FSM in thread
+import app_ui                       # for using the GUI constructs to interact with FSM in thread
 import PCAN_UDS_2013 as udsModule   # import uds library
 
 # import the dlls required for stack
@@ -85,7 +85,7 @@ def on_close():
     root.destroy()
     print('thread: destroyed')
 
-root = ui.create_gui()
+root = app_ui.create_gui()
 
 def start():
 
@@ -93,10 +93,10 @@ def start():
     fsm_thread.start()
 
     # Create GUI buttons and assign functions to call on user 'click'
-    ui.create_buttons(root, start_thread, idle_thread)
+    app_ui.create_buttons(root, start_thread, idle_thread)
 
     # Bind the GUI closing event for destroying thread
-    ui.bind_close_event(root, on_close)
+    app_ui.bind_close_event(root, on_close)
 
     # Run the GUI
-    ui.run_gui(root)
+    app_ui.run_gui(root)
