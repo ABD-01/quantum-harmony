@@ -22,14 +22,13 @@ tested on python 3.11.8 on windows 11 x64
 # dependencies
 pip3 install tk
 
-# make the uds_stack available to python
-export PYTHONPATH="$PWD/src/uds_stack"
+# run the script to launch app
+launch_app.sh
 '''
 
 import app_logic
 
 def main():
-
     app_logic.start()
 
 if __name__ == "__main__":
