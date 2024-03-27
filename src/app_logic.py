@@ -21,6 +21,7 @@ import threading                    # for threading
 import time                         # for sleep
 import app_ui                       # for using the GUI constructs to interact with FSM in thread
 import PCAN_UDS_2013 as udsModule   # import uds library
+from tkinter import filedialog
 
 # import the dlls required for stack
 
@@ -45,20 +46,24 @@ class FsmThread(threading.Thread):
     def run(self):
         while not self._stop_event.is_set():
             with self._lock:
-                if self._state == 'RUN':
-                    print("thread: RUN")
-                elif self._state == 'IDLE':
-                    print("thread: IDLE")
+                if self._state == 'IDLE':
+                    pass
+                elif self._state == 'BOOT_LOCK':
+                    pass
+                elif self._state == 'FILE_UPLOAD':
+                    pass
             time.sleep(0.1)
         print("thread: exit")
 
-    def start_thread(self):
+    def fsm_transition_boot_lock(self):
+        app_ui.append_log(log_window, 'trying to lock into bootloader...')
         with self._lock:
-            self._state = 'RUN'
-
-    def idle_thread(self):
+            self._state = 'BOOT_LOCK'
+    
+    def fsm_transition_upload_file(self):
+        app_ui.append_log(log_window, 'initiating file upload...')
         with self._lock:
-            self._state = 'IDLE'
+            self._state = 'FILE_UPLOAD'
 
     def stop_thread(self):
         self._stop_event.set()
@@ -70,11 +75,17 @@ stop_event = threading.Event()
 # Create an instance of the thread
 fsm_thread = FsmThread(stop_event)
 
-def start_thread():
-    fsm_thread.start_thread()
+def browse_file():
+    file_path = filedialog.askopenfilename()
+    if file_path:
+        path =  "\r\nselected file " + file_path
+        app_ui.append_log(log_window, path)
 
-def idle_thread():
-    fsm_thread.idle_thread()
+def boot_lock():
+    fsm_thread.fsm_transition_boot_lock()
+
+def upload_file():
+    fsm_thread.fsm_transition_upload_file()
 
 def stop_thread():
     fsm_thread.stop_thread()
@@ -88,12 +99,17 @@ def on_close():
 root = app_ui.create_gui()
 
 def start():
-
     # Start the background thread for finite state machine
     fsm_thread.start()
 
     # Create GUI buttons and assign functions to call on user 'click'
-    app_ui.create_buttons(root, start_thread, idle_thread)
+    app_ui.create_buttons(root, browse_file, boot_lock, upload_file)
+    
+    global log_window
+    log_window = app_ui.create_log_window(root)
+
+    app_ui.append_log(log_window, "Tool version 0.1.0, Build date 26 Mar 2024")
+    app_ui.append_log(log_window, "Software usage is restricted to Accolade service engineers or representatives only")
 
     # Bind the GUI closing event for destroying thread
     app_ui.bind_close_event(root, on_close)
