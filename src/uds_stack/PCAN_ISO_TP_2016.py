@@ -228,6 +228,7 @@ PCANTP_INFOSTATUS_CAUTION_DATA_LENGTH_MODIFIED = cantp_infostatus(0X04) # Data L
 PCANTP_INFOSTATUS_CAUTION_FD_FLAG_MODIFIED = cantp_infostatus(0X08) # FD related flags value were modified by the API
 PCANTP_INFOSTATUS_CAUTION_RX_QUEUE_FULL = cantp_infostatus(0X10) # Message receive queue is full (oldest messages may be lost)
 PCANTP_INFOSTATUS_CAUTION_BUFFER_IN_USE = cantp_infostatus(0X20) # Buffer is used by another thread or API
+PCANTP_INFOSTATUS_CAUTION_RX_QUEUE_OVERRUN = cantp_infostatus(0X30) # Internal queue read too late (a frame was lost).
 
 # Represents the PCAN error and status codes
 cantp_pcanstatus = c_uint32
@@ -294,6 +295,8 @@ PCANTP_STATUS_CAUTION_DATA_LENGTH_MODIFIED = cantp_status(PCANTP_INFOSTATUS_CAUT
 PCANTP_STATUS_CAUTION_FD_FLAG_MODIFIED = cantp_status(PCANTP_INFOSTATUS_CAUTION_FD_FLAG_MODIFIED.value << PCANTP_STATUS_OFFSET_INFO) # FD flags of the input was modified
 PCANTP_STATUS_CAUTION_RX_QUEUE_FULL = cantp_status(PCANTP_INFOSTATUS_CAUTION_RX_QUEUE_FULL.value << PCANTP_STATUS_OFFSET_INFO) # Receive queue is full
 PCANTP_STATUS_CAUTION_BUFFER_IN_USE = cantp_status(PCANTP_INFOSTATUS_CAUTION_BUFFER_IN_USE.value << PCANTP_STATUS_OFFSET_INFO) # Buffer is used by another thread or API
+PCANTP_STATUS_CAUTION_RX_QUEUE_OVERRUN = cantp_status(PCANTP_INFOSTATUS_CAUTION_RX_QUEUE_OVERRUN.value << PCANTP_STATUS_OFFSET_INFO) # Internal queue read too late (a frame was lost).
+
 # Lower API status code: see also PCANTP_STATUS_xx macros
 PCANTP_STATUS_FLAG_PCAN_STATUS = cantp_status(0X80000000) # PCAN error flag, remove flag to get a usable PCAN error/status code (cf. PCANBasic API)
 # Masks to merge/retrieve different PCANTP status by type in a cantp_status
@@ -374,6 +377,7 @@ cantp_msgflag = c_uint32
 PCANTP_MSGFLAG_NONE = cantp_msgflag(0) # no flag
 PCANTP_MSGFLAG_LOOPBACK = cantp_msgflag(1) # message is the confirmation of a transmitted message
 PCANTP_MSGFLAG_ISOTP_FRAME = cantp_msgflag(2) # message is a frame of a segmented ISO-TP message
+PCANTP_MSGFLAG_QOVERRUN_OCCURED = cantp_msgflag(4) # a QOVERRUN error occured while processing this message (confirmation via echo message is not confirmed)
 
 
 # Represents the flags of a CAN or CAN FD frame (must be used as flags for ex. EXTENDED|FD|BRS.) (see field "cantp_msg.can_info.can_msgtype")
@@ -521,12 +525,12 @@ PCANTP_TIMEOUT_TOLERANCE				=0			# Default value for timeout tolerance [0..100] 
 # Standard ISO-15765-4 (OBDII) values
 PCANTP_STMIN_ISO_15765_4				=0			# OBDII value for Separation time
 PCANTP_BS_ISO_15765_4					=0			# OBDII value for BlockSize
-PCANTP_TIMEOUT_AR_ISO_15765_4			=(1000*25)	# OBDII value for Timeout Ar in microseconds
-PCANTP_TIMEOUT_AS_ISO_15765_4			=(1000*25)	# OBDII value for Timeout As in microseconds
+PCANTP_TIMEOUT_AR_ISO_15765_4			=(1000*33)	# OBDII value for Timeout Ar in microseconds
+PCANTP_TIMEOUT_AS_ISO_15765_4			=(1000*33)	# OBDII value for Timeout As in microseconds
 PCANTP_TIMEOUT_BR_ISO_15765_4			=(1000*75)	# OBDII value for Timeout Br in microseconds
 PCANTP_TIMEOUT_BS_ISO_15765_4			=(1000*75)	# OBDII value for Timeout Bs in microseconds
 PCANTP_TIMEOUT_CR_ISO_15765_4			=(1000*150)	# OBDII value for Timeout Cr in microseconds
-PCANTP_TIMEOUT_CS_ISO_15765_4			=(1000*150)	# OBDII value for Timeout Cs in microseconds
+PCANTP_TIMEOUT_CS_ISO_15765_4			=(1000*17)	# OBDII value for Timeout Cs in microseconds (Cs+As < 50ms)
 
 
 # Values for cfg_value
