@@ -247,7 +247,7 @@ PUDS_NRC_RTNA = uds_nrc(0x94)     # Resource Temporarily Not Available
 
 # PUDS ISO_15765_4 11 bit CAN ID definitions
 PUDS_ISO_15765_4_CAN_ID_FUNCTIONAL_REQUEST      = 0x7DF        # CAN ID for functionally addressed request messages sent by external test equipment
-PUDS_ISO_15765_4_CAN_ID_PHYSICAL_REQUEST_1      = 0x726        # physical request CAN ID from external test equipment to ECU #1
+PUDS_ISO_15765_4_CAN_ID_PHYSICAL_REQUEST_1      = 0x7E0        # physical request CAN ID from external test equipment to ECU #1
 PUDS_ISO_15765_4_CAN_ID_PHYSICAL_RESPONSE_1     = 0x7E8        # physical response CAN ID from ECU #1 to external test equipment
 PUDS_ISO_15765_4_CAN_ID_PHYSICAL_REQUEST_2      = 0x7E1        # physical request CAN ID from external test equipment to ECU #2
 PUDS_ISO_15765_4_CAN_ID_PHYSICAL_RESPONSE_2     = 0x7E9        # physical response CAN ID from ECU #2 to external test equipment
@@ -267,7 +267,7 @@ PUDS_ISO_15765_4_CAN_ID_PHYSICAL_RESPONSE_8     = 0x7EF        # physical respon
 # PUDS ISO_15765_4 address definitions
 PUDS_ISO_15765_4_ADDR_TEST_EQUIPMENT            = 0xF1     # external test equipment
 PUDS_ISO_15765_4_ADDR_OBD_FUNCTIONAL            = 0x33     # OBD funtional system
-PUDS_ISO_15765_4_ADDR_ECU_1                     = 0x33     # ECU 1
+PUDS_ISO_15765_4_ADDR_ECU_1                     = 0x01     # ECU 1
 PUDS_ISO_15765_4_ADDR_ECU_2                     = 0x02     # ECU 2
 PUDS_ISO_15765_4_ADDR_ECU_3                     = 0x03     # ECU 3
 PUDS_ISO_15765_4_ADDR_ECU_4                     = 0x04     # ECU 4

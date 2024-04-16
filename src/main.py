@@ -15,7 +15,7 @@ file        main.py
 brief       This is the main script file for launching the service tool application
 
 date        22 March 2024
-author      Eshwar J <eshwar.jorvekar@accoladeelectronics.com>
+author      Accolade Electronics <www.accoladeelectronics.com>
 
 tested on python 3.11.8 on windows 11 x64
 

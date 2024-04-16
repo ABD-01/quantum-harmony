@@ -2,3 +2,14 @@ __pycache__/
 reference/
 build/
 dist/
+*.spec
+tmp_code.py
+src/PCANBasic.py
+src/PCAN_ISO_TP_2016.py
+src/PCAN_UDS_2013.py
+src/tmp.py
+src/PCAN-ISO-TP.dll
+src/PCAN-UDS.dll
+src/PCANBasic.dll
+src/aepl.ico
+src/background.gif
