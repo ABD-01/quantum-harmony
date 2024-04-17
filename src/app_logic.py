@@ -86,7 +86,6 @@ def connect_can():
             app_ui.set_btn_enabled('BOOT_LOCK_BTN', True)
         elif int_tester_id == 0x18DA33F1:
             app_ui.set_btn_enabled('BROWSE_BTN', True)
-            app_ui.set_btn_enabled('UPLOAD_BTN', True)
         # end tmp code
         app_ui.g_combobox.config(state='disabled')
         app_ui.g_text_input_tester_id.config(state='disabled')
@@ -110,14 +109,12 @@ def boot_lock():
     if app_comm.testTesterPresent(handle, config) == False:
         print('app_logic : tester present test failed')
         app_ui.set_btn_enabled('BROWSE_BTN', True)
-        app_ui.set_btn_enabled('UPLOAD_BTN', True)
 
 def upload_file():
     print('app_logic : initiating file upload...')
     app_ui.append_log('initiating file upload...')
 
     app_ui.set_btn_enabled('BROWSE_BTN', False)
-    app_ui.set_btn_enabled('UPLOAD_BTN', False)
 
     app_comm.perform_service_tests()
 
