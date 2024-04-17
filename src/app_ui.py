@@ -19,6 +19,8 @@ author      Accolade Electronics <www.accoladeelectronics.com>
 
 import tkinter as tk           # for core tk
 from tkinter import ttk        # for progressbar
+from tkinter import font
+from __version__ import VERSION
 
 ########################################### (GUI creation) ####################################################
 
@@ -28,7 +30,7 @@ def create_gui():
     root = tk.Tk()
     root.title('Accolade Service Tool')
     root.geometry('600x400')
-    icon_path = get_resource_path(r'resources/aepl.ico')
+    icon_path = get_resource_path('resources/aepl.ico')
 
     # Set the window title icon
     root.iconbitmap(icon_path)
@@ -39,7 +41,7 @@ def create_gui():
     root.resizable(False, False)
 
     # Load the background image
-    background_image = tk.PhotoImage(file=get_resource_path(r'resources/background.gif'))
+    background_image = tk.PhotoImage(file=get_resource_path('resources/background.gif'))
 
     # Create a label to display the background image
     background_label = tk.Label(root, image=background_image)
@@ -56,13 +58,16 @@ def on_combobox_selected(event):
     print("app_ui    : selected", g_combobox.get())
 
 def create_labels(root):
-    sw_label = tk.Label(root, text='uCommander v0.2', font=('White Rabbit', 24), bg='white')
+
+    load_fonts()
+    
+    sw_label = tk.Label(root, text='uCommander v{}'.format(VERSION), font=('White Rabbit', 24), bg='white')
     sw_label.place(x=200, y=30)
 
     version_label = tk.Label(root, text='build 15 Apr 2024', font=('White Rabbit', 9), bg='white')
     version_label.place(x=350, y=60)
 
-    label_font = ('Fira Sans', 10)
+    label_font = font.Font(root, family='Fira Sans', size=10, weight='normal')
     label = tk.Label(root, text="Bit rate", font=label_font, bg='white')
     label.place(x=50, y=120)
 
@@ -248,6 +253,32 @@ def show_dialog(type, message):
 def browse_file_from_disk():
     # return the file path
     return filedialog.askopenfilename()
+
+def load_fonts():
+    _load_font(get_resource_path("resources/fonts/fira-sans.regular.ttf"))
+    _load_font(get_resource_path("resources/fonts/TitilliumWeb-Regular.ttf"))
+    _load_font(get_resource_path("resources/fonts/whitrabt.ttf"))
+    
+def _load_font(font_path: str, private: bool = False, enumerable: bool = False) -> bool:
+    """ Function taken from: https://stackoverflow.com/questions/11993290/truly-custom-font-in-tkinter/30631309#30631309 """
+
+    from ctypes import windll, byref, create_unicode_buffer, create_string_buffer
+
+    FR_PRIVATE = 0x10
+    FR_NOT_ENUM = 0x20
+
+    if isinstance(font_path, bytes):
+        path_buffer = create_string_buffer(font_path)
+        add_font_resource_ex = windll.gdi32.AddFontResourceExA
+    elif isinstance(font_path, str):
+        path_buffer = create_unicode_buffer(font_path)
+        add_font_resource_ex = windll.gdi32.AddFontResourceExW
+    else:
+        raise TypeError('font_path must be of type bytes or str')
+
+    flags = (FR_PRIVATE if private else 0) | (FR_NOT_ENUM if not enumerable else 0)
+    num_fonts_added = add_font_resource_ex(byref(path_buffer), flags, 0)
+    return bool(min(num_fonts_added, 1))
 
 def get_resource_path(relative_path):
     '''

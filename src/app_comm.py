@@ -17,6 +17,10 @@ date        01 Apr 2024
 author      Accolade Electronics <www.accoladeelectronics.com>
 '''
 
+import sys
+import os.path as osp
+sys.path.append(osp.join(osp.dirname(osp.abspath(__file__)), 'uds_stack'))
+
 ########################################### (UDS over CAN: core initialization) ####################################################
 
 import threading                # for file upload thread

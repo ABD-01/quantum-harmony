@@ -41,6 +41,10 @@ pyinstaller --name uCommander_v${VERSION}.exe --log-level WARN \
 # exit 0
 cd $PROJECT_DIRECTORY
 WORKING_DIRECTORY=./artifacts/uCommander_v$VERSION
+if [ -d "$WORKING_DIRECTORY" ]; then
+    echo "[i] Removing old artifacts"
+    rm -rf $WORKING_DIRECTORY
+fi
 mkdir -p $WORKING_DIRECTORY
 
 echo "[i] Copying artifacts"
@@ -50,10 +54,6 @@ cp -v ./doc/release_notes/*.pdf $WORKING_DIRECTORY/
 cd $WORKING_DIRECTORY
 
 7z a uCommander_v${VERSION}.zip uCommander_v${VERSION}.exe release_notes_v${VERSION}.pdf
-
-# rm -rf ./artifacts/uCommander/*
-
-# cp *.zip ./artifacts/uCommander/
 
 # cleanup
 cd $PROJECT_DIRECTORY
