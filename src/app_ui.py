@@ -17,10 +17,10 @@ date        22 March 2024
 author      Accolade Electronics <www.accoladeelectronics.com>
 '''
 
-import tkinter as tk           # for core tk
-from tkinter import ttk        # for progressbar
-from tkinter import font
-from __version__ import VERSION
+import tkinter as tk            # for core tk
+from tkinter import ttk         # for progressbar
+from tkinter import font        # for fonts
+from __version__ import VERSION # for tool versioning
 
 ########################################### (GUI creation) ####################################################
 
@@ -64,7 +64,7 @@ def create_labels(root):
     sw_label = tk.Label(root, text='uCommander v{}'.format(VERSION), font=('White Rabbit', 24), bg='white')
     sw_label.place(x=200, y=30)
 
-    version_label = tk.Label(root, text='build 15 Apr 2024', font=('White Rabbit', 9), bg='white')
+    version_label = tk.Label(root, text='build 17 Apr 2024', font=('White Rabbit', 9), bg='white')
     version_label.place(x=350, y=60)
 
     label_font = font.Font(root, family='Fira Sans', size=10, weight='normal')

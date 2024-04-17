@@ -17,9 +17,9 @@ date        01 Apr 2024
 author      Accolade Electronics <www.accoladeelectronics.com>
 '''
 
-import sys
-import os.path as osp
-sys.path.append(osp.join(osp.dirname(osp.abspath(__file__)), 'uds_stack'))
+# For PCAN stack python modules
+import os, sys
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uds_stack'))
 
 ########################################### (UDS over CAN: core initialization) ####################################################
 
@@ -32,8 +32,6 @@ import app_ui                   # for updating percentage progress to ui
 g_nbErr = 0
 
 # import the dlls required for stack
-import os
-import sys
 from pathlib import Path
 
 dll_path = Path(__file__).resolve().parent /'uds_stack'
