@@ -38,9 +38,8 @@ pyinstaller --name uCommander_v${VERSION}.exe --log-level WARN \
     --hidden-import platform \
     main.py
 
-# exit 0
 cd $PROJECT_DIRECTORY
-WORKING_DIRECTORY=./artifacts/uCommander_v$VERSION
+WORKING_DIRECTORY=./artifacts/uCommander
 if [ -d "$WORKING_DIRECTORY" ]; then
     echo "[i] Removing old artifacts"
     rm -rf $WORKING_DIRECTORY
