@@ -1,0 +1,8 @@
+[submodule "mqtt-client-sub"]
+	path = mqtt-client-sub
+	url = https://github.com/ABD-01/quantum-harmony
+	branch = mqtt-client-sub
+[submodule "server-fota-crc-multithreading"]
+	path = server-fota-crc-multithreading
+	url = https://github.com/ABD-01/quantum-harmony
+	branch = server-fota-crc-multithreading
