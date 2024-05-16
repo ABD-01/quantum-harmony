@@ -82,10 +82,11 @@ def connect_can():
     if app_comm.can_init(bit_rate, int_tester_id, int_ecu_id) == True:
         app_ui.set_btn_enabled('CONNECT_BTN', False)
         # tmp code: code kept until boot lock button dependency is present 
-        if int_tester_id == 0xCDA33F1:
+        # if int_tester_id == 0xCDA33F1:
+        if 2==2:
             app_ui.set_btn_enabled('BOOT_LOCK_BTN', True)
-        elif int_tester_id == 0x18DA33F1:
-            app_ui.set_btn_enabled('BROWSE_BTN', True)
+        # elif int_tester_id == 0x18DA33F1:
+        app_ui.set_btn_enabled('BROWSE_BTN', True)
         # end tmp code
         app_ui.g_combobox.config(state='disabled')
         app_ui.g_text_input_tester_id.config(state='disabled')

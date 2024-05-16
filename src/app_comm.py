@@ -95,10 +95,10 @@ def can_init(bit_rate, tester_id, ecu_id):
     print('app_comm  : Get response timeout value (%ums): %s' % (timeout_response.value, print_test_status(status)))
 
     # CAN-TP PRIORITY bits.
-    can_tp_prio = c_uint32(0)
-    status = objPCANUds.GetValue_2013(g_pcan_handle, PUDS_PARAMETER_J1939_PRIORITY, can_tp_prio,
-                                    sizeof(can_tp_prio))
-    print('app_comm  : Get default PUDS_PARAMETER_J1939_PRIORITY (%ums): %s' % (can_tp_prio.value, print_test_status(status)))
+    # can_tp_prio = c_uint32(0)
+    # status = objPCANUds.GetValue_2013(g_pcan_handle, PUDS_PARAMETER_J1939_PRIORITY, can_tp_prio,
+                                    # sizeof(can_tp_prio))
+    # print('app_comm  : Get default PUDS_PARAMETER_J1939_PRIORITY (%ums): %s' % (can_tp_prio.value, print_test_status(status)))
 
     # fixme: understand why is it required for this id
     if tester_id == 0x0CDA33F1:
@@ -109,16 +109,15 @@ def can_init(bit_rate, tester_id, ecu_id):
         print('app_comm  : New PUDS_PARAMETER_J1939_PRIORITY (%ums): %s' % (can_tp_prio.value, print_test_status(status)))
     # end fixme
 
-    status = objPCANUds.AddCanIdFilter_2013(g_pcan_handle, tester_id)
-    print('app_comm  : Add can id filter', hex(tester_id), print_test_status(status))
-
     # extract the source and destination ids. ECU is UDS server and Tester is UDS client
     client_id = tester_id & 0x00000FF
     server_id = ecu_id & 0x00000FF
 
     # Define Network Address Information used for all the tests
+    g_pcan_config.can_id = tester_id
     g_pcan_config.can_msgtype = PCANTP_CAN_MSGTYPE_EXTENDED
-    g_pcan_config.nai.protocol = PUDS_MSGPROTOCOL_ISO_15765_2_29B_FIXED_NORMAL
+    # g_pcan_config.nai.protocol = PUDS_MSGPROTOCOL_ISO_15765_2_29B_FIXED_NORMAL
+    g_pcan_config.nai.protocol = PUDS_MSGPROTOCOL_ISO_15765_2_29B_EXTENDED 
     g_pcan_config.nai.target_type = PCANTP_ISOTP_ADDRESSING_PHYSICAL
     g_pcan_config.type = PUDS_MSGTYPE_USDT
     g_pcan_config.nai.source_addr = client_id
@@ -180,6 +179,15 @@ def testTesterPresent(channel, config):
 
     print('app_comm  : broadcasting tester present for 5 seconds')
     result = False
+
+    # print all values of config structure
+    print("Can Id: " + hex(config.can_id))
+    print("Can Msgtype: " + hex(config.can_msgtype))
+    print("Nai Protocol: " + hex(config.nai.protocol))
+    print("Nai Target Type: " + hex(config.nai.target_type))
+    print("Type: " + hex(config.type))
+    print("Nai Source Addr: " + hex(config.nai.source_addr))
+    print("Nai Target Addr: " + hex(config.nai.target_addr))
 
     start_time = time.time()
 
