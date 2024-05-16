@@ -1,0 +1,14 @@
+title = "uCommander"
+version = "0.2.1"
+
+# TODO: get a better name for this list
+[[supported_projects]]
+name = "Bajaj 2 wheeler"
+identifier = "DIET"
+can_id = 0xCDA33F1
+requires = {field="VinNo", default="DIET_111_15"}
+
+[[supported_projects]]
+name = "Gradient Sensor"
+identifier = "GradS"
+can_id = 0x1BDAA2F1
