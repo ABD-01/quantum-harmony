@@ -1,0 +1,9 @@
+remote_theme: jekyll-theme-midnight
+
+title: Quantum Harmony
+description: >
+  Random stuff I keep doing to learn about new topics, packages, languages, frameworks and whatever else is out there.
+
+github:
+  zip_url: http://example.com/download.zip
+  another_url: another value
