@@ -1,14 +1,37 @@
 title = "uCommander"
-version = "0.2.1"
+version = "0.2.2"
 
-# TODO: get a better name for this list
-[[supported_projects]]
+[[projects]]
 name = "Bajaj 2 wheeler"
 identifier = "DIET"
 can_id = 0xCDA33F1
-requires = {field="VinNo", default="DIET_111_15"}
+[[projects.requires]]
+field = "VinNo"
+default = "DIET_111_15"
+type = "string"
 
-[[supported_projects]]
+
+[[projects]]
 name = "Gradient Sensor"
-identifier = "GradS"
+identifier = "GradSens"
 can_id = 0x1BDAA2F1
+requires = []
+
+[[projects]]
+can_id = 0xdeadbeef
+identifier = "Test"
+name = "Test Project"
+[[projects.requires]]
+field = "foo"
+type = "string"
+default = 10
+
+[[projects.requires]]
+field = "bar"
+type = "string"
+
+[[projects.requires]]
+field = "baz"
+type = "string"
+
+

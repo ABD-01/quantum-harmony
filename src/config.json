@@ -1,0 +1,45 @@
+{
+  "title": "uCommander",
+  "version": "0.2.2",
+
+  "projects": [
+    {
+      "name": "Bajaj 2 wheeler",
+      "identifier": "DIET",
+      "can_id": 215626737,
+      "requires": [
+        {
+          "field": "VinNo",
+          "default": "DIET_111_15",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "Gradient Sensor",
+      "identifier": "GradSens",
+      "can_id": 467313393,
+      "requires": []
+    },
+    {
+      "can_id": 233495534,
+      "identifier": "Test",
+      "name": "Test Project",
+      "requires": [
+        {
+          "field": "foo",
+          "type": "string",
+          "default": 10
+        },
+        {
+          "field": "bar",
+          "type": "string"
+        },
+        {
+          "field": "baz",
+          "type": "string"
+        }
+      ]
+    }
+  ]
+}

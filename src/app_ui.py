@@ -17,6 +17,7 @@ date        22 March 2024
 author      Accolade Electronics <www.accoladeelectronics.com>
 '''
 
+import json
 import tkinter as tk            # for core tk
 from tkinter import ttk         # for progressbar
 from tkinter import font        # for fonts
@@ -50,9 +51,30 @@ def create_gui():
     # To prevent garbage collection of the image object
     background_label.image = background_image
 
+    # JSON CONFIG
+    global g_config
+    g_config = json.load(open(get_resource_path('config.json')))
+    # g_config = toml.load(open(get_resource_path('config.json')))
+
     print('app_ui    : created ui root')
 
     return root
+
+def on_project_selected(event):
+    current = g_projectcombobox.current()
+    requires = g_config['projects'][current - 1]['requires']
+    if current == 0:
+        show_dialog('Error', 'Must choose a project')
+        return
+    print("app_ui    : selected", g_combobox.get())
+    g_projectcombobox.config(state='disabled')
+
+    if requires:
+        global g_additionaldetails
+        dialog = AdditionalDialog(root, requires)
+        g_additionaldetails = dialog.result
+        print('app_ui    : additional details', g_additionaldetails)
+    set_btn_enabled('CONNECT_BTN', True)
 
 def on_combobox_selected(event):
     print("app_ui    : selected", g_combobox.get())
@@ -61,21 +83,25 @@ def create_labels(root):
 
     load_fonts()
     
-    sw_label = tk.Label(root, text='uCommander v{}'.format(VERSION), font=('White Rabbit', 24), bg='white')
+    sw_label = tk.Label(root, text='uCommander v{}'.format(g_config['version']), font=('White Rabbit', 24), bg='white')
     sw_label.place(x=200, y=30)
 
-    version_label = tk.Label(root, text='build 17 Apr 2024', font=('White Rabbit', 9), bg='white')
+    version_label = tk.Label(root, text='build 22 May 2024', font=('White Rabbit', 9), bg='white')
     version_label.place(x=350, y=60)
 
     label_font = font.Font(root, family='Fira Sans', size=10, weight='normal')
+    
+    label = tk.Label(root, text="Project", font=label_font, bg='white')
+    label.place(x=50, y=105)
+
     label = tk.Label(root, text="Bit rate", font=label_font, bg='white')
-    label.place(x=50, y=120)
+    label.place(x=50, y=130)
 
     label = tk.Label(root, text="Tester id   0x", font=label_font, bg='white')
-    label.place(x=50, y=150)
+    label.place(x=50, y=160)
 
     label = tk.Label(root, text="ECU id        0x", font=label_font, bg='white')
-    label.place(x=50, y=180)
+    label.place(x=50, y=190)
 
     print('app_ui    : created labels')
 
@@ -84,10 +110,10 @@ def create_input_labels(root):
     global g_text_input_ecu_id
 
     g_text_input_tester_id = tk.Entry(root, width=10)
-    g_text_input_tester_id.place(x=130, y=150)
+    g_text_input_tester_id.place(x=130, y=160)
 
     g_text_input_ecu_id = tk.Entry(root, width=10)
-    g_text_input_ecu_id.place(x=130, y=180)
+    g_text_input_ecu_id.place(x=130, y=190)
 
     print('app_ui    : created input labels')
 
@@ -95,10 +121,21 @@ def create_combobox(root):
     global g_combobox
     options = ["500 kBit/s", "1 MBit/s"]
     g_combobox = ttk.Combobox(root, values=options, width=10, state='readonly')
-    g_combobox.place(x=130, y=120)
+    g_combobox.place(x=130, y=130)
     g_combobox.set(options[0])  # Set default value
 
     g_combobox.bind("<<ComboboxSelected>>", on_combobox_selected)
+
+    projects = ['--Select Project--']
+    for project in g_config['projects']:
+        projects.append(project['name'])
+
+    global g_projectcombobox
+    g_projectcombobox = ttk.Combobox(root, values=projects, width=15, state='readonly')
+    g_projectcombobox.place(x=130, y=105)
+    g_projectcombobox.current(0)
+
+    g_projectcombobox.bind("<<ComboboxSelected>>", on_project_selected)
 
     print('app_ui    : created combobox')
 
@@ -141,7 +178,7 @@ def create_buttons(root, connect_can, boot_lock, reset_ecu, browse_file, upload_
     global g_btn_upload
 
     g_btn_connect = tk.Button(root, text='Connect', font=button_font, bg='#04508e', fg='white', activebackground='yellow', command=connect_can)
-    g_btn_connect.place(x=50, y=215)
+    g_btn_connect.place(x=50, y=220)
 
     g_btn_boot_lock = tk.Button(root, text='Boot lock', font=button_font, bg='#04508e', fg='white', activebackground='yellow', command=boot_lock)
     g_btn_boot_lock.place(x=315, y=215)
@@ -155,6 +192,7 @@ def create_buttons(root, connect_can, boot_lock, reset_ecu, browse_file, upload_
     g_btn_upload = tk.Button(root, text='Upload', font=button_font, bg='#04508e', fg='white', activebackground='yellow', command=upload_file)
     g_btn_upload.place(x=130, y=300)
 
+    set_btn_enabled('CONNECT_BTN', False)
     set_btn_enabled('BOOT_LOCK_BTN', False)
     set_btn_enabled('RESET_ECU_BTN', False)
     set_btn_enabled('BROWSE_BTN', False)
@@ -297,3 +335,55 @@ def get_resource_path(relative_path):
         return os.path.join(sys._MEIPASS, relative_path)
 
     return os.path.join(os.path.abspath('.'), relative_path)
+
+
+########################################### (Pop Up Dialog Box for Additional Details) ####################################################
+
+class AdditionalDialog(tk.Toplevel):
+    def __init__(self, parent, requires):
+        super().__init__(parent)
+        self.transient(parent)
+        self.grab_set()
+        self.protocol("WM_DELETE_WINDOW", self.on_close)
+        
+        self.title("Additional Details")
+        self.entries = {}
+        for i, req in enumerate(requires):
+            field_name = req["field"]
+            default_value = req.get("default", "")
+            field_type = req["type"]
+            
+            tk.Label(self, text=field_name).grid(row=i, column=0, pady=5, padx=5)
+            entry = tk.Entry(self)
+            entry.grid(row=i, column=1, pady=5, padx=5)
+            entry.insert(0, default_value)
+            self.entries[field_name] = entry
+
+        ok_button = tk.Button(self, text="OK", command=self.on_ok)
+        ok_button.grid(row=len(requires), columnspan=2, pady=10, padx=5, sticky="ew")
+        self.result = None
+        
+        self.center_window()
+        self.wait_window(self)
+
+    def center_window(self):
+        self.update_idletasks()
+        width = self.winfo_width()
+        height = self.winfo_height()
+        x = (self.winfo_screenwidth() // 2) - (width // 2)
+        y = (self.winfo_screenheight() // 2) - (height // 2)
+        self.geometry(f'{width}x{height}+{x}+{y}')
+
+    def on_ok(self):
+        self.result = {}
+        for field_name, entry in self.entries.items():
+            value = entry.get()
+            if not value:
+                messagebox.showwarning("Input Required", f"Please enter a value for {field_name}.")
+                return
+            self.result[field_name] = value
+        self.destroy()
+
+    def on_close(self):
+        messagebox.showinfo("Input Required", "You must enter all required values to proceed.")
+

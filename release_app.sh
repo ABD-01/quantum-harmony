@@ -16,7 +16,7 @@ PROJECT_DIRECTORY=$(pwd)
 echo $PROJECT_DIRECTORY
 cd src/
 
-VERSION=$(grep VERSION __version__.py | cut -d "'" -f2)
+VERSION=$(grep version config.toml | cut -d '"' -f2) # -f4 for config.json
 
 echo ""
 echo "[i] RELEASING uCOMMANDER VERSION v${VERSION}"
@@ -35,6 +35,7 @@ pyinstaller --name uCommander_v${VERSION}.exe --log-level WARN \
     --add-data="resources/fonts/fira-sans.regular.ttf;resources/fonts" \
     --add-data="resources/fonts/whitrabt.ttf;resources/fonts" \
     --add-data="resources/fonts/TitilliumWeb-Regular.ttf;resources/fonts" \
+    --add-data="config.json;." \
     --hidden-import platform \
     main.py
 
