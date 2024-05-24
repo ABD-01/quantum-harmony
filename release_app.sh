@@ -16,6 +16,7 @@ PROJECT_DIRECTORY=$(pwd)
 echo $PROJECT_DIRECTORY
 cd src/
 
+sed -i "s/\(build \)[[:digit:]]\+ [[:alpha:]]\+ [[:digit:]]\+/\1$(date +"%d %B %Y")/" app_ui.py
 VERSION=$(grep version config.toml | cut -d '"' -f2) # -f4 for config.json
 
 echo ""
@@ -35,7 +36,7 @@ pyinstaller --name uCommander_v${VERSION}.exe --log-level WARN \
     --add-data="resources/fonts/fira-sans.regular.ttf;resources/fonts" \
     --add-data="resources/fonts/whitrabt.ttf;resources/fonts" \
     --add-data="resources/fonts/TitilliumWeb-Regular.ttf;resources/fonts" \
-    --add-data="config.json;." \
+    --add-data="config.toml;." \
     --hidden-import platform \
     main.py
 

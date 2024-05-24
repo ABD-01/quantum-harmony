@@ -17,7 +17,7 @@ date        22 March 2024
 author      Accolade Electronics <www.accoladeelectronics.com>
 '''
 
-import json
+import json, toml
 import tkinter as tk            # for core tk
 from tkinter import ttk         # for progressbar
 from tkinter import font        # for fonts
@@ -53,7 +53,7 @@ def create_gui():
 
     # JSON CONFIG
     global g_config
-    g_config = json.load(open(get_resource_path('config.json')))
+    g_config = toml.load(open(get_resource_path('config.toml')))
     # g_config = toml.load(open(get_resource_path('config.json')))
 
     print('app_ui    : created ui root')
@@ -62,18 +62,22 @@ def create_gui():
 
 def on_project_selected(event):
     current = g_projectcombobox.current()
-    requires = g_config['projects'][current - 1]['requires']
+    project = g_config['projects'][current - 1]
     if current == 0:
         show_dialog('Error', 'Must choose a project')
         return
     print("app_ui    : selected", g_combobox.get())
     g_projectcombobox.config(state='disabled')
 
-    if requires:
-        global g_additionaldetails
-        dialog = AdditionalDialog(root, requires)
+    global g_additionaldetails, g_project_id
+    g_project_id = current
+    g_additionaldetails = None
+    if project['requires']:
+        dialog = AdditionalDialog(root, project['requires'])
         g_additionaldetails = dialog.result
         print('app_ui    : additional details', g_additionaldetails)
+    g_text_input_tester_id.insert(0, f"{project['tester_id']:X}")
+    g_text_input_ecu_id.insert(0, f"{project['ecu_id']:X}")
     set_btn_enabled('CONNECT_BTN', True)
 
 def on_combobox_selected(event):
@@ -86,7 +90,7 @@ def create_labels(root):
     sw_label = tk.Label(root, text='uCommander v{}'.format(g_config['version']), font=('White Rabbit', 24), bg='white')
     sw_label.place(x=200, y=30)
 
-    version_label = tk.Label(root, text='build 22 May 2024', font=('White Rabbit', 9), bg='white')
+    version_label = tk.Label(root, text='build 01 Jan 1970', font=('White Rabbit', 9), bg='white')
     version_label.place(x=350, y=60)
 
     label_font = font.Font(root, family='Fira Sans', size=10, weight='normal')

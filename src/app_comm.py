@@ -95,10 +95,10 @@ def can_init(bit_rate, tester_id, ecu_id):
     print('app_comm  : Get response timeout value (%ums): %s' % (timeout_response.value, print_test_status(status)))
 
     # CAN-TP PRIORITY bits.
-    # can_tp_prio = c_uint32(0)
-    # status = objPCANUds.GetValue_2013(g_pcan_handle, PUDS_PARAMETER_J1939_PRIORITY, can_tp_prio,
-                                    # sizeof(can_tp_prio))
-    # print('app_comm  : Get default PUDS_PARAMETER_J1939_PRIORITY (%ums): %s' % (can_tp_prio.value, print_test_status(status)))
+    can_tp_prio = c_uint32(0)
+    status = objPCANUds.GetValue_2013(g_pcan_handle, PUDS_PARAMETER_J1939_PRIORITY, can_tp_prio,
+                                    sizeof(can_tp_prio))
+    print('app_comm  : Get default PUDS_PARAMETER_J1939_PRIORITY (%ums): %s' % (can_tp_prio.value, print_test_status(status)))
 
     # fixme: understand why is it required for this id
     if tester_id == 0x0CDA33F1:
@@ -159,8 +159,12 @@ def perform_service_tests():
     #     print('Last programming  Write DID fail')
     # elif testWriteDataByIdentifier(handle, config, 0x5408, shopCode, 5) == False:
     #     print('Shop code Write DID fail')
-    # elif testWriteDataByIdentifier(handle, config, 0x5409, downloadingSite, 5) == False:
-        # print('Download site Write DID fail')
+    if app_ui.g_project_id == 1:
+        vinNo = app_ui.g_additionaldetails['VinNo']
+        vinNo = create_string_buffer(vinNo.encode('utf-8'))
+        vinDid = 0xF190
+        if testWriteDataByIdentifier(handle, config, vinDid, vinNo, sizeof(vinNo)) == False:
+            print('VinNo Write DID fail')
     # elif testRoutineControlFlashErase(handle, config) == False:
     #     print('Routine control for Flash erase fail')
     elif testRequestDownload(handle, config) == False:

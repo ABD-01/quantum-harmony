@@ -1,10 +1,11 @@
 title = "uCommander"
-version = "0.2.2"
+version = "0.3.0"
 
 [[projects]]
 name = "Bajaj 2 wheeler"
-identifier = "DIET"
-can_id = 0xCDA33F1
+ecu_id = 0x0CDAF133
+tester_id = 0x0CDA33F1
+
 [[projects.requires]]
 field = "VinNo"
 default = "DIET_111_15"
@@ -13,14 +14,15 @@ type = "string"
 
 [[projects]]
 name = "Gradient Sensor"
-identifier = "GradSens"
-can_id = 0x1BDAA2F1
+ecu_id = 0x1BDAF1A2
+tester_id = 0x1BDAA2F1
 requires = []
 
 [[projects]]
-can_id = 0xdeadbeef
-identifier = "Test"
+ecu_id = 0xdeadbeef
+tester_id = 0xc0ffee
 name = "Test Project"
+
 [[projects.requires]]
 field = "foo"
 type = "string"
