@@ -101,7 +101,8 @@ def can_init(bit_rate, tester_id, ecu_id):
     print('app_comm  : Get default PUDS_PARAMETER_J1939_PRIORITY (%ums): %s' % (can_tp_prio.value, print_test_status(status)))
 
     # fixme: understand why is it required for this id
-    if tester_id == 0x0CDA33F1:
+    # if tester_id == 0x0CDA33F1:
+    if 1 == 2:
         can_tp_prio = c_uint32(3)
         status = objPCANUds.SetValue_2013(g_pcan_handle,
                                         PUDS_PARAMETER_J1939_PRIORITY,
@@ -116,8 +117,8 @@ def can_init(bit_rate, tester_id, ecu_id):
     # Define Network Address Information used for all the tests
     g_pcan_config.can_id = tester_id
     g_pcan_config.can_msgtype = PCANTP_CAN_MSGTYPE_EXTENDED
-    # g_pcan_config.nai.protocol = PUDS_MSGPROTOCOL_ISO_15765_2_29B_FIXED_NORMAL
-    g_pcan_config.nai.protocol = PUDS_MSGPROTOCOL_ISO_15765_2_29B_EXTENDED 
+    g_pcan_config.nai.protocol = PUDS_MSGPROTOCOL_ISO_15765_2_29B_FIXED_NORMAL
+    # g_pcan_config.nai.protocol = PUDS_MSGPROTOCOL_ISO_15765_2_29B_EXTENDED 
     g_pcan_config.nai.target_type = PCANTP_ISOTP_ADDRESSING_PHYSICAL
     g_pcan_config.type = PUDS_MSGTYPE_USDT
     g_pcan_config.nai.source_addr = client_id
@@ -177,9 +178,6 @@ def perform_service_tests():
     #     print('CRC check fail')
 
 def testTesterPresent(channel, config):
-    request = uds_msg()
-    response = uds_msg()
-    confirmation = uds_msg()
 
     print('app_comm  : broadcasting tester present for 5 seconds')
     result = False
@@ -195,19 +193,30 @@ def testTesterPresent(channel, config):
 
     start_time = time.time()
 
-    # Send tester present for 5 seconds so that the bootloader can be locked
+    count = 0
     while time.time() - start_time < 5:
-        status = objPCANUds.SvcTesterPresent_2013(channel, config, request, objPCANUds.PUDS_SVC_PARAM_TP_ZSUBF)
-        #print('app_comm  : execute tester present service: %s' % (print_test_status(status)))
+        t = threading.Thread(target=_testTesterPresent, args=(channel, config, count))
+        t.start()
+        count += 1
 
-        # if objPCANUds.StatusIsOk_2013(status, PUDS_STATUS_OK, False):
-        #     status = objPCANUds.WaitForService_2013(channel, request, response, confirmation)
-        # if objPCANUds.StatusIsOk_2013(status, PUDS_STATUS_OK, False):
-        #     result = display_uds_msg_validate(confirmation, response, False)
-        # else:
-        #     result = display_uds_msg_validate(request, None, False)
+    return result
 
-    #print('app_comm  : TesterPresent: ' + test_result_to_string(result))
+def _testTesterPresent(channel, config, thread_id=0):
+    request = uds_msg()
+    response = uds_msg()
+    confirmation = uds_msg()
+
+    status = objPCANUds.SvcTesterPresent_2013(channel, config, request, objPCANUds.PUDS_SVC_PARAM_TP_ZSUBF)
+    print('app_comm  : (Thread %d) execute tester present service: %s'  % ( thread_id, print_test_status(status)))
+
+    if objPCANUds.StatusIsOk_2013(status, PUDS_STATUS_OK, False):
+        status = objPCANUds.WaitForService_2013(channel, request, response, confirmation)
+    if objPCANUds.StatusIsOk_2013(status, PUDS_STATUS_OK, False):
+        result = display_uds_msg_validate(confirmation, response, False)
+    else:
+        result = display_uds_msg_validate(request, None, False)
+
+    print('app_comm  : (Thread %d) TesterPresent: %s' % (thread_id, test_result_to_string(result)))
     status = objPCANUds.MsgFree_2013(request)
     status = objPCANUds.MsgFree_2013(response)
     status = objPCANUds.MsgFree_2013(confirmation)

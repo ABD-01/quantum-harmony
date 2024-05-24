@@ -17,6 +17,7 @@ date        22 March 2024
 author      Accolade Electronics <www.accoladeelectronics.com>
 '''
 
+import sys
 import json, toml
 import tkinter as tk            # for core tk
 from tkinter import ttk         # for progressbar
@@ -66,7 +67,7 @@ def on_project_selected(event):
     if current == 0:
         show_dialog('Error', 'Must choose a project')
         return
-    print("app_ui    : selected", g_combobox.get())
+    print("app_ui    : selected", g_projectcombobox.get())
     g_projectcombobox.config(state='disabled')
 
     global g_additionaldetails, g_project_id
@@ -159,10 +160,13 @@ def on_debug_window_close():
 def toggle_debug_window():
     if g_debug_checkbox_ticked.get() == True:
         open_new_window()
+        stream = EmittingStream(g_log_window, sys.stdout)
+        sys.stdout = stream
     else:
         if g_ui_debug_window:
             g_ui_debug_window.destroy()
             print('app_ui    : destroyed debug window ui root')
+        sys.stdout = sys.__stdout__
 
 def create_checkbox(root):
     global checkbox
@@ -391,3 +395,21 @@ class AdditionalDialog(tk.Toplevel):
     def on_close(self):
         messagebox.showinfo("Input Required", "You must enter all required values to proceed.")
 
+########################################### (Emitting Stream) ####################################################
+# Reference from: https://github.com/ABD-01/log-analysis/blob/master/logpy/gui_legacy.py#L30 
+class EmittingStream():
+    def __init__(self, log_window, terminal):
+        self.log_window = log_window
+        self.terminal = terminal
+    def write(self, text):
+        if self.log_window:
+            self.log_window.configure(state='normal')
+            self.log_window.insert('end', text)
+            self.log_window.configure(state='disabled')
+            self.log_window.see('end')
+        if self.terminal:
+            self.terminal.write(text)
+            self.terminal.flush()
+
+    def flush(self):
+        pass
