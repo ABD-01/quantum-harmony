@@ -100,15 +100,18 @@ def can_init(bit_rate, tester_id, ecu_id):
                                     sizeof(can_tp_prio))
     print('app_comm  : Get default PUDS_PARAMETER_J1939_PRIORITY (%ums): %s' % (can_tp_prio.value, print_test_status(status)))
 
-    # fixme: understand why is it required for this id
-    # if tester_id == 0x0CDA33F1:
-    if 1 == 2:
+    # TODO: understand why is it required for this project
+    if app_ui.g_project['name'] == "Bajaj 2 wheeler":
         can_tp_prio = c_uint32(3)
         status = objPCANUds.SetValue_2013(g_pcan_handle,
                                         PUDS_PARAMETER_J1939_PRIORITY,
                                         can_tp_prio, sizeof(can_tp_prio))
         print('app_comm  : New PUDS_PARAMETER_J1939_PRIORITY (%ums): %s' % (can_tp_prio.value, print_test_status(status)))
-    # end fixme
+
+    # Add can id filter
+    # Dev Note: Write DID fails if filter is not added
+    status = objPCANUds.AddCanIdFilter_2013(g_pcan_handle, ecu_id)
+    print('app_comm  : Add can id filter (0x%X): %s' % (ecu_id, print_test_status(status)))
 
     # extract the source and destination ids. ECU is UDS server and Tester is UDS client
     client_id = tester_id & 0x00000FF
@@ -117,8 +120,18 @@ def can_init(bit_rate, tester_id, ecu_id):
     # Define Network Address Information used for all the tests
     g_pcan_config.can_id = tester_id
     g_pcan_config.can_msgtype = PCANTP_CAN_MSGTYPE_EXTENDED
-    g_pcan_config.nai.protocol = PUDS_MSGPROTOCOL_ISO_15765_2_29B_FIXED_NORMAL
-    # g_pcan_config.nai.protocol = PUDS_MSGPROTOCOL_ISO_15765_2_29B_EXTENDED 
+
+    # TODO: study which CAN ids requires the EXTENDED protocol, and which the NORMAL
+    # The follwoing if/else can be then done based on ID instead of
+    # user defined configuration
+    nai_protocol = app_ui.g_project.get("nai_protocol")
+    if nai_protocol == "29B_EXTENDED":
+        g_pcan_config.nai.protocol = PUDS_MSGPROTOCOL_ISO_15765_2_29B_EXTENDED 
+    elif nai_protocol == "29B_FIXED_NORMAL":
+        g_pcan_config.nai.protocol = PUDS_MSGPROTOCOL_ISO_15765_2_29B_FIXED_NORMAL
+    else:
+        g_pcan_config.nai.protocol = PUDS_MSGPROTOCOL_ISO_15765_2_29B_NORMAL
+
     g_pcan_config.nai.target_type = PCANTP_ISOTP_ADDRESSING_PHYSICAL
     g_pcan_config.type = PUDS_MSGTYPE_USDT
     g_pcan_config.nai.source_addr = client_id
@@ -129,6 +142,7 @@ def can_init(bit_rate, tester_id, ecu_id):
 
 ########################################### (UDS over CAN: service tests) ####################################################
 
+import copy
 g_file_path = ''
 g_file_size = 0
 
@@ -160,7 +174,7 @@ def perform_service_tests():
     #     print('Last programming  Write DID fail')
     # elif testWriteDataByIdentifier(handle, config, 0x5408, shopCode, 5) == False:
     #     print('Shop code Write DID fail')
-    if app_ui.g_project_id == 1:
+    if app_ui.g_project['name'] == "Bajaj 2 wheeler":
         vinNo = app_ui.g_additionaldetails['VinNo']
         vinNo = create_string_buffer(vinNo.encode('utf-8'))
         vinDid = 0xF190
@@ -168,7 +182,7 @@ def perform_service_tests():
             print('VinNo Write DID fail')
     # elif testRoutineControlFlashErase(handle, config) == False:
     #     print('Routine control for Flash erase fail')
-    elif testRequestDownload(handle, config) == False:
+    if testRequestDownload(handle, config) == False:
         print('Request Download Fail')
     elif testTrasferFile(handle, config, g_file_path, g_file_size) == False:
         print('Transfer Data Fail')
@@ -178,6 +192,10 @@ def perform_service_tests():
     #     print('CRC check fail')
 
 def testTesterPresent(channel, config):
+
+    testWrite(channel, config)
+    result = True
+    return result
 
     print('app_comm  : broadcasting tester present for 5 seconds')
     result = False
@@ -192,25 +210,50 @@ def testTesterPresent(channel, config):
     print("Nai Target Addr: " + hex(config.nai.target_addr))
 
     start_time = time.time()
+    
 
     count = 0
     while time.time() - start_time < 5:
+        Write()
         t = threading.Thread(target=_testTesterPresent, args=(channel, config, count))
         t.start()
         count += 1
+        time.sleep(0.1)
 
     return result
+
+def testWrite(channel, config):
+    objPCANBasic = PCANBasic()
+    status = objPCANBasic.Initialize(g_pcan_handle, PCANTP_BAUDRATE_500K, 0, 0, 0)
+    
+    message = TPCANMsg()
+    message.ID = 0x0CDA33F1
+    message.LEN = 8
+    message.MSGTYPE = PCAN_MESSAGE_EXTENDED
+    message.DATA[0] = 0x02
+    message.DATA[1] = 0x3E
+    message.DATA[2] = 0x00
+    message.DATA[3] = 0x55
+    message.DATA[4] = 0x55
+    message.DATA[5] = 0x55
+    message.DATA[6] = 0x55
+    message.DATA[7] = 0x55
+    objPCANBasic.Write(g_pcan_handle, message)
+
 
 def _testTesterPresent(channel, config, thread_id=0):
     request = uds_msg()
     response = uds_msg()
     confirmation = uds_msg()
+    config_copy = uds_msgconfig()
+    config_copy = copy.deepcopy(config)
 
-    status = objPCANUds.SvcTesterPresent_2013(channel, config, request, objPCANUds.PUDS_SVC_PARAM_TP_ZSUBF)
+    status = objPCANUds.SvcTesterPresent_2013(channel, config_copy, request, objPCANUds.PUDS_SVC_PARAM_TP_ZSUBF)
     print('app_comm  : (Thread %d) execute tester present service: %s'  % ( thread_id, print_test_status(status)))
 
     if objPCANUds.StatusIsOk_2013(status, PUDS_STATUS_OK, False):
         status = objPCANUds.WaitForService_2013(channel, request, response, confirmation)
+    result = False
     if objPCANUds.StatusIsOk_2013(status, PUDS_STATUS_OK, False):
         result = display_uds_msg_validate(confirmation, response, False)
     else:

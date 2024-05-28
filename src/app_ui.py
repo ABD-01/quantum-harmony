@@ -62,23 +62,22 @@ def create_gui():
     return root
 
 def on_project_selected(event):
+    global g_additionaldetails, g_project
     current = g_projectcombobox.current()
-    project = g_config['projects'][current - 1]
+    g_project = g_config['projects'][current - 1]
     if current == 0:
         show_dialog('Error', 'Must choose a project')
         return
     print("app_ui    : selected", g_projectcombobox.get())
     g_projectcombobox.config(state='disabled')
 
-    global g_additionaldetails, g_project_id
-    g_project_id = current
     g_additionaldetails = None
-    if project['requires']:
-        dialog = AdditionalDialog(root, project['requires'])
+    if g_project['requires']:
+        dialog = AdditionalDialog(root, g_project['requires'])
         g_additionaldetails = dialog.result
         print('app_ui    : additional details', g_additionaldetails)
-    g_text_input_tester_id.insert(0, f"{project['tester_id']:X}")
-    g_text_input_ecu_id.insert(0, f"{project['ecu_id']:X}")
+    g_text_input_tester_id.insert(0, f"{g_project['tester_id']:X}")
+    g_text_input_ecu_id.insert(0, f"{g_project['ecu_id']:X}")
     set_btn_enabled('CONNECT_BTN', True)
 
 def on_combobox_selected(event):
@@ -359,10 +358,19 @@ class AdditionalDialog(tk.Toplevel):
         for i, req in enumerate(requires):
             field_name = req["field"]
             default_value = req.get("default", "")
+            max_length = req.get("max_length", 1000)
             field_type = req["type"]
+            print(f"app_ui    : {field_name} {field_type} {default_value} {max_length}")
             
             tk.Label(self, text=field_name).grid(row=i, column=0, pady=5, padx=5)
-            entry = tk.Entry(self)
+            entry = tk.Entry(
+                    self,
+                    validate="key",
+                    validatecommand=(
+                        self.register(lambda x: len(x) <=max_length), 
+                        "%P"
+                    )
+                )
             entry.grid(row=i, column=1, pady=5, padx=5)
             entry.insert(0, default_value)
             self.entries[field_name] = entry
