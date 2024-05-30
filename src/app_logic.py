@@ -62,7 +62,11 @@ def browse_file():
             return False
 
 def connect_can():
-    bit_rate = app_ui.g_combobox.get()
+    # Dev Note: Kilobits per second is abbreviated to "Kbps" throughout this project
+    # Kilobits per second is shortened to kb/s, Kbps or kbps 
+    # (as opposed to KBps, which is Kilobytes per second. Note the capitalization). 
+    # The lowercase b is commonly used to denote bits, while the uppercase B is used for bytes.
+    bit_rate = app_ui.g_project.get("bit_rate", "500Kbps")
     tester_id = app_ui.g_text_input_tester_id.get()
     ecu_id = app_ui.g_text_input_ecu_id.get()
 
@@ -85,7 +89,6 @@ def connect_can():
         app_ui.set_btn_enabled('BOOT_LOCK_BTN', True)
         app_ui.set_btn_enabled('BROWSE_BTN', True)
         # end tmp code
-        app_ui.g_combobox.config(state='disabled')
         app_ui.g_text_input_tester_id.config(state='disabled')
         app_ui.g_text_input_ecu_id.config(state='disabled')
     else:
@@ -126,6 +129,7 @@ def reset_ecu():
 
 # Function to handle application exit
 def on_close():
+    app_ui.reset_sysout()
     handle = app_comm.g_pcan_handle
     app_comm.objPCANUds.Uninitialize_2013(handle)
     g_ui_main_window.destroy()

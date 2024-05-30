@@ -76,12 +76,11 @@ def on_project_selected(event):
         dialog = AdditionalDialog(root, g_project['requires'])
         g_additionaldetails = dialog.result
         print('app_ui    : additional details', g_additionaldetails)
+    g_text_input_tester_id.delete(0, 'end')
     g_text_input_tester_id.insert(0, f"{g_project['tester_id']:X}")
+    g_text_input_ecu_id.delete(0, 'end')
     g_text_input_ecu_id.insert(0, f"{g_project['ecu_id']:X}")
     set_btn_enabled('CONNECT_BTN', True)
-
-def on_combobox_selected(event):
-    print("app_ui    : selected", g_combobox.get())
 
 def create_labels(root):
 
@@ -94,18 +93,14 @@ def create_labels(root):
     version_label.place(x=350, y=60)
 
     label_font = font.Font(root, family='Fira Sans', size=10, weight='normal')
-    
     label = tk.Label(root, text="Project", font=label_font, bg='white')
-    label.place(x=50, y=105)
-
-    label = tk.Label(root, text="Bit rate", font=label_font, bg='white')
-    label.place(x=50, y=130)
+    label.place(x=50, y=120)
 
     label = tk.Label(root, text="Tester id   0x", font=label_font, bg='white')
-    label.place(x=50, y=160)
+    label.place(x=50, y=150)
 
     label = tk.Label(root, text="ECU id        0x", font=label_font, bg='white')
-    label.place(x=50, y=190)
+    label.place(x=50, y=180)
 
     print('app_ui    : created labels')
 
@@ -114,29 +109,21 @@ def create_input_labels(root):
     global g_text_input_ecu_id
 
     g_text_input_tester_id = tk.Entry(root, width=10)
-    g_text_input_tester_id.place(x=130, y=160)
+    g_text_input_tester_id.place(x=130, y=150)
 
     g_text_input_ecu_id = tk.Entry(root, width=10)
-    g_text_input_ecu_id.place(x=130, y=190)
+    g_text_input_ecu_id.place(x=130, y=180)
 
     print('app_ui    : created input labels')
 
 def create_combobox(root):
-    global g_combobox
-    options = ["500 kBit/s", "1 MBit/s"]
-    g_combobox = ttk.Combobox(root, values=options, width=10, state='readonly')
-    g_combobox.place(x=130, y=130)
-    g_combobox.set(options[0])  # Set default value
-
-    g_combobox.bind("<<ComboboxSelected>>", on_combobox_selected)
-
     projects = ['--Select Project--']
     for project in g_config['projects']:
         projects.append(project['name'])
 
     global g_projectcombobox
     g_projectcombobox = ttk.Combobox(root, values=projects, width=15, state='readonly')
-    g_projectcombobox.place(x=130, y=105)
+    g_projectcombobox.place(x=130, y=120)
     g_projectcombobox.current(0)
 
     g_projectcombobox.bind("<<ComboboxSelected>>", on_project_selected)
@@ -152,7 +139,11 @@ def open_new_window():
     create_log_window(g_ui_debug_window)
     bind_close_event(g_ui_debug_window, on_debug_window_close)
 
+def reset_sysout():
+    sys.stdout = sys.__stdout__
+
 def on_debug_window_close():
+    reset_sysout()
     g_debug_checkbox_ticked.set(False)
     toggle_debug_window()
 
@@ -162,10 +153,10 @@ def toggle_debug_window():
         stream = EmittingStream(g_log_window, sys.stdout)
         sys.stdout = stream
     else:
+        reset_sysout()
         if g_ui_debug_window:
             g_ui_debug_window.destroy()
             print('app_ui    : destroyed debug window ui root')
-        sys.stdout = sys.__stdout__
 
 def create_checkbox(root):
     global checkbox
@@ -185,7 +176,7 @@ def create_buttons(root, connect_can, boot_lock, reset_ecu, browse_file, upload_
     global g_btn_upload
 
     g_btn_connect = tk.Button(root, text='Connect', font=button_font, bg='#04508e', fg='white', activebackground='yellow', command=connect_can)
-    g_btn_connect.place(x=50, y=220)
+    g_btn_connect.place(x=50, y=215)
 
     g_btn_boot_lock = tk.Button(root, text='Boot lock', font=button_font, bg='#04508e', fg='white', activebackground='yellow', command=boot_lock)
     g_btn_boot_lock.place(x=315, y=215)

@@ -6,6 +6,7 @@ name = "Bajaj 2 wheeler"
 ecu_id = 0x0CDAF133
 tester_id = 0x0CDA33F1
 nai_protocol = "29B_FIXED_NORMAL"
+bit_rate = "500Kbps"
 
 [[projects.requires]]
 field = "VinNo"
@@ -19,6 +20,7 @@ name = "Gradient Sensor"
 ecu_id = 0x1BDAF1A2
 tester_id = 0x1BDAA2F1
 nai_protocol = "29B_EXTENDED"
+bit_rate = "500Kbps"
 requires = []
 
 [[projects]]

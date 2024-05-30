@@ -58,9 +58,9 @@ def can_init(bit_rate, tester_id, ecu_id):
     print('app_comm  : PCAN-UDS API Version - %s: %s' % (buffer.value, print_test_status(status)))
 
     # Initialize channel
-    if bit_rate == '500 kBit/s':
+    if bit_rate == '500Kbps':
         status = objPCANUds.Initialize_2013(g_pcan_handle, PCANTP_BAUDRATE_500K, 0, 0, 0)
-    if bit_rate == '1 MBit/s':
+    if bit_rate == '1Mbps':
         status = objPCANUds.Initialize_2013(g_pcan_handle, PCANTP_BAUDRATE_1M, 0, 0, 0)
     print('app_comm  : Initialize channel: %s' % (print_test_status(status)))
 
