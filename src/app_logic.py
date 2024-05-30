@@ -46,6 +46,7 @@ def start():
 ########################################## (GUI EVENT HANDLING) #####################################################
 
 import os
+import threading
 
 def browse_file():
     file_path = ''
@@ -125,7 +126,8 @@ def reset_ecu():
 
     handle = app_comm.g_pcan_handle
     config = app_comm.g_pcan_config
-    app_comm.testECUReset(handle, config)
+    threading.Thread(target=app_comm.testECUReset, args=(handle, config)).start()
+    # app_comm.testECUReset(handle, config)
 
 # Function to handle application exit
 def on_close():
