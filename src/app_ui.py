@@ -401,7 +401,7 @@ class EmittingStream():
         self.log_window = log_window
         self.terminal = terminal
     def write(self, text):
-        if self.log_window:
+        if self.log_window and self.log_window.winfo_exists():
             self.log_window.configure(state='normal')
             self.log_window.insert('end', text)
             self.log_window.configure(state='disabled')

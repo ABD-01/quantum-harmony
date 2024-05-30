@@ -192,74 +192,28 @@ def perform_service_tests():
     #     print('CRC check fail')
 
 def testTesterPresent(channel, config):
-
-    testWrite(channel, config)
-    result = True
-    return result
+    request = uds_msg()
+    response = uds_msg()
+    confirmation = uds_msg()
 
     print('app_comm  : broadcasting tester present for 5 seconds')
     result = False
 
-    # print all values of config structure
-    print("Can Id: " + hex(config.can_id))
-    print("Can Msgtype: " + hex(config.can_msgtype))
-    print("Nai Protocol: " + hex(config.nai.protocol))
-    print("Nai Target Type: " + hex(config.nai.target_type))
-    print("Type: " + hex(config.type))
-    print("Nai Source Addr: " + hex(config.nai.source_addr))
-    print("Nai Target Addr: " + hex(config.nai.target_addr))
-
     start_time = time.time()
-    
 
-    count = 0
+    # Send tester present for 5 seconds so that the bootloader can be locked
     while time.time() - start_time < 5:
-        Write()
-        t = threading.Thread(target=_testTesterPresent, args=(channel, config, count))
-        t.start()
-        count += 1
-        time.sleep(0.1)
+        status = objPCANUds.SvcTesterPresent_2013(channel, config, request, objPCANUds.PUDS_SVC_PARAM_TP_ZSUBF)
+        #print('app_comm  : execute tester present service: %s' % (print_test_status(status)))
 
-    return result
+        # if objPCANUds.StatusIsOk_2013(status, PUDS_STATUS_OK, False):
+        #     status = objPCANUds.WaitForService_2013(channel, request, response, confirmation)
+        # if objPCANUds.StatusIsOk_2013(status, PUDS_STATUS_OK, False):
+        #     result = display_uds_msg_validate(confirmation, response, False)
+        # else:
+        #     result = display_uds_msg_validate(request, None, False)
 
-def testWrite(channel, config):
-    objPCANBasic = PCANBasic()
-    status = objPCANBasic.Initialize(g_pcan_handle, PCANTP_BAUDRATE_500K, 0, 0, 0)
-    
-    message = TPCANMsg()
-    message.ID = 0x0CDA33F1
-    message.LEN = 8
-    message.MSGTYPE = PCAN_MESSAGE_EXTENDED
-    message.DATA[0] = 0x02
-    message.DATA[1] = 0x3E
-    message.DATA[2] = 0x00
-    message.DATA[3] = 0x55
-    message.DATA[4] = 0x55
-    message.DATA[5] = 0x55
-    message.DATA[6] = 0x55
-    message.DATA[7] = 0x55
-    objPCANBasic.Write(g_pcan_handle, message)
-
-
-def _testTesterPresent(channel, config, thread_id=0):
-    request = uds_msg()
-    response = uds_msg()
-    confirmation = uds_msg()
-    config_copy = uds_msgconfig()
-    config_copy = copy.deepcopy(config)
-
-    status = objPCANUds.SvcTesterPresent_2013(channel, config_copy, request, objPCANUds.PUDS_SVC_PARAM_TP_ZSUBF)
-    print('app_comm  : (Thread %d) execute tester present service: %s'  % ( thread_id, print_test_status(status)))
-
-    if objPCANUds.StatusIsOk_2013(status, PUDS_STATUS_OK, False):
-        status = objPCANUds.WaitForService_2013(channel, request, response, confirmation)
-    result = False
-    if objPCANUds.StatusIsOk_2013(status, PUDS_STATUS_OK, False):
-        result = display_uds_msg_validate(confirmation, response, False)
-    else:
-        result = display_uds_msg_validate(request, None, False)
-
-    print('app_comm  : (Thread %d) TesterPresent: %s' % (thread_id, test_result_to_string(result)))
+    #print('app_comm  : TesterPresent: ' + test_result_to_string(result))
     status = objPCANUds.MsgFree_2013(request)
     status = objPCANUds.MsgFree_2013(response)
     status = objPCANUds.MsgFree_2013(confirmation)
