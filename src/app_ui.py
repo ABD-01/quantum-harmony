@@ -85,20 +85,17 @@ def create_labels(root):
 
     load_fonts()
     
-    sw_label = tk.Label(root, text='uCommander v{}'.format(g_config['version']), font=('White Rabbit', 24), bg='white')
-    sw_label.place(x=200, y=30)
-
-    version_label = tk.Label(root, text='build 01 Jan 1970', font=('White Rabbit', 9), bg='white')
-    version_label.place(x=350, y=60)
+    sw_label = tk.Label(root, text='v{}'.format(g_config['version']), font=('White Rabbit', 9), bg='white')
+    sw_label.place(x=520, y=382)
 
     label_font = font.Font(root, family='Fira Sans', size=10, weight='normal')
     label = tk.Label(root, text="Product", font=label_font, bg='white')
     label.place(x=50, y=120)
 
-    label = tk.Label(root, text="Tester id   0x", font=label_font, bg='white')
+    label = tk.Label(root, text="Tester id     ", font=label_font, bg='white')
     label.place(x=50, y=150)
 
-    label = tk.Label(root, text="ECU id        0x", font=label_font, bg='white')
+    label = tk.Label(root, text="ECU id          ", font=label_font, bg='white')
     label.place(x=50, y=180)
 
     print('app_ui    : created labels')
@@ -152,6 +149,10 @@ def toggle_debug_window():
         open_new_window()
         stream = EmittingStream(g_log_window, sys.stdout)
         sys.stdout = stream
+
+        sw_ver = g_config['version']
+        print(f'########### you are using uCommander v{sw_ver}')
+        print(f'########### build 01 Jan 1970\r\n')
     else:
         reset_sysout()
         if g_ui_debug_window:
