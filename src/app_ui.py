@@ -18,7 +18,7 @@ author      Accolade Electronics <www.accoladeelectronics.com>
 '''
 
 import sys                      # for stdout
-import toml                     # for TOML config
+import toml                     # for handling project information in TOML config (TOML is used as alternate to JSON)
 import tkinter as tk            # for core tk
 from tkinter import ttk         # for progressbar
 from tkinter import font        # for fonts
@@ -62,13 +62,13 @@ def create_gui():
 
 def on_project_selected(event):
     global g_additional_details, g_project
-    current = g_projectcombobox.current()
+    current = g_project_combo_box.current()
     g_project = g_config['projects'][current - 1]
     if current == 0:
         show_dialog('Error', 'Must choose a project')
         return
-    print("app_ui    : selected", g_projectcombobox.get())
-    g_projectcombobox.config(state='disabled')
+    print("app_ui    : selected", g_project_combo_box.get())
+    g_project_combo_box.config(state='disabled')
 
     g_additional_details = None
     if g_project['requires']:
@@ -89,7 +89,7 @@ def create_labels(root):
     sw_label.place(x=520, y=382)
 
     label_font = font.Font(root, family='Fira Sans', size=10, weight='normal')
-    label = tk.Label(root, text="Product", font=label_font, bg='white')
+    label = tk.Label(root, text="Project", font=label_font, bg='white')
     label.place(x=50, y=120)
 
     label = tk.Label(root, text="Tester id     ", font=label_font, bg='white')
@@ -113,16 +113,16 @@ def create_input_labels(root):
     print('app_ui    : created input labels')
 
 def create_combobox(root):
-    projects = ['--Select Product--']
+    projects = ['--Select Project--']
     for project in g_config['projects']:
         projects.append(project['name'])
 
-    global g_projectcombobox
-    g_projectcombobox = ttk.Combobox(root, values=projects, width=15, state='readonly')
-    g_projectcombobox.place(x=130, y=120)
-    g_projectcombobox.current(0)
+    global g_project_combo_box
+    g_project_combo_box = ttk.Combobox(root, values=projects, width=15, state='readonly')
+    g_project_combo_box.place(x=130, y=120)
+    g_project_combo_box.current(0)
 
-    g_projectcombobox.bind("<<ComboboxSelected>>", on_project_selected)
+    g_project_combo_box.bind("<<ComboboxSelected>>", on_project_selected)
 
     print('app_ui    : created combobox')
 
@@ -351,8 +351,7 @@ class AdditionalDialog(tk.Toplevel):
             field_name = req["field"]
             default_value = req.get("default", "")
             max_length = req.get("max_length", 1000)
-            field_type = req["type"]
-            print(f"app_ui    : {field_name} {field_type} {default_value} {max_length}")
+            print(f"app_ui    : {field_name} {default_value} {max_length}")
             
             tk.Label(self, text=field_name).grid(row=i, column=0, pady=5, padx=5)
             entry = tk.Entry(
