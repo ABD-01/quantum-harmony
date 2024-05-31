@@ -3,7 +3,7 @@
     "version": "0.3.0",
     "projects": [
         {
-            "name": "Bajaj 2 wheeler",
+            "name": "TCU (chetak)",
             "ecu_id": 215675187,
             "tester_id": 215626737,
             "nai_protocol": "29B_NORMAL",

@@ -17,8 +17,8 @@ date        22 March 2024
 author      Accolade Electronics <www.accoladeelectronics.com>
 '''
 
-import sys
-import json, toml
+import sys                      # for stdout
+import toml                     # for TOML config
 import tkinter as tk            # for core tk
 from tkinter import ttk         # for progressbar
 from tkinter import font        # for fonts
@@ -52,17 +52,16 @@ def create_gui():
     # To prevent garbage collection of the image object
     background_label.image = background_image
 
-    # JSON CONFIG
+    # TOML CONFIG
     global g_config
     g_config = toml.load(open(get_resource_path('config.toml')))
-    # g_config = toml.load(open(get_resource_path('config.json')))
 
     print('app_ui    : created ui root')
 
     return root
 
 def on_project_selected(event):
-    global g_additionaldetails, g_project
+    global g_additional_details, g_project
     current = g_projectcombobox.current()
     g_project = g_config['projects'][current - 1]
     if current == 0:
@@ -71,11 +70,11 @@ def on_project_selected(event):
     print("app_ui    : selected", g_projectcombobox.get())
     g_projectcombobox.config(state='disabled')
 
-    g_additionaldetails = None
+    g_additional_details = None
     if g_project['requires']:
         dialog = AdditionalDialog(root, g_project['requires'])
-        g_additionaldetails = dialog.result
-        print('app_ui    : additional details', g_additionaldetails)
+        g_additional_details = dialog.result
+        print('app_ui    : additional details', g_additional_details)
     g_text_input_tester_id.delete(0, 'end')
     g_text_input_tester_id.insert(0, f"{g_project['tester_id']:X}")
     g_text_input_ecu_id.delete(0, 'end')
@@ -93,7 +92,7 @@ def create_labels(root):
     version_label.place(x=350, y=60)
 
     label_font = font.Font(root, family='Fira Sans', size=10, weight='normal')
-    label = tk.Label(root, text="Project", font=label_font, bg='white')
+    label = tk.Label(root, text="Product", font=label_font, bg='white')
     label.place(x=50, y=120)
 
     label = tk.Label(root, text="Tester id   0x", font=label_font, bg='white')
@@ -117,7 +116,7 @@ def create_input_labels(root):
     print('app_ui    : created input labels')
 
 def create_combobox(root):
-    projects = ['--Select Project--']
+    projects = ['--Select Product--']
     for project in g_config['projects']:
         projects.append(project['name'])
 
@@ -139,6 +138,7 @@ def open_new_window():
     create_log_window(g_ui_debug_window)
     bind_close_event(g_ui_debug_window, on_debug_window_close)
 
+# to set printing behavior back to normal
 def reset_sysout():
     sys.stdout = sys.__stdout__
 

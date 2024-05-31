@@ -17,7 +17,7 @@ echo $PROJECT_DIRECTORY
 cd src/
 
 sed -i "s/\(build \)[[:digit:]]\+ [[:alpha:]]\+ [[:digit:]]\+/\1$(date +"%d %B %Y")/" app_ui.py
-VERSION=$(grep version config.toml | cut -d '"' -f2) # -f4 for config.json
+VERSION=$(grep version config.toml | cut -d '"' -f2)
 
 echo ""
 echo "[i] RELEASING uCOMMANDER VERSION v${VERSION}"

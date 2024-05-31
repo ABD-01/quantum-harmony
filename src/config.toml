@@ -2,7 +2,7 @@ title = "uCommander"
 version = "0.3.0"
 
 [[projects]]
-name = "Bajaj 2 wheeler"
+name = "TCU (chetak)"
 ecu_id = 0x0CDAF133
 tester_id = 0x0CDA33F1
 nai_protocol = "29B_FIXED_NORMAL"
@@ -22,24 +22,3 @@ tester_id = 0x1BDAA2F1
 nai_protocol = "29B_EXTENDED"
 bit_rate = "500Kbps"
 requires = []
-
-[[projects]]
-ecu_id = 0xdeadbeef
-tester_id = 0xc0ffee
-name = "Test Project"
-
-[[projects.requires]]
-field = "foo"
-type = "string"
-default = 10
-
-[[projects.requires]]
-field = "bar"
-type = "string"
-max_length = 4
-
-[[projects.requires]]
-field = "baz"
-type = "string"
-max_length = 7
-

@@ -101,7 +101,7 @@ def can_init(bit_rate, tester_id, ecu_id):
     print('app_comm  : Get default PUDS_PARAMETER_J1939_PRIORITY (%ums): %s' % (can_tp_prio.value, print_test_status(status)))
 
     # TODO: understand why is it required for this project
-    if app_ui.g_project['name'] == "Bajaj 2 wheeler":
+    if app_ui.g_project['name'] == "TCU (chetak)":
         can_tp_prio = c_uint32(3)
         status = objPCANUds.SetValue_2013(g_pcan_handle,
                                         PUDS_PARAMETER_J1939_PRIORITY,
@@ -122,7 +122,7 @@ def can_init(bit_rate, tester_id, ecu_id):
     g_pcan_config.can_msgtype = PCANTP_CAN_MSGTYPE_EXTENDED
 
     # TODO: study which CAN ids requires the EXTENDED protocol, and which the NORMAL
-    # The follwoing if/else can be then done based on ID instead of
+    # The following if/else can be then done based on ID instead of
     # user defined configuration
     nai_protocol = app_ui.g_project.get("nai_protocol")
     if nai_protocol == "29B_EXTENDED":
@@ -174,8 +174,8 @@ def perform_service_tests():
     #     print('Last programming  Write DID fail')
     # elif testWriteDataByIdentifier(handle, config, 0x5408, shopCode, 5) == False:
     #     print('Shop code Write DID fail')
-    if app_ui.g_project['name'] == "Bajaj 2 wheeler":
-        vinNo = app_ui.g_additionaldetails['VinNo']
+    if app_ui.g_project['name'] == "TCU (chetak)":
+        vinNo = app_ui.g_additional_details['VinNo']
         vinNo = create_string_buffer(vinNo.encode('utf-8'))
         vinDid = 0xF190
         if testWriteDataByIdentifier(handle, config, vinDid, vinNo, sizeof(vinNo)) == False:

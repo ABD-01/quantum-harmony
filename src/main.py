@@ -21,6 +21,7 @@ tested on python 3.11.8 on windows 11 x64
 
 # dependencies
 pip3 install tk
+pip3 install toml
 
 # run the script to launch app
 launch_app.sh
