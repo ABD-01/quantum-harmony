@@ -10,15 +10,23 @@ static char log_buffer[1024];
 static size_t log_buffer_offset = 0;
 
 // Mock bn_logger function
-void my_logger(const char *format, va_list args) {
-    log_buffer_offset += vsprintf(log_buffer + log_buffer_offset, format, args);
+// void my_logger(const char *format, va_list args) {
+//     log_buffer_offset += vsprintf(log_buffer + log_buffer_offset, format, args);
+// }
+
+void bn_logger(const char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    log_buffer_offset += vsprintf(log_buffer + log_buffer_offset, format, args);    va_end(args);
 }
+
 
 // Reset log buffer before each test
 void setUp(void) {
     log_buffer[0] = '\0';
     log_buffer_offset = 0;
-    set_log_function(my_logger);
+    // set_log_function(my_logger);
 }
 
 

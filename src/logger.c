@@ -5,6 +5,10 @@
 
 static log_function_t user_log_function = NULL;
 
+/**
+ * @brief Set the log function
+ * @param function 
+ */
 void set_log_function(log_function_t function) {
     user_log_function = function;
 }

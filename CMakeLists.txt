@@ -5,13 +5,15 @@ project(BumbleNet
     DESCRIPTION "Network Library"
 )
 
+# ---- Include guards ----
+#ref: https://github.com/ClausKlein/cmake-example-component-lib/blob/develop/CMakeLists.txt#L14
+include(cmake/PreventInSourceBuilds.cmake)
+
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 11)
 
 # Install Path
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/install/${CMAKE_SYSTEM_PROCESSOR})
-
-set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/cmake/armgcc.cmake)
 
 # Option to enable testing
 option(BumbleNet_ENABLE_TESTING "Enable testing" ON)
@@ -44,6 +46,8 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
 set_target_properties(${PROJECT_NAME} 
     PROPERTIES
         C_STANDARD      99 
+        VERSION         ${PROJECT_VERSION}
+        SOVERSION       ${PROJECT_VERSION_MAJOR}
         PUBLIC_HEADER   "${${PROJECT_NAME}_PUBLIC_HEADERS}"
 )
 
@@ -52,6 +56,7 @@ target_compile_definitions(${PROJECT_NAME}
         NUMCOLS=${NUMCOLS}
 )
 
+include(GNUInstallDirs)
 install(TARGETS ${PROJECT_NAME}
     RUNTIME         DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY         DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -59,11 +64,18 @@ install(TARGETS ${PROJECT_NAME}
     PUBLIC_HEADER   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
-if(BumbleNet_ENABLE_TESTING)
+add_subdirectory(config_files)
+
+if(BumbleNet_ENABLE_TESTING AND NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "arm")
     enable_testing()
-    add_subdirectory(third_party/googletest)
+    # add_subdirectory(third_party/googletest)
     add_subdirectory(third_party/unity)
     add_subdirectory(test)
+endif()
+
+# Set default build type to Debug if not specified
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug)
 endif()
 
 MESSAGE(STATUS "BUILD_TYPE: " ${CMAKE_BUILD_TYPE})

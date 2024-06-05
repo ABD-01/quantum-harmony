@@ -12,25 +12,18 @@ extern "C" {
 static char log_buffer[1024];
 static size_t log_buffer_offset = 0;
 
-void my_logger_v(const char *format, va_list args) {
-    log_buffer_offset += vsprintf(log_buffer + log_buffer_offset, format, args);
-}
-
 void bn_logger(const char *format, ...) {
     va_list args;
     va_start(args, format);
-    my_logger_v(format, args);
+    log_buffer_offset += vsprintf(log_buffer + log_buffer_offset, format, args);
     va_end(args);
 }
 
-// Test fixture for setting up and tearing down
 class HexdumpTest : public ::testing::Test {
 protected:
     void SetUp() override {
-        // Reset log buffer before each test
         log_buffer[0] = '\0';
         log_buffer_offset = 0;
-        // set_log_function(my_logger);
     }
 
     void TearDown() override {
@@ -38,7 +31,7 @@ protected:
     }
 };
 
-TEST_F(HexdumpTest, ConvertsToHexCorrectly) {
+TEST_F(HexdumpTest, ConvertsHelloWorldToHex) {
     const char *data = "Hello, World!";
     size_t size = strlen(data);
 

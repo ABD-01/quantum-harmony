@@ -6,9 +6,12 @@
 #include "hexdump.h"
 #include "bn_logger.h"
 
-void my_logger(const char *format, va_list args)
+void bn_logger(const char *format, ...)
 {
+    va_list args;
+    va_start(args, format);
     vprintf(format, args);
+    va_end(args);
 }
 
 typedef struct 
@@ -24,7 +27,7 @@ static void generatRandomBuffer(uint8_t buffer[], size_t size);
 
 int main(int argc, char* argv[]) {
 
-    set_log_function(my_logger);
+    // set_log_function(my_logger);
 
     data_s data = { 0 };
     data.lenght = 100;

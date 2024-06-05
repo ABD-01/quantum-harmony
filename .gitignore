@@ -1,6 +1,12 @@
 build/
 install/
 
+# docs
+html/
+xml/
+# TODO: remove later
+sphinx/
+
 .vscode/
 
 # certificates
