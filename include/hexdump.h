@@ -2,6 +2,7 @@
  * @file hexdump.h
  * @brief Hexdump implementation
  * @author Muhammed Abdullah
+ * @date 5 June 2024
 */
 
 #ifndef HEXDUMP_H
@@ -22,7 +23,7 @@ extern "C" {
 
 
 /**
- * @brief Prints the buffer in hexdump format
+ * @brief Prints the buffer in hexdump format. Depends on @ref bn_logger
  * @param buffer Input buffer
  * @param size Size
  */

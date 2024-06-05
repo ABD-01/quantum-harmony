@@ -25,7 +25,7 @@ add_library(${PROJECT_NAME} STATIC)
 # Source Files:
 set(SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hexdump.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/logger.c
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/logger.c
 )
 target_sources(${PROJECT_NAME} 
     PRIVATE 
