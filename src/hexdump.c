@@ -1,3 +1,19 @@
+/**
+ * @file        src/hexdump.c
+ *
+ * @copyright   Accolade Electronics Pvt Ltd, 2024
+ *              All Rights Reserved
+ *              UNPUBLISHED, LICENSED SOFTWARE.
+ *              Accolade Electronics, Pune
+ *              CONFIDENTIAL AND PROPRIETARY INFORMATION
+ *              WHICH IS THE PROPERTY OF M/s Accolade Electronics.
+ *
+ * @date        February 6, 2024
+ * @author      Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
+ * 
+ * @brief       This file contains the implementation of hexdump functions
+ */
+
 #include "hexdump.h"
 #include "bn_logger.h"
 

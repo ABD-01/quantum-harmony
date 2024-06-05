@@ -1,18 +1,13 @@
-#*******************************************************************************
-# arm-gcc-toolchain.cmake
-#
-# This file holds ARM GCC toolchain settings, paths, etc.
-# Sets various compiler flags as per BUILD_TYPE
-# Also sets architechture specific CPU and FPU flags.
-#
-# Author: Muhammed Abdullah Shaikh
-# Date:   May 29, 2024
+# cmake/arm-gcc-toolchain.cmake
 #
 # Copyright (c) 2024 Accolade Electronics Pvt. Ltd.
-#
-# This file is part of [Project Name].
-#
-#*******************************************************************************
+# 
+# Date:     May 29, 2024
+# Author:   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
+# 
+# Brief:    This file holds ARM GCC toolchain settings, paths, etc.
+#           Sets various compiler flags as per BUILD_TYPE
+#           Also sets architechture specific CPU and FPU flags.
 
 SET(CMAKE_SYSTEM_NAME Generic)
 SET(CMAKE_SYSTEM_PROCESSOR arm)

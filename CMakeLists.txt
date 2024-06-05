@@ -1,3 +1,13 @@
+# CMakeLists.txt
+# 
+# Copyright (c) 2023-24 Accolade Electronics Pvt Ltd. All Rights Reserved.
+#
+# Date:     May 29, 2024
+# Modified: June 5, 2024
+# Author:   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
+# Brief:    This CMakeLists.txt file is used to configure the build system
+#           for the project.
+
 cmake_minimum_required(VERSION 3.27.0)
 project(BumbleNet
     VERSION     0.0.1

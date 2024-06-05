@@ -1,10 +1,18 @@
 /**
- * @file hexdump.h
- * @brief Hexdump implementation
- * @author Muhammed Abdullah
- * @date 5 June 2024
-*/
-
+ * @file        include/hexdump.h
+ *
+ * @copyright   Accolade Electronics Pvt Ltd, 2024
+ *              All Rights Reserved
+ *              UNPUBLISHED, LICENSED SOFTWARE.
+ *              Accolade Electronics, Pune
+ *              CONFIDENTIAL AND PROPRIETARY INFORMATION
+ *              WHICH IS THE PROPERTY OF M/s Accolade Electronics.
+ *
+ * @date        May 29, 2024
+ * @author      Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
+ * 
+ * @brief       Header File for hexdump functions
+ */
 #ifndef HEXDUMP_H
 #define HEXDUMP_H
 
@@ -32,9 +40,9 @@ void hexdump(const void *buffer, size_t size);
 
 /**
  * @brief Prints the buffer in hexdump format to a buffer
- * @param buffer 
- * @param size 
- * @param outBuffer 
+ * @param buffer input buffer
+ * @param size size of buffer
+ * @param outBuffer buffer to store the hexdump output
  * @see hexdump
  */
 void hexdumpToBuffer(const void *buffer, size_t size, char* outBuffer);

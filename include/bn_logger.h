@@ -1,9 +1,18 @@
 /**
- * @file bn_logger.h
- * @brief Logger implementation
- * @author Muhammed Abdullah
- * @date 5 June 2024
-*/
+ * @file        include/bn_logger.h
+ *
+ * @copyright   Accolade Electronics Pvt Ltd, 2024
+ *              All Rights Reserved
+ *              UNPUBLISHED, LICENSED SOFTWARE.
+ *              Accolade Electronics, Pune
+ *              CONFIDENTIAL AND PROPRIETARY INFORMATION
+ *              WHICH IS THE PROPERTY OF M/s Accolade Electronics.
+ *
+ * @date        May 29, 2024
+ * @author      Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
+ * 
+ * @brief       Header File for Logger function prototype
+ */
 
 #ifndef BN_LOGGER_H
 #define BN_LOGGER_H

@@ -1,3 +1,12 @@
+# test/CMakeLists.txt
+#
+# Copyright (c) 2024 Accolade Electronics Pvt. Ltd.
+# 
+# Date:       June 5, 2024
+# Author:     Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
+# 
+# Brief:      This CMakeLists.txt file is used to configure the tests
+
 project(BumbleNet-tests)
 
 # TEST1

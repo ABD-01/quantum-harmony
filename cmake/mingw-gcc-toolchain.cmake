@@ -1,3 +1,13 @@
+# cmake/mingw-gcc-toolchain.cmake
+#
+# Copyright (c) 2024 Accolade Electronics Pvt. Ltd.
+# 
+# Date:     May 29, 2024
+# Author:   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
+# 
+# Brief:    This file holds GNU GCC toolchain settings, paths, etc.
+#           Sets various compiler flags as per BUILD_TYPE
+
 set(CMAKE_SYSTEM_NAME "Windows")
 set(CMAKE_SYSTEM_PROCESSOR "x86_64")
 

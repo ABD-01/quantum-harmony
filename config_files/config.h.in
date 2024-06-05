@@ -1,3 +1,19 @@
+/**
+ * @file        config_files/config.h.in
+ *
+ * @copyright   Accolade Electronics Pvt Ltd, 2024
+ *              All Rights Reserved
+ *              UNPUBLISHED, LICENSED SOFTWARE.
+ *              Accolade Electronics, Pune
+ *              CONFIDENTIAL AND PROPRIETARY INFORMATION
+ *              WHICH IS THE PROPERTY OF M/s Accolade Electronics.
+ *
+ * @date        June 5, 2023
+ * @author      Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
+ * 
+ * @brief       Configuration file
+ */
+
 #ifndef CONFIG_H
 #define CONFIG_H
 
