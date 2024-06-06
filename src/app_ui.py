@@ -336,7 +336,7 @@ def get_resource_path(relative_path):
     return os.path.join(os.path.abspath('.'), relative_path)
 
 
-########################################### (Pop Up Dialog Box for Additional Details) ####################################################
+############ (Pop Up Dialog Box for reading Additional Details from user accoring to config.toml) ############
 
 class AdditionalDialog(tk.Toplevel):
     def __init__(self, parent, requires):

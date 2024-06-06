@@ -142,7 +142,6 @@ def can_init(bit_rate, tester_id, ecu_id):
 
 ########################################### (UDS over CAN: service tests) ####################################################
 
-import copy
 g_file_path = ''
 g_file_size = 0
 
