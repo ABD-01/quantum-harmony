@@ -36,7 +36,7 @@ import time
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QTimer, QByteArray
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGridLayout, QLabel, QComboBox, QLineEdit, QPushButton
 from PyQt5.QtGui import QMovie
-import snoop
+
 
 class Command:
     def __init__(self, cmd, rsp_pattern=None, callback=None, timeout=15, **kwargs):
@@ -50,6 +50,7 @@ class WorkerConfig(QObject):
     finished = pyqtSignal()
     handleUi = pyqtSignal(list)
     getVariantSignal = pyqtSignal(object)
+    rebootingSignal = pyqtSignal(bool)
     ser_dll = None
     state = IntEnum('State', ['IDLE', 'TRANSPARENT', 'SENDIND', 'WAITING_RESPONSE'], start=0)
     rbtWaitTimer = 20
@@ -83,20 +84,32 @@ class WorkerConfig(QObject):
             if self.fsmState == self.state.TRANSPARENT:
                 try:
                     if self.currentCmd and self.currentCmd.willRbt:
+                        self.logAppend("Waiting for Reboot...")
+                        print("Waiting for Reboot...")
+                        self.rebootingSignal.emit(True)
                         start_time = time.time()
-                        while time.time() - start_time < self.rbtWaitTimer:
-                            self.ser_dll.readline(self.ser_handle, self.rxBuffer, 1024)
+                        while (time.time() - start_time) < self.rbtWaitTimer:
+                            ret = self.ser_dll.readline(self.ser_handle, self.rxBuffer, 1024)
+                            if ret == -1:
+                                self.handleUi.emit(['SHOW_POPUP', 'COM PORT ERROR', 'Failed to read from serial port'])
+                                raise Exception("Failed to read from serial port")
                             rxData = self.rxBuffer.value.decode('utf-8', 'ignore')
                             print("rx <- \033[0;36m%s\033[0m" % rxData.strip())
                             if re.search('BOOT SIGNATURE', rxData):
+                                self.logAppend("Reboot Successful...")
+                                print("Reboot Successful...")
                                 break
+                        self.rebootingSignal.emit(False)
+                        self.currentCmd = None
                             
                     if self.commandQueue.empty():
-                        self.ser_dll.readline(self.ser_handle, self.rxBuffer, 1024)
+                        ret = self.ser_dll.readline(self.ser_handle, self.rxBuffer, 1024)
+                        if ret == -1:
+                            self.handleUi.emit(['SHOW_POPUP', 'COM PORT ERROR', 'Failed to read from serial port'])
+                            raise Exception("Failed to read from serial port")
                         rxData = self.rxBuffer.value.decode('utf-8', 'ignore')
-                        # print("rx <- " + rxData)
-
                         self.handleUi.emit(['LOG_APPEND', rxData, ''])
+                        # print("rx <- " + rxData)
                     else:
                         self.fsmState = self.state.SENDIND
                 except Exception as e:
@@ -104,21 +117,21 @@ class WorkerConfig(QObject):
                     pass
                 
             if self.fsmState == self.state.SENDIND:
-                self.currentCmd = self.commandQueue.get()
-                self.ser_dll.serial_write(self.ser_handle, self.currentCmd.cmd.encode())        
-                self.logAppend("Sending command: %s" % self.currentCmd.name)
+                self.currentCmd: Command = self.commandQueue.get()
+                self.ser_dll.serial_write(self.ser_handle, self.currentCmd.cmd.encode(), len(self.currentCmd.cmd.encode()))        
+                self.logAppend("Sending command: %s" % self.currentCmd.cmd)
+                print("Sending command: %s" % self.currentCmd.cmd)
                 
                 if self.currentCmd.rsp_pattern:
                     self.fsmState = self.state.WAITING_RESPONSE
                 else:
+                    if self.currentCmd.callback:
+                        self.currentCmd.callback()
                     self.fsmState = self.state.TRANSPARENT
                 
             if self.fsmState == self.state.WAITING_RESPONSE:
-                start_time = time.time()
-                while time.time() - start_time < 1:
-                    self.ser_dll.serial_read(self.ser_handle, self.rxBuffer, 1024)
-                self.rxBuffer.value = b''
-                
+                self.handleUi.emit(['LOG_APPEND', "Waiting for response ...", ''])
+                print("Waiting for response ...")
                 start_time = time.time()
                 attempt = 0
                 found = False
@@ -132,15 +145,17 @@ class WorkerConfig(QObject):
                         found = True
                         if self.currentCmd.callback:
                             self.currentCmd.callback(match.groups())
-                        self.logAppend("Response received: {}".format(match.string))
+                        self.logAppend("Response received: {}".format(str(match[0])))
+                        print("Response received: {}".format(str(match[0])))
                         break
                     attempt += 1
                     print(attempt)
                 if not found:
-                    self.logAppend("Failed to get response for command: %s" % self.currentCmd.name)
+                    self.logAppend("Failed to get response for command: %s" % self.currentCmd.cmd)
+                    self.handleUi.emit(['SHOW_POPUP', 'Warning',"Failed to get response for command: %s" % self.currentCmd.cmd])
+
                 
                 self.fsmState = self.state.TRANSPARENT
-                self.currentCmd = None     
             
         self.finished.emit()
     
@@ -150,14 +165,15 @@ class WorkerConfig(QObject):
         )
         return len(self.commands) - 1
 
-    @pyqtSlot(result=bool)
     def sendCommand(self, cmdId, command=None):
         if cmdId >= len(self.commands):
+            self.logAppend("Invalid command")
             return False
         if self.commandQueue.full():
+            self.logAppend("Command queue is full. Try Again")
             return False
         
-        
+        self.logAppend("Command Queued")
         if cmdId == -1:
             # Incase command is not registered
             if command is None:
@@ -169,10 +185,11 @@ class WorkerConfig(QObject):
         return True
         
     def logAppend(self, text):
-        self.handleUi.emit(['LOG_APPEND', "<h3><span style='color:cyan'>%s</span></h3>" %text, ''])
+        escape = lambda t : t.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("'", "&#39;").replace('"', "&quot;")
+        self.handleUi.emit(['LOG_APPEND', f"<h3><span style='color:cyan'>{escape(text)}</span></h3>", ''])
 
     
-    def getDeviceVariant(self, cb):
+    def getDeviceVariant(self, cb=None):
         print("Get Device Variant")
         if self.ser_dll is None or self.ser_handle is None:
             self.handleUi.emit(['LOG_APPEND', "Serial port not initialized", ""])
@@ -214,7 +231,6 @@ class WorkerConfig(QObject):
                 looprun = False
 
         if res is None:
-            # time.sleep(1) # is this even needed??
             looprun = True
             attempt = 0
             self.ser_dll.serial_write(self.ser_handle, b'CMN GET UIN\r\n', 16)
@@ -237,7 +253,8 @@ class WorkerConfig(QObject):
                     looprun = False
     
         self.fsmState = self.state.TRANSPARENT
-        cb(res)             
+        # cb(res)
+        self.getVariantSignal.emit(res)         
         return res
     
 
@@ -290,11 +307,12 @@ class UIConfigRecovery:
 
         if self.thread.isFinished():
             print('Starting cfg recovery...')
-            # self.worker = Worker2()
             self.worker = WorkerConfig(self.ser_handle)
             self.worker.moveToThread(self.thread)
             self.worker.finished.connect(self.worker.deleteLater)
             self.worker.handleUi.connect(self.handleUiFromThread) 
+            self.worker.getVariantSignal.connect(self.getVariant)
+            self.worker.rebootingSignal.connect(self.rebooting)
             self.worker.ser_dll = self.ser_dll
             self.thread.started.connect(self.worker.work)
             self.thread.start()
@@ -311,7 +329,7 @@ class UIConfigRecovery:
                 # Used self.thread.terminate()
                 print("terminating thread: ", self.thread.terminate())
                 if self.switchProfileAttempt % 6 == 0:
-                    self.handleUiFromThread(None, 'SHOW_POPUP', "Warning", "Check if the serial port is connected and sending data")
+                    self.handleUiFromThread('SHOW_POPUP', "Warning", "Check if the serial port is connected and sending data")
             else:        
                 print("is thread running: ", self.thread.isRunning())
                 print('is thread finished: ', self.thread.isFinished())
@@ -331,22 +349,38 @@ class UIConfigRecovery:
             self.labelVersion.show()
             return
         if idx == 2:
-            self.gif.stop()
-            self.gif.deleteLater()
+            # self.gif.stop()
+            # self.gif.deleteLater()
             self.labelBuild.setParent(self.page_cfg)
             self.labelVersion.setParent(self.page_cfg)
             self.labelBuild.show()
             self.labelVersion.show()
+            
+            self.labelWait.setParent(self.page_cfg)
+            self.labelWait.setText("Please Wait. Rebooting...")
+            self.labelLoading.setParent(self.page_cfg)
+            self.labelWait.hide()
+            self.labelLoading.hide()
             return
     
         return
-            
+    
+    def rebooting(self, isRebooting):
+        if isRebooting:
+            self.labelWait.show()
+            self.labelLoading.show()
+            QTimer.singleShot(1000, lambda: self.buttons.disable(True))
+        else:
+            self.labelWait.hide()
+            self.labelLoading.hide() 
+            QTimer.singleShot(1000, lambda: self.buttons.disable(False))  
+         
     def getVariant(self, res):
         print("Receved Callback")
         if res is None:
             self.btnGetVariant.setEnabled(True)
             self.worker.handleUi.emit(['LOG_APPEND', 'Could not get device variant', ''])
-            self.worker.handleUi.emit(['SHOW_POPUP', 'Warning','Could not get device variant'])
+            self.popWarning('Could not get device variant')
             print("Could not get device variant")
             return
         variant, uin = res
@@ -356,7 +390,112 @@ class UIConfigRecovery:
         self.lineEditVin.setEnabled(True)
         self.lineEditCip2.setEnabled(True)
         self.deviceVariant = variant
+        self.buttons.disable(False)
         self.setupCfgButtons(self.deviceVariant)
+
+    def setupCfgButtons(self, variant):
+        
+        def handleNwsw(x):
+            self.lineEditNwsw.setText(x[0])
+            nwsw = int(x[0])
+            if nwsw != 1:
+                # self.handleUiFromThread('SHOW_POPUP', 'Warning', 'Auto NW Switching was not enabled. Enabling it.')
+                self.popWarning('Auto NW Switching is not enabled. Enabling it.')
+                self.worker.sendCommand(self.command_ids["SET NWSW"])
+
+        def handleSimtype(x):
+            self.lineEditSimtype.setText(x[0])
+            simtype = int(x[0])
+            if simtype != 0:
+                self.popWarning('SIM TYPE was not set to 0. Setting it.')
+                self.worker.sendCommand(self.command_ids["SET SIMTYP"])
+
+        def handleUin(x):
+            uin = x[0]
+            self.lineEditUin.setText(uin)
+            if len(uin) < 19 or uin == 'ACCOLADE123456789':
+                self.popWarning('UIN is not valid.')
+
+        def setUIN():
+            uin = self.lineEditUin.text()
+            if len(uin) < 19 or uin == 'ACCOLADE123456789':
+                self.popWarning('UIN is not valid.')
+                return
+            cmd = f"CMN SET UIN:{uin}" if self.deviceVariant == "CDAC" else f"CMN *SET#UIN#{uin}#"
+            self.worker.sendCommand(-1, Command(cmd, willRbt=True))
+            return
+            
+        def handleVin(x):
+            vin = x[0]
+            self.lineEditVin.setText(vin)
+            if len(vin) < 17 or vin == 'AAAAAAAAAAAAAA':
+                self.popWarning('VIN/CHNO is not valid.')
+
+        def setVIN():
+            vin = self.lineEditVin.text()
+            if len(vin) < 17 or vin == 'AAAAAAAAAAAAAA':
+                self.popWarning('VIN/CHNO is not valid.')
+                return
+            cmd = f"CMN SET CHNO:{vin}" if self.deviceVariant == "CDAC" else f"CMN *SET#CHNO#{vin}#"
+            self.worker.sendCommand(-1, Command(cmd, willRbt=True))
+            return
+
+            
+        def handleCip2(x):
+            ip, port = x[0], x[1]
+            self.lineEditCip2.setText("%s:%s" % (ip, port))
+            if ip != 'ais-data.accoladeelectronics.com':
+                self.popWarning('Invalid IP address for CIP2.')
+            elif port != '5555':
+                self.worker.handleUi.emit(['SHOW_POPUP', 'Warning', 'Invalid port for CIP2.'])
+                self.popWarning('Invalid port for CIP2.')
+        
+        
+            
+        NORMAL_COMMANDS = {
+            "GET NWSW": ("CMN *GET#DEVNWSW#", r"<STATUS#DEVNWSW#(\d)#>", handleNwsw),
+            "SET NWSW": ("CMN *SET#DEVNWSW#1#", None, None),
+            "GET SIMTYP": ("CMN *GET#SIMTYP#", r"<STATUS#SIMTYP#(\d)#>", handleSimtype),
+            "SET SIMTYP": ("CMN *SET#SIMTYP#0#", None, None),
+            "GET UIN": ("CMN *GET#UIN#", r"<STATUS#UIN#(\w+)#>", handleUin),
+            "GET CHNO": ("CMN *GET#CHNO#", r"<STATUS#CHNO#(\w+)#>", handleVin),
+            "GET CIP2": ("CMN *GET#CIP2#", r"<STATUS#CIP2#(.+)#(\d+)#>", handleCip2),
+            "SET CIP2": ("CMN *SET#CIP2#ais-data.accoladeelectronics.com#5555#", None, None),
+            "REBOOT": ("CMN *SET#CRST#1#", None, None),
+            "EMR ACK": ("CMN *SET*SACK#1#", None, None),
+        }
+
+        # Define commands for CDAC variant
+        CDAC_COMMANDS = {
+            "GET NWSW": ("CMN GET DEVNWSW", r"<DEVNWSW:(\d)>", handleNwsw),
+            "SET NWSW": ("CMN SET DEVNWSW:1", None, None),
+            "GET SIMTYP": ("CMN GET SIMTYP", r"<SIMTYP:(\d)>", handleSimtype),
+            "SET SIMTYP": ("CMN SET SIMTYP:0", None, None),
+            "GET UIN": ("CMN GET UIN", r"<UIN:(\w+)>", handleUin),
+            "GET CHNO": ("CMN GET CHNO", r"<CHNO:ACCDEV07240045162>", handleVin),
+            "GET CIP2": ("CMN GET CIP2", r"<CIP2:(.+):(\d+)>", handleCip2),
+            "SET CIP2": ("CMN SET CIP2:ais-data.accoladeelectronics.com:5555", None, None),
+            "REBOOT": ("CMN SET CRST:1", None, None),
+            "EMR ACK": ("CMN SET EO:EO", None, None),
+        }
+
+        command_table = CDAC_COMMANDS if variant == "CDAC" else NORMAL_COMMANDS
+        self.command_ids = {}
+        for btn, (cmd, rsp_pattern, callback) in command_table.items():
+            cmd_id = self.worker.registerCommand(cmd, rsp_pattern, callback, willRbt=True if 'SET' in cmd else False)
+            self.command_ids[btn] = cmd_id
+        
+        # Connect buttons with commands
+        self.btnGetnSetNwsw.clicked.connect(lambda: self.worker.sendCommand(self.command_ids["GET NWSW"]))
+        self.btnGetnSetSimtype.clicked.connect(lambda: self.worker.sendCommand(self.command_ids["GET SIMTYP"]))
+        self.btnGetUin.clicked.connect(lambda: self.worker.sendCommand(self.command_ids["GET UIN"]))
+        self.btnSetUin.clicked.connect(setUIN)
+        self.btnGetVin.clicked.connect(lambda: self.worker.sendCommand(self.command_ids["GET CHNO"]))
+        self.btnSetVin.clicked.connect(setVIN)
+        self.btnGetCip2.clicked.connect(lambda: self.worker.sendCommand(self.command_ids["GET CIP2"]))
+        self.btnSetCip2.clicked.connect(lambda: self.worker.sendCommand(self.command_ids["SET CIP2"]))
+        self.btnReboot.clicked.connect(lambda: self.worker.sendCommand(self.command_ids["REBOOT"]))
+        self.btnEmrAck.clicked.connect(lambda: self.worker.sendCommand(self.command_ids["EMR ACK"]))
 
     def getPage2Children(self):
         self.page_mid = self.findChild(QWidget,'page_mid')
@@ -367,7 +506,7 @@ class UIConfigRecovery:
     def getPage3Children(self):
         self.page_cfg = self.findChild(QWidget,'page_cfg')
 
-        layout = QVBoxLayout()
+        layout = QVBoxLayout(self.page_cfg)
 
         hlayout1 = QGridLayout()
         labelVariant = QLabel(self, text="Variant")
@@ -376,12 +515,9 @@ class UIConfigRecovery:
         list(map(lambda x: self.comboBoxVariant.model().item(x).setEnabled(False), range(3)))
         self.btnGetVariant = QPushButton(self, text="GET VARIANT")
         
-        def getVariant():
-            self.btnGetVariant.setEnabled(False)
-            Thread(target=self.worker.getDeviceVariant, args=(self.getVariant,)).start()
-            # self.worker.getDeviceVariant(self.getVariant)
-
-        self.btnGetVariant.clicked.connect(getVariant)
+        self.btnGetVariant.clicked.connect(
+            lambda: [self.btnGetVariant.setEnabled(False), Thread(target=self.worker.getDeviceVariant, args=(self.getVariant,)).start()]
+        )
         
         hlayout1.addWidget(labelVariant, 0, 0)
         hlayout1.addWidget(self.comboBoxVariant, 0, 1)
@@ -393,21 +529,21 @@ class UIConfigRecovery:
         i = count(0)
 
         labelNwsw = QLabel(self, text="Auto NW Switching")
-        lineEditNwsw = QLineEdit(self); lineEditNwsw.setDisabled(True)
+        self.lineEditNwsw = QLineEdit(self); self.lineEditNwsw.setDisabled(True)
         self.btnGetnSetNwsw = QPushButton(self, text="GETnSet NWSW")
         
         labelSimtype = QLabel(self, text="Sim Type")
-        lineEditSimtype = QLineEdit(self); lineEditSimtype.setDisabled(True)
+        self.lineEditSimtype = QLineEdit(self); self.lineEditSimtype.setDisabled(True)
         self.btnGetnSetSimtype = QPushButton(self, text="GETnSet SIMTYPE")
                 
         hlayout2.addWidget(labelNwsw, 0, next(i))
-        hlayout2.addWidget(lineEditNwsw, 0, next(i))
+        hlayout2.addWidget(self.lineEditNwsw, 0, next(i))
         hlayout2.addWidget(self.btnGetnSetNwsw, 0, next(i))
                 
         hlayout2.addWidget(QLabel(self, text=""), 0, next(i))
                 
         hlayout2.addWidget(labelSimtype, 0, next(i))
-        hlayout2.addWidget(lineEditSimtype, 0, next(i))
+        hlayout2.addWidget(self.lineEditSimtype, 0, next(i))
         hlayout2.addWidget(self.btnGetnSetSimtype, 0, next(i))
         
         [hlayout2.setColumnStretch(_, 1) for _ in range(next(i))]
@@ -430,7 +566,7 @@ class UIConfigRecovery:
         self.lineEditVin.setDisabled(True)
         self.btnGetVin = QPushButton(self, text="GET VIN")
         self.btnSetVin = QPushButton(self, text="SET VIN")
-        
+
         hlayout3.addWidget(labelVIN, 0, 3)
         hlayout3.addWidget(self.lineEditVin, 0, 4, 1, 2)
         hlayout3.addWidget(self.btnGetVin, 1, 4)
@@ -438,6 +574,7 @@ class UIConfigRecovery:
         
         labelCip2 = QLabel(self, text="CIP2")
         self.lineEditCip2 = QLineEdit(self)
+        self.lineEditCip2.setReadOnly(True)
         self.lineEditCip2.setDisabled(True)
         self.btnGetCip2 = QPushButton(self, text="GET CIP2")
         self.btnSetCip2 = QPushButton(self, text="SET CIP2")
@@ -473,109 +610,12 @@ class UIConfigRecovery:
             def timeout(self):[self.disable(True), QTimer.singleShot(1000, lambda: self.disable(False))]
             
         self.buttons = Buttons(self.page_cfg.findChildren(QPushButton))
-        list(map(lambda btn: btn.clicked.connect((lambda btn: lambda: print("BTN_CLICKED:", btn.text()))(btn)), self.buttons))
+        # list(map(lambda btn: btn.clicked.connect((lambda btn: lambda: print("BTN_CLICKED:", btn.text()))(btn)), self.buttons))
         self.buttons.remove(self.btnGetVariant)
         self.buttons.disable(True)
-        list(map(lambda x: x.clicked.connect(lambda: self.buttons.timeout()), self.buttons))
-        
-            
-    def setupCfgButtons(self, variant):
-        
-        cfgWorker = self.worker
-        
-        def handleNwsw(x):
-            self.lineEditNwsw.setText(x[0])
-            
-            nwsw = int(x[0])
-            if nwsw != 1:
-                buff = create_string_buffer(b'CMN *SET#DEVNWSW#1#')
-                self.ser_dll.serial_write(self.ser_handle, buff, len(buff))
-        
-        def handleResponse(x):
-            self.handleUiFromThread(None, 'LOG_APPEND', f"Reponse from {x.cmd}:\n{x.rsp}")
-            
-        cfgWorker.registerCommand(
-            "CMN *GET#DEVNWSW#", r"<STATUS#DEVNWSW#(\d)#>",
-            handleResponse,
-        )
-        cfgWorker.registerCommand(
-            "CMN *SET#DEVNWSW#1#", None,
-            handleResponse,
-        )
-        cfgWorker.registerCommand(
-            "CMN GET DEVNWSW", r"<DEVNWSW:(\d)>",
-            handleResponse,
-        )
-        cfgWorker.registerCommand(
-            "CMN SET DEVNWSW:1", None,
-            handleResponse,
-        )
-        cfgWorker.registerCommand(
-            "CMN *GET#SIMTYP#", r"<STATUS#SIMTYP#(\d)#>",
-            handleResponse,
-        )
-        cfgWorker.registerCommand(
-            "CMN *SET#SIMTYP#0#", None,
-            handleResponse,
-        )
-        cfgWorker.registerCommand(
-            "CMN GET SIMTYP", r"<SIMTYP:(\d)>",
-            handleResponse,
-        )
-        cfgWorker.registerCommand(
-            "CMN SET SIMTYP:0", None,
-            handleResponse,
-        )
+        list(map(lambda btn: btn.clicked.connect((lambda btn: lambda: (print("BTN_CLICKED:", btn.text()),self.buttons.timeout()))(btn)), self.buttons))
+        # list(map(lambda x: x.clicked.connect(lambda: self.buttons.timeout()), self.buttons))
 
-        cfgWorker.registerCommand(
-            "CMN *GET#UIN#", r"<STATUS#UIN#(\w+)#>",
-            handleResponse,
-        )
 
-        cfgWorker.registerCommand(
-            "CMN GET UIN", r"<UIN:(\w+)>",
-            handleResponse,
-        )
-        cfgWorker.registerCommand(
-            "CMN *GET#CHNO#", r"<STATUS#CHNO#(\w+)#>",
-            handleResponse,
-        )
-        cfgWorker.registerCommand(
-            "CMN GET CHNO", r"<CHNO:ACCDEV07240045162>",
-            handleResponse,
-        )
-        
-        cfgWorker.registerCommand(
-            "CMN *GET#CIP2#", r"<STATUS#CIP2#(.+)#(\d+)#>",
-            handleResponse,
-        )
-        cfgWorker.registerCommand(
-            "CMN *SET#CIP2#ais-data.accoladeelectronics.com#5555#", None,
-            handleResponse,
-        )
-        cfgWorker.registerCommand(
-            "CMN GET CIP2", r"<CIP2:(.+):(\d+)>",
-            handleResponse,
-        )
-        cfgWorker.registerCommand(
-            "CMN SET CIP2:ais-data.accoladeelectronics.com:5555", None,
-            handleResponse,
-        )
-        
-        cfgWorker.registerCommand(
-            "CMN *SET#CRST#1#", None,
-            handleResponse,
-        )
-        cfgWorker.registerCommand(
-            "CMN SET CRST:1", None,
-            handleResponse,
-        )
-        cfgWorker.registerCommand(
-            "CMN *SET*SACK#1#", None,
-            handleResponse,
-        )
-        cfgWorker.registerCommand(
-            "CMN SET EO:EO", None,
-            handleResponse,
-        )
-            
+    def popWarning(self, text):
+        self.worker.handleUi.emit(['SHOW_POPUP', 'Warning', text])
