@@ -69,6 +69,7 @@ EXPORT int readline(HANDLE hSerial, char *buffer, int limit)
 
     while (buff_size < limit) {
         if (!ReadFile(hSerial, &ch, 1, &bytesRead, NULL)) {
+            printf("ERR READ FILE %ld\r\n", GetLastError());
             return -1;
         }
         if (bytesRead > 0) {

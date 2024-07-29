@@ -79,7 +79,7 @@ CERT_TYPE_DEVICE_KEY = 2    # file name must be "device-key.pem"
 VERSION='0.2.0'
 
 # THIS VARIABLE WILL SERVE AS A SWITCH TO ENABLE OR DISABLE CONFIG RECOVERY
-CONFIG_RECOVERY_SUPPORT = False
+CONFIG_RECOVERY_SUPPORT = True
 
 if CONFIG_RECOVERY_SUPPORT:
     from config_recovery import UIConfigRecovery
@@ -390,7 +390,6 @@ class ServiceToolUi(QtWidgets.QMainWindow):
             self.stackedWidget = self.findChild(QtWidgets.QStackedWidget,'stackedWidget')
             self.btnCfgRecover.clicked.connect(self.switchProfile)
 
-            
             def hidebtnCfgRecover(): 
                 self.btnCfgRecover.hide()
                 self.btnFwMode.clicked.disconnect(hidebtnCfgRecover)
@@ -437,7 +436,7 @@ class ServiceToolUi(QtWidgets.QMainWindow):
         self.thread.destroyed.connect(lambda: print("Thread Destroyed"))
         self.thread.start()
         
-        self.handleUiFromThread(['SHOW_POPUP', 'Disclaimer', 'Accolade Service tool usage is restricted to Accolade service engineers and representatives only\n'])
+        self.handleUiFromThread('SHOW_POPUP', 'Disclaimer', 'Accolade Service tool usage is restricted to Accolade service engineers and representatives only\n')
         self.labelVersion.setText('SERVICE TOOL v{}'.format(VERSION))
         self.labelBuild.setText('Stable build 08 Jul 2024')
         
@@ -504,7 +503,7 @@ class ServiceToolUi(QtWidgets.QMainWindow):
                                 fileList[0] = './__temp__/' + file_name
                                 break
                             elif extractedFileList.__len__() == index:
-                                self.handleUiFromThread(['SHOW_POPUP', 'No suitable file found', 'The selected file does not contain a .bin file'])
+                                self.handleUiFromThread('SHOW_POPUP', 'No suitable file found', 'The selected file does not contain a .bin file')
                                 self.btnFwMode.setChecked(False)
                                 return
                     
@@ -512,7 +511,7 @@ class ServiceToolUi(QtWidgets.QMainWindow):
         
                 if upgradeType == 'CERTIFICATE': # must select 3 cert files
                     if fileList.__len__() != 3:
-                        self.handleUiFromThread(['SHOW_POPUP', 'Count unsatisfied', 'Please select 3 certificates'])
+                        self.handleUiFromThread('SHOW_POPUP', 'Count unsatisfied', 'Please select 3 certificates')
                         return
                     
                     # must have exact names for recognition
@@ -521,7 +520,7 @@ class ServiceToolUi(QtWidgets.QMainWindow):
                     if (fileList[0].find(cert_names[0]) != -1) and (fileList[1].find(cert_names[1]) != -1) and (fileList[2].find(cert_names[2]) != -1):
                         self.worker.initCsvFile()
                     else:
-                        self.handleUiFromThread(['SHOW_POPUP', 'File', 'Please rename files as per certificate types \n%s' % "\n".join(cert_names)])
+                        self.handleUiFromThread('SHOW_POPUP', 'File', 'Please rename files as per certificate types \n%s' % "\n".join(cert_names))
                         return
                     self.btnWrite.setEnabled(True)
         except:
@@ -550,7 +549,7 @@ class ServiceToolUi(QtWidgets.QMainWindow):
                 self.btnCfgRecover.setEnabled(True)
             
         except:
-            self.handleUiFromThread(['SHOW_POPUP', 'COM Port Error', 'Access denied'])
+            self.handleUiFromThread('SHOW_POPUP', 'COM Port Error', 'Access denied')
 
     def getResourcePath(self, relative_path):
         '''
@@ -570,9 +569,8 @@ class ServiceToolUi(QtWidgets.QMainWindow):
 
         return os.path.join(os.path.abspath('.'), relative_path)
          
-    def handleUiFromThread(self, arg, *args):
-        if arg is None:
-            arg = list(args)
+    def handleUiFromThread(self, *args):
+        arg = args[0] if isinstance(args[0], list) else args
         if arg[0] == 'SHOW_POPUP':
             msgBox = QMessageBox()
             msgBox.setWindowTitle(arg[1])
