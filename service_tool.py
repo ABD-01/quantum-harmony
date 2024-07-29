@@ -76,7 +76,7 @@ CERT_TYPE_CA_CRT = 0        # file name must be "ca-crt.pem"
 CERT_TYPE_DEVICE_CRT = 1    # file name must be "device-crt.pem"
 CERT_TYPE_DEVICE_KEY = 2    # file name must be "device-key.pem"
 
-VERSION='0.2.0'
+VERSION='1.1.0'
 
 # THIS VARIABLE WILL SERVE AS A SWITCH TO ENABLE OR DISABLE CONFIG RECOVERY
 CONFIG_RECOVERY_SUPPORT = True

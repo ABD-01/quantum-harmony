@@ -17,6 +17,7 @@ pyinstaller -n service_tool_v%VERSION% --noconfirm --clean --log-level=WARN ^
 --noconsole ^
 --onefile ^
 --add-data="resources/thumbnail.ico;resources" ^
+--add-data="resources/loading.gif;resources" ^
 --add-data="service_tool.ui;." ^
 --add-data="resources/serial_upload.dll;resources" ^
 --icon=resources/thumbnail.ico ^

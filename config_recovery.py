@@ -226,7 +226,7 @@ class WorkerConfig(QObject):
                 looprun = False
                 variantFound = "Normal"
                 res =  variantFound, uin
-            if attempt == 10: # TODO: adjust this 
+            if attempt == 10:
                 self.handleUi.emit(['LOG_APPEND', "Failed to get UIN...", ''])
                 looprun = False
 
@@ -248,7 +248,7 @@ class WorkerConfig(QObject):
                     looprun = False
                     variantFound = "CDAC"
                     res =  variantFound, uin
-                if attempt == 10: # TODO: adjust this
+                if attempt == 50:
                     self.handleUi.emit(['LOG_APPEND', "Failed to get UIN...", ''])
                     looprun = False
     
@@ -385,7 +385,8 @@ class UIConfigRecovery:
             return
         variant, uin = res
         self.comboBoxVariant.setCurrentText(variant)
-        self.lineEditUin.setText(uin)
+        if not (len(uin) < 19 or uin == 'ACCOLADE123456789'):
+            self.lineEditUin.setText(uin)
         self.lineEditUin.setEnabled(True)
         self.lineEditVin.setEnabled(True)
         self.lineEditCip2.setEnabled(True)
@@ -472,7 +473,7 @@ class UIConfigRecovery:
             "GET SIMTYP": ("CMN GET SIMTYP", r"<SIMTYP:(\d)>", handleSimtype),
             "SET SIMTYP": ("CMN SET SIMTYP:0", None, None),
             "GET UIN": ("CMN GET UIN", r"<UIN:(\w+)>", handleUin),
-            "GET CHNO": ("CMN GET CHNO", r"<CHNO:ACCDEV07240045162>", handleVin),
+            "GET CHNO": ("CMN GET CHNO", r"<CHNO:(\w+)>", handleVin),
             "GET CIP2": ("CMN GET CIP2", r"<CIP2:(.+):(\d+)>", handleCip2),
             "SET CIP2": ("CMN SET CIP2:ais-data.accoladeelectronics.com:5555", None, None),
             "REBOOT": ("CMN SET CRST:1", None, None),
@@ -482,7 +483,9 @@ class UIConfigRecovery:
         command_table = CDAC_COMMANDS if variant == "CDAC" else NORMAL_COMMANDS
         self.command_ids = {}
         for btn, (cmd, rsp_pattern, callback) in command_table.items():
-            cmd_id = self.worker.registerCommand(cmd, rsp_pattern, callback, willRbt=True if 'SET' in cmd else False)
+            willRbt = False
+            if 'SET' in cmd and btn != 'EMR ACK': willRbt = True
+            cmd_id = self.worker.registerCommand(cmd, rsp_pattern, callback, willRbt=willRbt)
             self.command_ids[btn] = cmd_id
         
         # Connect buttons with commands
