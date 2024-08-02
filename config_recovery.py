@@ -517,16 +517,20 @@ class UIConfigRecovery:
         self.comboBoxVariant.addItems(["Select Variant","Normal","CDAC"])
         list(map(lambda x: self.comboBoxVariant.model().item(x).setEnabled(False), range(3)))
         self.btnGetVariant = QPushButton(self, text="GET VARIANT")
+        self.btnReboot = QPushButton(self, text="REBOOT")
         
-        self.btnGetVariant.clicked.connect(
-            lambda: [self.btnGetVariant.setEnabled(False), Thread(target=self.worker.getDeviceVariant, args=(self.getVariant,)).start()]
-        )
+        def getVariantOnClick():
+            self.btnGetVariant.setEnabled(False)
+            self.worker.fsmState = 4
+
+        self.btnGetVariant.clicked.connect(getVariantOnClick)
         
         hlayout1.addWidget(labelVariant, 0, 0)
         hlayout1.addWidget(self.comboBoxVariant, 0, 1)
         hlayout1.addWidget(self.btnGetVariant, 0, 2)
+        hlayout1.addWidget(self.btnReboot, 0, 4)
         
-        [hlayout1.setColumnStretch(i, 1) for i in range(4)]
+        [hlayout1.setColumnStretch(i, 1) for i in range(5)]
                 
         hlayout2 = QGridLayout()
         i = count(0)
@@ -564,16 +568,22 @@ class UIConfigRecovery:
         hlayout3.addWidget(self.btnGetUin, 1, 1)
         hlayout3.addWidget(self.btnSetUin, 1, 2)
         
+        hlayout3.addWidget(QLabel(self, text=""), 0, 3)
+
         labelVIN = QLabel(self, text="VIN")
         self.lineEditVin = QLineEdit(self)
         self.lineEditVin.setDisabled(True)
         self.btnGetVin = QPushButton(self, text="GET VIN")
         self.btnSetVin = QPushButton(self, text="SET VIN")
 
-        hlayout3.addWidget(labelVIN, 0, 3)
-        hlayout3.addWidget(self.lineEditVin, 0, 4, 1, 2)
-        hlayout3.addWidget(self.btnGetVin, 1, 4)
-        hlayout3.addWidget(self.btnSetVin, 1, 5)
+        hlayout3.addWidget(labelVIN, 0, 4)
+        hlayout3.addWidget(self.lineEditVin, 0, 5, 1, 2)
+        hlayout3.addWidget(self.btnGetVin, 1, 5)
+        hlayout3.addWidget(self.btnSetVin, 1, 6)
+        
+        [hlayout3.setColumnStretch(i, 1) for i in range(7)]
+        
+        hlayout4 = QGridLayout()
         
         labelCip2 = QLabel(self, text="CIP2")
         self.lineEditCip2 = QLineEdit(self)
@@ -581,23 +591,18 @@ class UIConfigRecovery:
         self.lineEditCip2.setDisabled(True)
         self.btnGetCip2 = QPushButton(self, text="GET CIP2")
         self.btnSetCip2 = QPushButton(self, text="SET CIP2")
+        self.btnSetCip2.hide()
         
-        hlayout3.addWidget(labelCip2, 0, 6)
-        hlayout3.addWidget(self.lineEditCip2, 0, 7, 1, 2)
-        hlayout3.addWidget(self.btnGetCip2, 1, 7)
-        hlayout3.addWidget(self.btnSetCip2, 1, 8)
+        hlayout4.addWidget(labelCip2, 0, 0)
+        hlayout4.addWidget(self.lineEditCip2, 0, 1, 1, 3)
+        hlayout4.addWidget(self.btnGetCip2, 0, 4)
+        hlayout4.addWidget(self.btnSetCip2, 0, 5)
         
-        [hlayout3.setColumnStretch(i, 1) for i in range(9)]
-        
-        hlayout4 = QGridLayout()
-        
-        self.btnReboot = QPushButton(self, text="REBOOT")
         self.btnEmrAck = QPushButton(self, text="EMR ACK")
         
-        hlayout4.addWidget(self.btnReboot, 0, 0)
-        hlayout4.addWidget(self.btnEmrAck, 0, 1)
+        hlayout4.addWidget(self.btnEmrAck, 0, 7)
         
-        [hlayout4.setColumnStretch(i, 1) for i in range(5)]
+        [hlayout4.setColumnStretch(i, 1) for i in range(8)]
 
         layout.insertSpacing(0, 50)
         layout.addLayout(hlayout1)
