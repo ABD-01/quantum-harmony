@@ -390,16 +390,7 @@ class ServiceToolUi(QtWidgets.QMainWindow):
             self.stackedWidget = self.findChild(QtWidgets.QStackedWidget,'stackedWidget')
             self.btnCfgRecover.clicked.connect(self.switchProfile)
 
-            def hidebtnCfgRecover(): 
-                self.btnCfgRecover.hide()
-                self.btnFwMode.clicked.disconnect(hidebtnCfgRecover)
-                self.btnCertMode.clicked.disconnect(hidebtnCfgRecover)
-                self.btnCfgRecover.deleteLater()
-                self.page_mid.deleteLater()
-                self.page_cfg.deleteLater()
-                
-            self.btnFwMode.clicked.connect(hidebtnCfgRecover)
-            self.btnCertMode.clicked.connect(hidebtnCfgRecover)
+            self.switchProfileAttempt = 0
         else:
             self.btnCfgRecover.hide()
             self.btnCfgRecover.deleteLater()
@@ -419,7 +410,6 @@ class ServiceToolUi(QtWidgets.QMainWindow):
         # Profile Switching setup
         self.profiles = IntEnum('Profiles', ['FLASH', 'CFG_RECOVERY'])
         self.currentProfile = self.profiles.FLASH
-        self.switchProfileAttempt = 0
         
         # MUTLI-THREADING
         self.worker = Worker()                                  # a new worker to perform those tasks
@@ -445,6 +435,7 @@ class ServiceToolUi(QtWidgets.QMainWindow):
     
     def writeFiles(self):
         self.btnWrite.setEnabled(False)
+        self.btnCfgRecover.setEnabled(False)
         self.worker.fsmState = 'IDLE'
         # for serial port prevalidation must be done over SERIAL commands for battery and other checks
         if commInterface == 'SERIAL':
@@ -587,6 +578,8 @@ class ServiceToolUi(QtWidgets.QMainWindow):
             self.comboBoxComPort.setEnabled(False)
             self.btnFwMode.setEnabled(False)
             self.btnCertMode.setEnabled(False)
+            if CONFIG_RECOVERY_SUPPORT:
+                self.btnCfgRecover.setEnabled(False)
         if arg[0] == 'RE-ENABLE_BUTTONS':
             self.btnFwMode.setEnabled(True)
             self.btnCertMode.setEnabled(True)
@@ -601,6 +594,8 @@ class ServiceToolUi(QtWidgets.QMainWindow):
             self.btnCertMode.setChecked(False)
             fileList.clear()
             self.btnWrite.setEnabled(False)
+            if CONFIG_RECOVERY_SUPPORT:
+                self.btnCfgRecover.setEnabled(True)
         if arg[0] == 'PREVALIDATION_ERR':
             self.btnFwMode.setChecked(False)
             self.btnCertMode.setChecked(False)

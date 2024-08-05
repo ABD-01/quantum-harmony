@@ -52,7 +52,7 @@ class WorkerConfig(QObject):
     getVariantSignal = pyqtSignal(object)
     rebootingSignal = pyqtSignal(bool)
     ser_dll = None
-    state = IntEnum('State', ['IDLE', 'TRANSPARENT', 'SENDIND', 'WAITING_RESPONSE'], start=0)
+    state = IntEnum('State', ['IDLE', 'TRANSPARENT', 'SENDING', 'WAITING_RESPONSE', 'GET_VARIANT'], start=0)
     rbtWaitTimer = 20
     def __init__(self, ser_handle=None):
         super(WorkerConfig, self).__init__()
@@ -111,12 +111,12 @@ class WorkerConfig(QObject):
                         self.handleUi.emit(['LOG_APPEND', rxData, ''])
                         # print("rx <- " + rxData)
                     else:
-                        self.fsmState = self.state.SENDIND
+                        self.fsmState = self.state.SENDING
                 except Exception as e:
                     print(e)
                     pass
                 
-            if self.fsmState == self.state.SENDIND:
+            if self.fsmState == self.state.SENDING:
                 self.currentCmd: Command = self.commandQueue.get()
                 self.ser_dll.serial_write(self.ser_handle, self.currentCmd.cmd.encode(), len(self.currentCmd.cmd.encode()))        
                 self.logAppend("Sending command: %s" % self.currentCmd.cmd)
@@ -149,12 +149,15 @@ class WorkerConfig(QObject):
                         print("Response received: {}".format(str(match[0])))
                         break
                     attempt += 1
-                    print(attempt)
                 if not found:
                     self.logAppend("Failed to get response for command: %s" % self.currentCmd.cmd)
                     self.handleUi.emit(['SHOW_POPUP', 'Warning',"Failed to get response for command: %s" % self.currentCmd.cmd])
 
                 
+                self.fsmState = self.state.TRANSPARENT
+
+            if self.fsmState == self.state.GET_VARIANT:
+                self.getDeviceVariant()
                 self.fsmState = self.state.TRANSPARENT
             
         self.finished.emit()
@@ -189,13 +192,11 @@ class WorkerConfig(QObject):
         self.handleUi.emit(['LOG_APPEND', f"<h3><span style='color:cyan'>{escape(text)}</span></h3>", ''])
 
     
-    def getDeviceVariant(self, cb=None):
+    def getDeviceVariant(self):
         print("Get Device Variant")
         if self.ser_dll is None or self.ser_handle is None:
             self.handleUi.emit(['LOG_APPEND', "Serial port not initialized", ""])
             return None
-        
-        self.fsmState = self.state.IDLE
         
         uin_pattern1 = re.compile(r"<STATUS#UIN#(\w+)#>")
         uin_pattern2 = re.compile(r"<UIN:(\w+)>")
@@ -252,8 +253,6 @@ class WorkerConfig(QObject):
                     self.handleUi.emit(['LOG_APPEND', "Failed to get UIN...", ''])
                     looprun = False
     
-        self.fsmState = self.state.TRANSPARENT
-        # cb(res)
         self.getVariantSignal.emit(res)         
         return res
     
@@ -318,7 +317,7 @@ class UIConfigRecovery:
             self.thread.start()
             self.worker.fsmState = 1
             self.currentProfile = self.profiles.CFG_RECOVERY
-            self.stackedWidget.setCurrentIndex(2) # TODO: set to 2
+            self.stackedWidget.setCurrentIndex(2)
             
             # UI Stuff on change
             self._updateUiOnSwicth(2)
@@ -376,7 +375,7 @@ class UIConfigRecovery:
             QTimer.singleShot(1000, lambda: self.buttons.disable(False))  
          
     def getVariant(self, res):
-        print("Receved Callback")
+        print("Receved getVariantSignal")
         if res is None:
             self.btnGetVariant.setEnabled(True)
             self.worker.handleUi.emit(['LOG_APPEND', 'Could not get device variant', ''])
@@ -387,12 +386,24 @@ class UIConfigRecovery:
         self.comboBoxVariant.setCurrentText(variant)
         if not (len(uin) < 19 or uin == 'ACCOLADE123456789'):
             self.lineEditUin.setText(uin)
+        self.lineEditNwsw.setEnabled(True)
+        self.lineEditSimtype.setEnabled(True)
         self.lineEditUin.setEnabled(True)
         self.lineEditVin.setEnabled(True)
         self.lineEditCip2.setEnabled(True)
+        self.lineEditCert.setEnabled(True)
         self.deviceVariant = variant
         self.buttons.disable(False)
         self.setupCfgButtons(self.deviceVariant)
+
+    def startCfgRecovery(self):
+        i = count(1000,2000)
+        QTimer.singleShot(next(i), lambda: self.btnGetnSetNwsw.click())
+        QTimer.singleShot(next(i), lambda: self.btnGetnSetSimtype.click())
+        QTimer.singleShot(next(i), lambda: self.btnGetCip2.click())
+        QTimer.singleShot(next(i), lambda: self.btnGetUin.click())
+        QTimer.singleShot(next(i), lambda: self.btnGetVin.click())
+        QTimer.singleShot(next(i), lambda: self.btnGetCert.click())
 
     def setupCfgButtons(self, variant):
         
@@ -400,27 +411,26 @@ class UIConfigRecovery:
             self.lineEditNwsw.setText(x[0])
             nwsw = int(x[0])
             if nwsw != 1:
-                # self.handleUiFromThread('SHOW_POPUP', 'Warning', 'Auto NW Switching was not enabled. Enabling it.')
-                self.popWarning('Auto NW Switching is not enabled. Enabling it.')
+                self.popWarning('Auto NW Switching is not enabled. It will be enabled now.')
                 self.worker.sendCommand(self.command_ids["SET NWSW"])
 
         def handleSimtype(x):
             self.lineEditSimtype.setText(x[0])
             simtype = int(x[0])
             if simtype != 0:
-                self.popWarning('SIM TYPE was not set to 0. Setting it.')
+                self.popWarning('SIM TYPE was not set to 0. It is now being set to 0.')
                 self.worker.sendCommand(self.command_ids["SET SIMTYP"])
 
         def handleUin(x):
             uin = x[0]
             self.lineEditUin.setText(uin)
             if len(uin) < 19 or uin == 'ACCOLADE123456789':
-                self.popWarning('UIN is not valid.')
+                self.popWarning('UIN is not valid. Please enter a valid UIN as per the device sticker.')
 
         def setUIN():
             uin = self.lineEditUin.text()
             if len(uin) < 19 or uin == 'ACCOLADE123456789':
-                self.popWarning('UIN is not valid.')
+                self.popWarning('UIN is not valid. Please enter a valid UIN as per the device sticker.')
                 return
             cmd = f"CMN SET UIN:{uin}" if self.deviceVariant == "CDAC" else f"CMN *SET#UIN#{uin}#"
             self.worker.sendCommand(-1, Command(cmd, willRbt=True))
@@ -430,29 +440,33 @@ class UIConfigRecovery:
             vin = x[0]
             self.lineEditVin.setText(vin)
             if len(vin) < 17 or vin == 'AAAAAAAAAAAAAA':
-                self.popWarning('VIN/CHNO is not valid.')
+                self.popWarning('VIN is not valid. Please enter a valid VIN number as per the vehicle Chassis number.')
 
         def setVIN():
             vin = self.lineEditVin.text()
             if len(vin) < 17 or vin == 'AAAAAAAAAAAAAA':
-                self.popWarning('VIN/CHNO is not valid.')
+                self.popWarning('VIN is not valid. Please enter a valid VIN number as per the vehicle Chassis number.')
                 return
             cmd = f"CMN SET CHNO:{vin}" if self.deviceVariant == "CDAC" else f"CMN *SET#CHNO#{vin}#"
             self.worker.sendCommand(-1, Command(cmd, willRbt=True))
             return
 
-            
         def handleCip2(x):
             ip, port = x[0], x[1]
             self.lineEditCip2.setText("%s:%s" % (ip, port))
-            if ip != 'ais-data.accoladeelectronics.com':
-                self.popWarning('Invalid IP address for CIP2.')
-            elif port != '5555':
-                self.worker.handleUi.emit(['SHOW_POPUP', 'Warning', 'Invalid port for CIP2.'])
-                self.popWarning('Invalid port for CIP2.')
+            if ip != 'ais-data.accoladeelectronics.com' or port != '5555':
+                self.popWarning('CIP2 is invalid. It will now be set to valid CIP2.')
+                self.worker.sendCommand(self.command_ids["SET CIP2"])
         
-        
-            
+        def handleCert(x):
+            certs = int(x[0]), int(x[1]), int(x[2])
+            self.lineEditCert.setText("CA: %s, CC: %s, CK: %s" % (certs[0], certs[1], certs[2]))
+            is_within_1_percent = lambda given, target: abs(given - target) <= 0.01 * given
+            # expects cert lengths to be withing 1% of expected values
+            expected_values = [2048, 1984, 3294]
+            if not all(is_within_1_percent(cert, expected) for cert, expected in zip(certs, expected_values)):
+                self.popWarning('One or more certificates are invalid. Please flash the valid Certificate.')
+ 
         NORMAL_COMMANDS = {
             "GET NWSW": ("CMN *GET#DEVNWSW#", r"<STATUS#DEVNWSW#(\d)#>", handleNwsw),
             "SET NWSW": ("CMN *SET#DEVNWSW#1#", None, None),
@@ -462,6 +476,7 @@ class UIConfigRecovery:
             "GET CHNO": ("CMN *GET#CHNO#", r"<STATUS#CHNO#(\w+)#>", handleVin),
             "GET CIP2": ("CMN *GET#CIP2#", r"<STATUS#CIP2#(.+)#(\d+)#>", handleCip2),
             "SET CIP2": ("CMN *SET#CIP2#ais-data.accoladeelectronics.com#5555#", None, None),
+            "GET CERT": ("CMN *GET#CERT#", r"<STATUS#CERT#(\d+),(\d+),(\d+)#>", handleCert),
             "REBOOT": ("CMN *SET#CRST#1#", None, None),
             "EMR ACK": ("CMN *SET*SACK#1#", None, None),
         }
@@ -476,6 +491,7 @@ class UIConfigRecovery:
             "GET CHNO": ("CMN GET CHNO", r"<CHNO:(\w+)>", handleVin),
             "GET CIP2": ("CMN GET CIP2", r"<CIP2:(.+):(\d+)>", handleCip2),
             "SET CIP2": ("CMN SET CIP2:ais-data.accoladeelectronics.com:5555", None, None),
+            "GET CERT": ("CMN GET CERT", r"<CERT:(\d+),(\d+),(\d+)>", handleCert),
             "REBOOT": ("CMN SET CRST:1", None, None),
             "EMR ACK": ("CMN SET EO:EO", None, None),
         }
@@ -496,7 +512,7 @@ class UIConfigRecovery:
         self.btnGetVin.clicked.connect(lambda: self.worker.sendCommand(self.command_ids["GET CHNO"]))
         self.btnSetVin.clicked.connect(setVIN)
         self.btnGetCip2.clicked.connect(lambda: self.worker.sendCommand(self.command_ids["GET CIP2"]))
-        self.btnSetCip2.clicked.connect(lambda: self.worker.sendCommand(self.command_ids["SET CIP2"]))
+        self.btnGetCert.clicked.connect(lambda: self.worker.sendCommand(self.command_ids["GET CERT"]))
         self.btnReboot.clicked.connect(lambda: self.worker.sendCommand(self.command_ids["REBOOT"]))
         self.btnEmrAck.clicked.connect(lambda: self.worker.sendCommand(self.command_ids["EMR ACK"]))
 
@@ -509,109 +525,43 @@ class UIConfigRecovery:
     def getPage3Children(self):
         self.page_cfg = self.findChild(QWidget,'page_cfg')
 
-        layout = QVBoxLayout(self.page_cfg)
 
-        hlayout1 = QGridLayout()
-        labelVariant = QLabel(self, text="Variant")
-        self.comboBoxVariant = QComboBox(self)
-        self.comboBoxVariant.addItems(["Select Variant","Normal","CDAC"])
+        self.comboBoxVariant = self.findChild(QComboBox,'comboBoxVariant')
         list(map(lambda x: self.comboBoxVariant.model().item(x).setEnabled(False), range(3)))
-        self.btnGetVariant = QPushButton(self, text="GET VARIANT")
-        self.btnReboot = QPushButton(self, text="REBOOT")
+        self.btnGetVariant = self.findChild(QPushButton,'btnGetVariant')
+        self.btnStartCfgRecovery = self.findChild(QPushButton,'btnStartCfgRecovery')
+
+        self.btnReboot = self.findChild(QPushButton,'btnReboot')
+        self.btnEmrAck = self.findChild(QPushButton,'btnEmrAck')
         
+        self.lineEditNwsw = self.findChild(QLineEdit,'lineEditNwsw') 
+        self.btnGetnSetNwsw = self.findChild(QPushButton,'btnGetnSetNwsw')
+        
+        self.lineEditSimtype = self.findChild(QLineEdit,'lineEditSimtype')
+        self.btnGetnSetSimtype = self.findChild(QPushButton,'btnGetnSetSimtype')
+                
+        self.lineEditUin = self.findChild(QLineEdit,'lineEditUin')
+        self.btnGetUin = self.findChild(QPushButton,'btnGetUin')
+        self.btnSetUin = self.findChild(QPushButton,'btnSetUin')
+        
+        self.lineEditVin = self.findChild(QLineEdit,'lineEditVin')
+        self.btnGetVin = self.findChild(QPushButton,'btnGetVin')
+        self.btnSetVin = self.findChild(QPushButton,'btnSetVin')
+
+        self.lineEditCip2 = self.findChild(QLineEdit,'lineEditCip2')
+        self.btnGetCip2 = self.findChild(QPushButton,'btnGetCip2')
+
+        self.lineEditCert = self.findChild(QLineEdit,'lineEditCert')
+        self.btnGetCert = self.findChild(QPushButton,'btnGetCert')
+
+
         def getVariantOnClick():
             self.btnGetVariant.setEnabled(False)
             self.worker.fsmState = 4
 
         self.btnGetVariant.clicked.connect(getVariantOnClick)
         
-        hlayout1.addWidget(labelVariant, 0, 0)
-        hlayout1.addWidget(self.comboBoxVariant, 0, 1)
-        hlayout1.addWidget(self.btnGetVariant, 0, 2)
-        hlayout1.addWidget(self.btnReboot, 0, 4)
-        
-        [hlayout1.setColumnStretch(i, 1) for i in range(5)]
-                
-        hlayout2 = QGridLayout()
-        i = count(0)
-
-        labelNwsw = QLabel(self, text="Auto NW Switching")
-        self.lineEditNwsw = QLineEdit(self); self.lineEditNwsw.setDisabled(True)
-        self.btnGetnSetNwsw = QPushButton(self, text="GETnSet NWSW")
-        
-        labelSimtype = QLabel(self, text="Sim Type")
-        self.lineEditSimtype = QLineEdit(self); self.lineEditSimtype.setDisabled(True)
-        self.btnGetnSetSimtype = QPushButton(self, text="GETnSet SIMTYPE")
-                
-        hlayout2.addWidget(labelNwsw, 0, next(i))
-        hlayout2.addWidget(self.lineEditNwsw, 0, next(i))
-        hlayout2.addWidget(self.btnGetnSetNwsw, 0, next(i))
-                
-        hlayout2.addWidget(QLabel(self, text=""), 0, next(i))
-                
-        hlayout2.addWidget(labelSimtype, 0, next(i))
-        hlayout2.addWidget(self.lineEditSimtype, 0, next(i))
-        hlayout2.addWidget(self.btnGetnSetSimtype, 0, next(i))
-        
-        [hlayout2.setColumnStretch(_, 1) for _ in range(next(i))]
-        
-        hlayout3 = QGridLayout()
-        
-        labelUin = QLabel(self, text="UIN")
-        self.lineEditUin = QLineEdit(self)
-        self.lineEditUin.setDisabled(True)
-        self.btnGetUin = QPushButton(self, text="GET UIN")
-        self.btnSetUin = QPushButton(self, text="SET UIN")
-        
-        hlayout3.addWidget(labelUin, 0, 0)
-        hlayout3.addWidget(self.lineEditUin, 0, 1, 1, 2)
-        hlayout3.addWidget(self.btnGetUin, 1, 1)
-        hlayout3.addWidget(self.btnSetUin, 1, 2)
-        
-        hlayout3.addWidget(QLabel(self, text=""), 0, 3)
-
-        labelVIN = QLabel(self, text="VIN")
-        self.lineEditVin = QLineEdit(self)
-        self.lineEditVin.setDisabled(True)
-        self.btnGetVin = QPushButton(self, text="GET VIN")
-        self.btnSetVin = QPushButton(self, text="SET VIN")
-
-        hlayout3.addWidget(labelVIN, 0, 4)
-        hlayout3.addWidget(self.lineEditVin, 0, 5, 1, 2)
-        hlayout3.addWidget(self.btnGetVin, 1, 5)
-        hlayout3.addWidget(self.btnSetVin, 1, 6)
-        
-        [hlayout3.setColumnStretch(i, 1) for i in range(7)]
-        
-        hlayout4 = QGridLayout()
-        
-        labelCip2 = QLabel(self, text="CIP2")
-        self.lineEditCip2 = QLineEdit(self)
-        self.lineEditCip2.setReadOnly(True)
-        self.lineEditCip2.setDisabled(True)
-        self.btnGetCip2 = QPushButton(self, text="GET CIP2")
-        self.btnSetCip2 = QPushButton(self, text="SET CIP2")
-        self.btnSetCip2.hide()
-        
-        hlayout4.addWidget(labelCip2, 0, 0)
-        hlayout4.addWidget(self.lineEditCip2, 0, 1, 1, 3)
-        hlayout4.addWidget(self.btnGetCip2, 0, 4)
-        hlayout4.addWidget(self.btnSetCip2, 0, 5)
-        
-        self.btnEmrAck = QPushButton(self, text="EMR ACK")
-        
-        hlayout4.addWidget(self.btnEmrAck, 0, 7)
-        
-        [hlayout4.setColumnStretch(i, 1) for i in range(8)]
-
-        layout.insertSpacing(0, 50)
-        layout.addLayout(hlayout1)
-        layout.addLayout(hlayout2)
-        layout.addLayout(hlayout3)
-        layout.addLayout(hlayout4)
-        [layout.setStretch(i, 1) for i in range(2)]
-        
-        self.page_cfg.setLayout(layout)
+        self.btnStartCfgRecovery.clicked.connect(self.startCfgRecovery)
         
         class Buttons(list): 
             def disable(self, v):list(map(lambda x: x.setDisabled(v), self))
