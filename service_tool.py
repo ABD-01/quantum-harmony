@@ -76,7 +76,7 @@ CERT_TYPE_CA_CRT = 0        # file name must be "ca-crt.pem"
 CERT_TYPE_DEVICE_CRT = 1    # file name must be "device-crt.pem"
 CERT_TYPE_DEVICE_KEY = 2    # file name must be "device-key.pem"
 
-VERSION='1.1.0'
+VERSION='1.2.0'
 
 # THIS VARIABLE WILL SERVE AS A SWITCH TO ENABLE OR DISABLE CONFIG RECOVERY
 CONFIG_RECOVERY_SUPPORT = True
@@ -400,7 +400,7 @@ class ServiceToolUi(QtWidgets.QMainWindow):
     
         # populate the comboboxes
         self.btnConnect.setIcon(QIcon(':/resources/disconnected.png'))
-        comPortList = ['COM23','COM24']   # TODO eshwar enable TCP support after verified working. reserve TCP port string here, it will be followed by available serial ports
+        comPortList = []   # TODO eshwar enable TCP support after verified working. reserve TCP port string here, it will be followed by available serial ports
         # comPortList = ['TCP Port']   # reserve TCP port string here, it will be followed by available serial ports
         availablePorts = list(ports.comports())
         for i in availablePorts:
@@ -428,7 +428,7 @@ class ServiceToolUi(QtWidgets.QMainWindow):
         
         self.handleUiFromThread('SHOW_POPUP', 'Disclaimer', 'Accolade Service tool usage is restricted to Accolade service engineers and representatives only\n')
         self.labelVersion.setText('SERVICE TOOL v{}'.format(VERSION))
-        self.labelBuild.setText('Stable build 08 Jul 2024')
+        self.labelBuild.setText('QA build 05 Aug 2024')
         
         self.setFixedSize(600,400)
         self.show() # show the gui

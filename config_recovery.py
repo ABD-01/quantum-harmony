@@ -397,7 +397,7 @@ class UIConfigRecovery:
         self.setupCfgButtons(self.deviceVariant)
 
     def startCfgRecovery(self):
-        i = count(1000,2000)
+        i = count(1100,2000)
         QTimer.singleShot(next(i), lambda: self.btnGetnSetNwsw.click())
         QTimer.singleShot(next(i), lambda: self.btnGetnSetSimtype.click())
         QTimer.singleShot(next(i), lambda: self.btnGetCip2.click())
