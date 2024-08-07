@@ -99,6 +99,12 @@ class WorkerConfig(QObject):
                                 self.logAppend("Reboot Successful...")
                                 print("Reboot Successful...")
                                 break
+                        # Wait 5 sec after reboot
+                        start_time = time.time()
+                        while time.time() - start_time < 5:
+                            self.ser_dll.serial_read(self.ser_handle, self.rxBuffer, 1024)
+                        self.rxBuffer.value = b''
+                        
                         self.rebootingSignal.emit(False)
                         self.currentCmd = None
                             
@@ -227,7 +233,7 @@ class WorkerConfig(QObject):
                 looprun = False
                 variantFound = "Normal"
                 res =  variantFound, uin
-            if attempt == 10:
+            if attempt == 50:
                 self.handleUi.emit(['LOG_APPEND', "Failed to get UIN...", ''])
                 looprun = False
 
@@ -398,12 +404,13 @@ class UIConfigRecovery:
 
     def startCfgRecovery(self):
         i = count(1100,2000)
-        QTimer.singleShot(next(i), lambda: self.btnGetnSetNwsw.click())
-        QTimer.singleShot(next(i), lambda: self.btnGetnSetSimtype.click())
-        QTimer.singleShot(next(i), lambda: self.btnGetCip2.click())
-        QTimer.singleShot(next(i), lambda: self.btnGetUin.click())
-        QTimer.singleShot(next(i), lambda: self.btnGetVin.click())
-        QTimer.singleShot(next(i), lambda: self.btnGetCert.click())
+        with self.buttons:
+            QTimer.singleShot(next(i), lambda: self.worker.sendCommand(self.command_ids["GET NWSW"]))
+            QTimer.singleShot(next(i), lambda: self.worker.sendCommand(self.command_ids["GET SIMTYP"]))
+            QTimer.singleShot(next(i), lambda: self.worker.sendCommand(self.command_ids["GET CIP2"]))
+            QTimer.singleShot(next(i), lambda: self.worker.sendCommand(self.command_ids["GET UIN"]))
+            QTimer.singleShot(next(i), lambda: self.worker.sendCommand(self.command_ids["GET CHNO"]))
+            QTimer.singleShot(next(i), lambda: self.worker.sendCommand(self.command_ids["GET CERT"]))
 
     def setupCfgButtons(self, variant):
         
@@ -413,6 +420,9 @@ class UIConfigRecovery:
             if nwsw != 1:
                 self.popWarning('Auto NW Switching is not enabled. It will be enabled now.')
                 self.worker.sendCommand(self.command_ids["SET NWSW"])
+                self.setBg(self.lineEditNwsw, 1)
+                return
+            self.setBg(self.lineEditNwsw)
 
         def handleSimtype(x):
             self.lineEditSimtype.setText(x[0])
@@ -420,12 +430,18 @@ class UIConfigRecovery:
             if simtype != 0:
                 self.popWarning('SIM TYPE was not set to 0. It is now being set to 0.')
                 self.worker.sendCommand(self.command_ids["SET SIMTYP"])
+                self.setBg(self.lineEditSimtype, 1)
+                return
+            self.setBg(self.lineEditSimtype)
 
         def handleUin(x):
             uin = x[0]
             self.lineEditUin.setText(uin)
             if len(uin) < 19 or uin == 'ACCOLADE123456789':
                 self.popWarning('UIN is not valid. Please enter a valid UIN as per the device sticker.')
+                self.setBg(self.lineEditUin, 1)
+                return
+            self.setBg(self.lineEditUin)
 
         def setUIN():
             uin = self.lineEditUin.text()
@@ -441,6 +457,9 @@ class UIConfigRecovery:
             self.lineEditVin.setText(vin)
             if len(vin) < 17 or vin == 'AAAAAAAAAAAAAA':
                 self.popWarning('VIN is not valid. Please enter a valid VIN number as per the vehicle Chassis number.')
+                self.setBg(self.lineEditVin, 1)
+                return
+            self.setBg(self.lineEditVin)
 
         def setVIN():
             vin = self.lineEditVin.text()
@@ -457,6 +476,9 @@ class UIConfigRecovery:
             if ip != 'ais-data.accoladeelectronics.com' or port != '5555':
                 self.popWarning('CIP2 is invalid. It will now be set to valid CIP2.')
                 self.worker.sendCommand(self.command_ids["SET CIP2"])
+                self.setBg(self.lineEditCip2, 1)
+                return
+            self.setBg(self.lineEditCip2)
         
         def handleCert(x):
             certs = int(x[0]), int(x[1]), int(x[2])
@@ -466,6 +488,9 @@ class UIConfigRecovery:
             expected_values = [2048, 1984, 3294]
             if not all(is_within_1_percent(cert, expected) for cert, expected in zip(certs, expected_values)):
                 self.popWarning('One or more certificates are invalid. Please flash the valid Certificate.')
+                self.setBg(self.lineEditCert, 1)
+                return
+            self.setBg(self.lineEditCert)
  
         NORMAL_COMMANDS = {
             "GET NWSW": ("CMN *GET#DEVNWSW#", r"<STATUS#DEVNWSW#(\d)#>", handleNwsw),
@@ -566,6 +591,8 @@ class UIConfigRecovery:
         class Buttons(list): 
             def disable(self, v):list(map(lambda x: x.setDisabled(v), self))
             def timeout(self):[self.disable(True), QTimer.singleShot(1000, lambda: self.disable(False))]
+            def __enter__(self):self.disable(True)
+            def __exit__(self, type, value, traceback):self.disable(False)
             
         self.buttons = Buttons(self.page_cfg.findChildren(QPushButton))
         # list(map(lambda btn: btn.clicked.connect((lambda btn: lambda: print("BTN_CLICKED:", btn.text()))(btn)), self.buttons))
@@ -577,3 +604,13 @@ class UIConfigRecovery:
 
     def popWarning(self, text):
         self.worker.handleUi.emit(['SHOW_POPUP', 'Warning', text])
+
+    def setBg(self, widget, color=0):
+        """
+        if color is `1` Background will be set to danger
+        if color is `0` Background will be set to success
+        """
+        if color:
+            widget.setStyleSheet("background-color: rgb(255, 0, 0, 64);")
+        else:
+            widget.setStyleSheet("background-color: rgb(0, 255, 0, 64);")
