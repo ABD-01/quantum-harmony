@@ -430,7 +430,7 @@ class ServiceToolUi(QtWidgets.QMainWindow):
         self.labelVersion.setText('SERVICE TOOL v{}'.format(VERSION))
         self.labelBuild.setText('QA build 05 Aug 2024')
         
-        self.setFixedSize(600,400)
+        self.setFixedSize(680,460)
         self.show() # show the gui
     
     def writeFiles(self):
