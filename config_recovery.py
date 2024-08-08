@@ -579,6 +579,7 @@ class UIConfigRecovery:
 
         self.lineEditCip2 = self.findChild(QLineEdit,'lineEditCip2')
         self.btnGetCip2 = self.findChild(QPushButton,'btnGetCip2')
+        self.btnGetCip2.hide()
 
         self.lineEditCert = self.findChild(QLineEdit,'lineEditCert')
         self.btnGetCert = self.findChild(QPushButton,'btnGetCert')
