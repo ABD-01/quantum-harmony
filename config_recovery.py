@@ -25,6 +25,8 @@ pip3 install PyQt5
 pip3 install serial-tool
 pip install pyqt5-tools
 '''
+import sys
+from os import execl  
 from ctypes import create_string_buffer
 from enum import IntEnum
 from queue import Queue
@@ -503,7 +505,7 @@ class UIConfigRecovery:
             "SET CIP2": ("CMN *SET#CIP2#ais-data.accoladeelectronics.com#5555#", None, None),
             "GET CERT": ("CMN *GET#CERT#", r"<STATUS#CERT#(\d+),(\d+),(\d+)#>", handleCert),
             "REBOOT": ("CMN *SET#CRST#1#", None, None),
-            "EMR ACK": ("CMN *SET*SACK#1#", None, None),
+            "EMR ACK": ("CMN *SET#SACK#1#", None, None),
         }
 
         # Define commands for CDAC variant
@@ -561,9 +563,11 @@ class UIConfigRecovery:
         
         self.lineEditNwsw = self.findChild(QLineEdit,'lineEditNwsw') 
         self.btnGetnSetNwsw = self.findChild(QPushButton,'btnGetnSetNwsw')
+        self.btnGetnSetNwsw.hide()
         
         self.lineEditSimtype = self.findChild(QLineEdit,'lineEditSimtype')
         self.btnGetnSetSimtype = self.findChild(QPushButton,'btnGetnSetSimtype')
+        self.btnGetnSetSimtype.hide()
                 
         self.lineEditUin = self.findChild(QLineEdit,'lineEditUin')
         self.btnGetUin = self.findChild(QPushButton,'btnGetUin')
@@ -578,6 +582,9 @@ class UIConfigRecovery:
 
         self.lineEditCert = self.findChild(QLineEdit,'lineEditCert')
         self.btnGetCert = self.findChild(QPushButton,'btnGetCert')
+
+        self.btnFlashCert = self.findChild(QPushButton,'btnFlashCert')
+        self.btnFlashCert.clicked.connect(self.restart)
 
 
         def getVariantOnClick():
@@ -614,3 +621,7 @@ class UIConfigRecovery:
             widget.setStyleSheet("background-color: rgb(255, 0, 0, 64);")
         else:
             widget.setStyleSheet("background-color: rgb(0, 255, 0, 64);")
+
+    @staticmethod
+    def restart():
+        execl(sys.executable, sys.executable, *sys.argv)
