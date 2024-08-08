@@ -76,7 +76,7 @@ CERT_TYPE_CA_CRT = 0        # file name must be "ca-crt.pem"
 CERT_TYPE_DEVICE_CRT = 1    # file name must be "device-crt.pem"
 CERT_TYPE_DEVICE_KEY = 2    # file name must be "device-key.pem"
 
-VERSION='1.3.0'
+VERSION='1.3.1'
 
 # THIS VARIABLE WILL SERVE AS A SWITCH TO ENABLE OR DISABLE CONFIG RECOVERY
 CONFIG_RECOVERY_SUPPORT = True
@@ -428,7 +428,7 @@ class ServiceToolUi(QtWidgets.QMainWindow):
         
         self.handleUiFromThread('SHOW_POPUP', 'Disclaimer', 'Accolade Service tool usage is restricted to Accolade service engineers and representatives only\n')
         self.labelVersion.setText('SERVICE TOOL v{}'.format(VERSION))
-        self.labelBuild.setText('QA build 05 Aug 2024')
+        self.labelBuild.setText('<strong>Phase I</strong> Stable build 08 Aug 2024')
         
         self.setFixedSize(680,460)
         self.show() # show the gui
