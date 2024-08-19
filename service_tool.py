@@ -399,7 +399,7 @@ class ServiceToolUi(QtWidgets.QMainWindow):
     
         # populate the comboboxes
         self.btnConnect.setIcon(QIcon(':/resources/disconnected.png'))
-        comPortList = []   # TODO eshwar enable TCP support after verified working. reserve TCP port string here, it will be followed by available serial ports
+        comPortList = ["COM23"]   # TODO eshwar enable TCP support after verified working. reserve TCP port string here, it will be followed by available serial ports
         # comPortList = ['TCP Port']   # reserve TCP port string here, it will be followed by available serial ports
         availablePorts = list(ports.comports())
         for i in availablePorts:
