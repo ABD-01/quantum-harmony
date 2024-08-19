@@ -54,12 +54,11 @@ pip install packaging
 #   e) 1-second delay before using the "GET" command for certificates
 #   f) 2-second delay after the "END SESSION" event occurs and before using "RBT"
 
- 
 
-import sys, time, os, resources, re, tarfile, shutil, zipfile
+import ctypes
+import os, re, resources, shutil, sys, tarfile, time, zipfile
 import os.path as osp
 import threading
-import ctypes
 from datetime import datetime
 from enum import IntEnum
 
@@ -76,7 +75,7 @@ CERT_TYPE_CA_CRT = 0        # file name must be "ca-crt.pem"
 CERT_TYPE_DEVICE_CRT = 1    # file name must be "device-crt.pem"
 CERT_TYPE_DEVICE_KEY = 2    # file name must be "device-key.pem"
 
-VERSION='1.3.1'
+VERSION='1.4.0'
 
 # THIS VARIABLE WILL SERVE AS A SWITCH TO ENABLE OR DISABLE CONFIG RECOVERY
 CONFIG_RECOVERY_SUPPORT = True
@@ -428,7 +427,7 @@ class ServiceToolUi(QtWidgets.QMainWindow):
         
         self.handleUiFromThread('SHOW_POPUP', 'Disclaimer', 'Accolade Service tool usage is restricted to Accolade service engineers and representatives only\n')
         self.labelVersion.setText('SERVICE TOOL v{}'.format(VERSION))
-        self.labelBuild.setText('<strong>Phase I</strong> Stable build 08 Aug 2024')
+        self.labelBuild.setText('<strong>Phase I</strong> Stable build 19 Aug 2024')
         
         self.setFixedSize(680,460)
         self.show() # show the gui

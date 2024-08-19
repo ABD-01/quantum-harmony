@@ -25,20 +25,30 @@ pip3 install PyQt5
 pip3 install serial-tool
 pip install pyqt5-tools
 '''
+import re
 import sys
-from os import execl  
+import time
 from ctypes import create_string_buffer
 from enum import IntEnum
+from itertools import count
+from os import execl
 from queue import Queue
 from threading import Thread
-from itertools import count
 
-import re
-import time
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QTimer, QByteArray
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QGridLayout, QLabel, QComboBox, QLineEdit, QPushButton
-from PyQt5.QtGui import QMovie
+import requests
 
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, QByteArray, QObject, QTimer
+from PyQt5.QtGui import QMovie, QPixmap
+from PyQt5.QtWidgets import (
+    QComboBox,
+    QGridLayout,
+    QLabel,
+    QLineEdit,
+    QMessageBox,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+)
 
 class Command:
     def __init__(self, cmd, rsp_pattern=None, callback=None, timeout=15, **kwargs):
@@ -53,6 +63,7 @@ class WorkerConfig(QObject):
     handleUi = pyqtSignal(list)
     getVariantSignal = pyqtSignal(object)
     rebootingSignal = pyqtSignal(bool)
+    checkCfgSignal = pyqtSignal()
     ser_dll = None
     state = IntEnum('State', ['IDLE', 'TRANSPARENT', 'SENDING', 'WAITING_RESPONSE', 'GET_VARIANT'], start=0)
     rbtWaitTimer = 20
@@ -320,6 +331,7 @@ class UIConfigRecovery:
             self.worker.handleUi.connect(self.handleUiFromThread) 
             self.worker.getVariantSignal.connect(self.getVariant)
             self.worker.rebootingSignal.connect(self.rebooting)
+            self.worker.checkCfgSignal.connect(self.checkAllConfig)
             self.worker.ser_dll = self.ser_dll
             self.thread.started.connect(self.worker.work)
             self.thread.start()
@@ -405,6 +417,8 @@ class UIConfigRecovery:
         self.setupCfgButtons(self.deviceVariant)
 
     def startCfgRecovery(self):
+        self.config_states = dict.fromkeys(['NWSW', 'SIMTYP', 'UIN', 'VIN', 'CIP2', 'CERT'], False)
+
         i = count(1100,2000)
         with self.buttons:
             QTimer.singleShot(next(i), lambda: self.worker.sendCommand(self.command_ids["GET NWSW"]))
@@ -415,35 +429,39 @@ class UIConfigRecovery:
             QTimer.singleShot(next(i), lambda: self.worker.sendCommand(self.command_ids["GET CERT"]))
 
     def setupCfgButtons(self, variant):
-        
+
         def handleNwsw(x):
             self.lineEditNwsw.setText(x[0])
             nwsw = int(x[0])
-            if nwsw != 1:
-                self.popWarning('Auto NW Switching is not enabled. It will be enabled now.')
-                self.worker.sendCommand(self.command_ids["SET NWSW"])
-                self.setBg(self.lineEditNwsw, 1)
-                return
-            self.setBg(self.lineEditNwsw)
+            self.updateConfigState(
+                'NWSW', 
+                nwsw == 1,
+                'Auto NW Switching is not enabled. It will be enabled now.',
+                self.lineEditNwsw,
+                "SET NWSW"
+            )
 
         def handleSimtype(x):
             self.lineEditSimtype.setText(x[0])
             simtype = int(x[0])
-            if simtype != 0:
-                self.popWarning('SIM TYPE was not set to 0. It is now being set to 0.')
-                self.worker.sendCommand(self.command_ids["SET SIMTYP"])
-                self.setBg(self.lineEditSimtype, 1)
-                return
-            self.setBg(self.lineEditSimtype)
+            self.updateConfigState(
+                'SIMTYP', 
+                simtype == 0,
+                'SIM TYPE was not set to 0. It is now being set to 0.',
+                self.lineEditSimtype,
+                "SET SIMTYP"
+            )
 
         def handleUin(x):
             uin = x[0]
             self.lineEditUin.setText(uin)
-            if len(uin) < 19 or uin == 'ACCOLADE123456789':
-                self.popWarning('UIN is not valid. Please enter a valid UIN as per the device sticker.')
-                self.setBg(self.lineEditUin, 1)
-                return
-            self.setBg(self.lineEditUin)
+            is_valid = not (len(uin) < 19 or uin == 'ACCOLADE123456789')
+            self.updateConfigState(
+                'UIN', 
+                is_valid,
+                'UIN is not valid. Please enter a valid UIN as per the device sticker.',
+                self.lineEditUin
+            )
 
         def setUIN():
             uin = self.lineEditUin.text()
@@ -457,11 +475,13 @@ class UIConfigRecovery:
         def handleVin(x):
             vin = x[0]
             self.lineEditVin.setText(vin)
-            if len(vin) < 17 or vin == 'AAAAAAAAAAAAAA':
-                self.popWarning('VIN is not valid. Please enter a valid VIN number as per the vehicle Chassis number.')
-                self.setBg(self.lineEditVin, 1)
-                return
-            self.setBg(self.lineEditVin)
+            is_valid = not (len(vin) < 17 or vin == 'AAAAAAAAAAAAAA')
+            self.updateConfigState(
+                'VIN', 
+                is_valid,
+                'VIN is not valid. Please enter a valid VIN number as per the vehicle Chassis number.',
+                self.lineEditVin
+            )
 
         def setVIN():
             vin = self.lineEditVin.text()
@@ -475,29 +495,33 @@ class UIConfigRecovery:
         def handleCip2(x):
             ip, port = x[0], x[1]
             self.lineEditCip2.setText("%s:%s" % (ip, port))
-            if ip != 'ais-data.accoladeelectronics.com' or port != '5555':
-                self.popWarning('CIP2 is invalid. It will now be set to valid CIP2.')
-                self.worker.sendCommand(self.command_ids["SET CIP2"])
-                self.setBg(self.lineEditCip2, 1)
-                return
-            self.setBg(self.lineEditCip2)
+            is_valid = ip == 'ais-data.accoladeelectronics.com' and port == '5555'
+            self.updateConfigState(
+                'CIP2', 
+                is_valid,
+                'CIP2 is invalid. It will now be set to valid CIP2.',
+                self.lineEditCip2,
+                "SET CIP2"
+            )
         
         def handleCert(x):
             certs = int(x[0]), int(x[1]), int(x[2])
             self.lineEditCert.setText("CA: %s, CC: %s, CK: %s" % (certs[0], certs[1], certs[2]))
             is_within_1_percent = lambda given, target: abs(given - target) <= 0.01 * given
             # expects cert lengths to be withing 1% of expected values
-            expected_values = [2048, 1984, 3294]
-            if not all(is_within_1_percent(cert, expected) for cert, expected in zip(certs, expected_values)):
-                self.popWarning('One or more certificates are invalid. Please flash the valid Certificate.')
-                self.setBg(self.lineEditCert, 1)
-                return
-            self.setBg(self.lineEditCert)
+            EXPECTED_VALUES = [2048, 1984, 3294]
+            is_valid = all(is_within_1_percent(cert, expected) for cert, expected in zip(certs, EXPECTED_VALUES))
+            self.updateConfigState(
+                'CERT', 
+                is_valid,
+                'One or more certificates are invalid. Please flash the valid Certificate.',
+                self.lineEditCert
+            )
  
         NORMAL_COMMANDS = {
-            "GET NWSW": ("CMN *GET#DEVNWSW#", r"<STATUS#DEVNWSW#(\d)#>", handleNwsw),
+            "GET NWSW": ("CMN *GET#DEVNWSW#", r"<STATUS#DEVNWSW#(\d+)#>", handleNwsw),
             "SET NWSW": ("CMN *SET#DEVNWSW#1#", None, None),
-            "GET SIMTYP": ("CMN *GET#SIMTYP#", r"<STATUS#SIMTYP#(\d)#>", handleSimtype),
+            "GET SIMTYP": ("CMN *GET#SIMTYP#", r"<STATUS#SIMTYP#(\d+)#>", handleSimtype),
             "SET SIMTYP": ("CMN *SET#SIMTYP#0#", None, None),
             "GET UIN": ("CMN *GET#UIN#", r"<STATUS#UIN#(\w+)#>", handleUin),
             "GET CHNO": ("CMN *GET#CHNO#", r"<STATUS#CHNO#(\w+)#>", handleVin),
@@ -510,9 +534,9 @@ class UIConfigRecovery:
 
         # Define commands for CDAC variant
         CDAC_COMMANDS = {
-            "GET NWSW": ("CMN GET DEVNWSW", r"<DEVNWSW:(\d)>", handleNwsw),
+            "GET NWSW": ("CMN GET DEVNWSW", r"<DEVNWSW:(\d+)>", handleNwsw),
             "SET NWSW": ("CMN SET DEVNWSW:1", None, None),
-            "GET SIMTYP": ("CMN GET SIMTYP", r"<SIMTYP:(\d)>", handleSimtype),
+            "GET SIMTYP": ("CMN GET SIMTYP", r"<SIMTYP:(\d+)>", handleSimtype),
             "SET SIMTYP": ("CMN SET SIMTYP:0", None, None),
             "GET UIN": ("CMN GET UIN", r"<UIN:(\w+)>", handleUin),
             "GET CHNO": ("CMN GET CHNO", r"<CHNO:(\w+)>", handleVin),
@@ -542,6 +566,42 @@ class UIConfigRecovery:
         self.btnGetCert.clicked.connect(lambda: self.worker.sendCommand(self.command_ids["GET CERT"]))
         self.btnReboot.clicked.connect(lambda: self.worker.sendCommand(self.command_ids["REBOOT"]))
         self.btnEmrAck.clicked.connect(lambda: self.worker.sendCommand(self.command_ids["EMR ACK"]))
+    
+    def updateConfigState(self, cfg, is_valid, warning_msg, line_edit_key, set_command=None):
+        if is_valid:
+            self.setBg(line_edit_key)
+            self.config_states[cfg] = True
+        else:
+            self.popWarning(warning_msg)
+            self.setBg(line_edit_key, 1)
+            self.config_states[cfg] = False
+            if set_command is not None:
+                self.worker.sendCommand(self.command_ids[set_command])
+
+        self.worker.checkCfgSignal.emit()
+
+    def checkAllConfig(self):
+        if not all(self.config_states.values()):
+            return
+
+        # send config recovery status
+        SERVER_URL = "http://ais140vahan-test2.cloudjiffy.net/addDeviceCfgStatus"
+        try:
+            uin = self.lineEditUin.text()
+            x = requests.get(SERVER_URL, [('uin', uin), ('cfg_recovery_status', 'success')])
+            x.raise_for_status()
+
+            msgBox = QMessageBox()
+            msgBox.setWindowTitle("OK")
+            msgBox.setIconPixmap(QPixmap(':/resources/ok.png'))
+            msgBox.setText(x.json()['userMessage'])
+            msgBox.exec()
+
+            return True
+
+        except requests.exceptions.RequestException as e:
+            self.popWarning('Config Recovery Successfull, but could not update status to server')
+            print(e)
 
     def getPage2Children(self):
         self.page_mid = self.findChild(QWidget,'page_mid')
@@ -609,7 +669,6 @@ class UIConfigRecovery:
         list(map(lambda btn: btn.clicked.connect((lambda btn: lambda: (print("BTN_CLICKED:", btn.text()),self.buttons.timeout()))(btn)), self.buttons))
         # list(map(lambda x: x.clicked.connect(lambda: self.buttons.timeout()), self.buttons))
 
-
     def popWarning(self, text):
         self.worker.handleUi.emit(['SHOW_POPUP', 'Warning', text])
 
@@ -619,9 +678,9 @@ class UIConfigRecovery:
         if color is `0` Background will be set to success
         """
         if color:
-            widget.setStyleSheet("background-color: rgb(255, 0, 0, 64);")
+            widget.setStyleSheet("background-color: rgba(255, 0, 0, 30%);")
         else:
-            widget.setStyleSheet("background-color: rgb(0, 255, 0, 64);")
+            widget.setStyleSheet("background-color: rgba(0, 255, 0, 30%);")
 
     @staticmethod
     def restart():

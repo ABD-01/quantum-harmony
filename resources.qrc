@@ -4,5 +4,6 @@
         <file>resources/connected.png</file>
         <file>resources/disconnected.png</file>
         <file>resources/thumbnail.png</file>
+        <file>resources/ok.png</file>
     </qresource>
 </RCC>
