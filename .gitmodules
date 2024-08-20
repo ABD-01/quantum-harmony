@@ -6,3 +6,7 @@
 	path = server-fota-crc-multithreading
 	url = https://github.com/ABD-01/quantum-harmony
 	branch = server-fota-crc-multithreading
+[submodule "tcu-2g-service-tool-dealer"]
+	path = tcu-2g-service-tool-dealer
+	url = https://github.com/ABD-01/quantum-harmony.git
+	branch = tcu-2g-service-tool-dealer
