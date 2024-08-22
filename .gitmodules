@@ -10,3 +10,7 @@
 	path = tcu-2g-service-tool-dealer
 	url = https://github.com/ABD-01/quantum-harmony.git
 	branch = tcu-2g-service-tool-dealer
+[submodule "network-library-bumblenet"]
+	path = network-library-bumblenet
+	url = https://github.com/ABD-01/quantum-harmony
+	branch = network-library-bumblenet
