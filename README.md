@@ -1,8 +1,8 @@
 # Random stuff I keep doing to learn about new topics, packages, languages, frameworks and whatever else is out there
 
-## Branch: 
+Branches:
 
-### mqtt-client-sub
+## mqtt-client-sub
 
 **Theme**: The requirement was to provide a firmware for testing EC20 Modem. The telematics device connects to test.mosquitto.org public broker and publishes packet of size 60kB (default, configurable) at interval of 30secs (default, configurable).
 
@@ -121,4 +121,8 @@ The command I used to build paho.mqtt.c
 The first thing I wrote which satisfies the requirements in python file
 
 
-### server-fota-crc-multithreading
+## server-fota-crc-multithreading
+
+## network-library-bumblenet
+
+## tcu-2g-service-tool-dealer
