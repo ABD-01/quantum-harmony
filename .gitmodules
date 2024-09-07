@@ -14,3 +14,7 @@
 	path = network-library-bumblenet
 	url = https://github.com/ABD-01/quantum-harmony
 	branch = network-library-bumblenet
+[submodule "data-structures-algorithms"]
+	path = data-structures-algorithms
+	url = https://github.com/ABD-01/quantum-harmony.git
+	branch = DSA
