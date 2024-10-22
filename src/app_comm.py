@@ -52,12 +52,14 @@ def print_test_status(test):
 
 def can_init(bit_rate, tester_id, ecu_id):
     # Print version information
-    buff_size = 256
+    buff_size = 258
     buffer = create_string_buffer(buff_size)
     status = objPCANUds.GetValue_2013(PCANTP_HANDLE_NONEBUS, PUDS_PARAMETER_API_VERSION, buffer, buff_size)
     print('app_comm  : PCAN-UDS API Version - %s: %s' % (buffer.value, print_test_status(status)))
 
     # Initialize channel
+    if bit_rate == '250Kbps':
+        status = objPCANUds.Initialize_2013(g_pcan_handle, PCANTP_BAUDRATE_250K, 0, 0, 0)
     if bit_rate == '500Kbps':
         status = objPCANUds.Initialize_2013(g_pcan_handle, PCANTP_BAUDRATE_500K, 0, 0, 0)
     if bit_rate == '1Mbps':
@@ -72,7 +74,7 @@ def can_init(bit_rate, tester_id, ecu_id):
     status = objPCANUds.GetValue_2013(g_pcan_handle, PUDS_PARAMETER_TIMEOUT_REQUEST, timeout_request,
                                     sizeof(timeout_request))
     print('app_comm  : Get request timeout value (%ums): %s' % (timeout_request.value, print_test_status(status)))
-    customTimeOut = c_uint32(timeout_request.value * 2)
+    customTimeOut = c_uint32(timeout_request.value * 10)
     status = objPCANUds.SetValue_2013(g_pcan_handle,
                                     PUDS_PARAMETER_TIMEOUT_REQUEST,
                                     customTimeOut, sizeof(customTimeOut))
@@ -85,7 +87,7 @@ def can_init(bit_rate, tester_id, ecu_id):
     status = objPCANUds.GetValue_2013(g_pcan_handle, PUDS_PARAMETER_TIMEOUT_RESPONSE, timeout_response,
                                     sizeof(timeout_response))
     print('app_comm  : Get response timeout value (%ums): %s' % (timeout_response.value, print_test_status(status)))
-    customTimeOut = c_uint32(timeout_response.value * 2)
+    customTimeOut = c_uint32(timeout_response.value * 10)
     status = objPCANUds.SetValue_2013(g_pcan_handle,
                                     PUDS_PARAMETER_TIMEOUT_RESPONSE,
                                     customTimeOut, sizeof(customTimeOut))
@@ -101,7 +103,7 @@ def can_init(bit_rate, tester_id, ecu_id):
     print('app_comm  : Get default PUDS_PARAMETER_J1939_PRIORITY (%ums): %s' % (can_tp_prio.value, print_test_status(status)))
 
     # TODO: understand why is it required for this project
-    if app_ui.g_project['name'] == "TCU (chetak)":
+    if app_ui.g_project['name'] in ["TCU (chetak)", "Sampark"]:
         can_tp_prio = c_uint32(3)
         status = objPCANUds.SetValue_2013(g_pcan_handle,
                                         PUDS_PARAMETER_J1939_PRIORITY,
@@ -173,7 +175,7 @@ def perform_service_tests():
     #     print('Last programming  Write DID fail')
     # elif testWriteDataByIdentifier(handle, config, 0x5408, shopCode, 5) == False:
     #     print('Shop code Write DID fail')
-    if app_ui.g_project['name'] == "TCU (chetak)":
+    if app_ui.g_project['name'] in ["TCU (chetak)", "Sampark"]:
         vinNo = app_ui.g_additional_details['VinNo']
         vinNo = create_string_buffer(vinNo.encode('utf-8'))
         vinDid = 0xF190
@@ -536,7 +538,7 @@ def update_progress_bar(file_size, fileOffset):
 
 def transfer_file(channel, config, file_path, file_size):
     print(f'transferring file {file_size} {file_path}')
-    chunk_size = 254
+    chunk_size = 256
     sequence = 0
     fileOffset = 0
     index = 0
@@ -548,6 +550,9 @@ def transfer_file(channel, config, file_path, file_size):
         update_progress_bar(file_size, fileOffset)
         index = fileOffset
         status &= testTransferData(channel, config, read_bytes, data, sequence)
+        if not status:
+            print('FAILED')
+            return
         sequence = sequence + 1
 
 def testTransferData(channel, config, size, buffer, sequence):

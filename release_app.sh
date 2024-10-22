@@ -54,7 +54,7 @@ cp -v ./doc/release_notes/*.pdf $WORKING_DIRECTORY/
 
 cd $WORKING_DIRECTORY
 
-7z a uCommander_v${VERSION}.zip uCommander_v${VERSION}.exe release_notes_v*.pdf
+7z a uCommander_v${VERSION}.zip uCommander_v${VERSION}.exe release_notes.pdf
 
 # cleanup
 cd $PROJECT_DIRECTORY
