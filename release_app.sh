@@ -56,7 +56,6 @@ cd $WORKING_DIRECTORY
 
 7z a uCommander_v${VERSION}.zip uCommander_v${VERSION}.exe release_notes.pdf
 
-# cleanup
 cd $PROJECT_DIRECTORY
 echo "[i] CLEANUP"
 
