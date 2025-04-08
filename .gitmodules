@@ -18,3 +18,7 @@
 	path = data-structures-algorithms
 	url = https://github.com/ABD-01/quantum-harmony.git
 	branch = DSA
+[submodule "cmake-build-embedded"]
+	path = cmake-build-embedded
+	url = https://github.com/ABD-01/quantum-harmony.git
+	branch = cmake-for-mc25
