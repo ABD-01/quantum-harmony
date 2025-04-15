@@ -159,6 +159,7 @@ int main(int argc, char * argv[])
                       "}};" << endl;
     boot_info_file << "__attribute__((section(\".text\"))) void _dummy_entry(){}" << endl;
     boot_info_file.close();
+    cout << "boot_info_data.c created successfully" << endl;
 
     return 0;
 }

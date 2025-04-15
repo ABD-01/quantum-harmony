@@ -3,9 +3,10 @@
 #
 # File:		boot_info.mk
 # Author:	Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
-# Date:		14 April 2025
+# Date:		15 April 2025
 # Version:	1.0
-# Brief:	
+# Brief:	Builds a boot information hex file. Depends on application
+# 			bin file to generate boot info such as file size, crc etc.
 #
 # Copyright (c) 2024-2025 Accolade Electronics Pvt. Ltd. All Rights Reserved.
 #
@@ -16,30 +17,68 @@
 #
 ##############################################################################
 
-TOOLCHAIN_PATH := "C:/ti/ccs2002/ccs/tools/compiler/ti-cgt-armllvm_4.0.1.LTS"
+SHELL = cmd.exe
 
+TOOLCHAIN_PATH := C:/ti/ccs2002/ccs/tools/compiler/ti-cgt-armllvm_4.0.1.LTS
 CC := $(TOOLCHAIN_PATH)/bin/tiarmclang
-LD := $(TOOLCHAIN_PATH)/bin/tiarmlnk
+#LD := $(TOOLCHAIN_PATH)/bin/tiarmlnk
+LD := $(CC)
 OBJCOPY := $(TOOLCHAIN_PATH)/bin/tiarmhex
 
-DDEVICE := -D__MSPM0G3507__
-___FLAGS := -march=thumbv6m -mcpu=cortex-m0plus -mfloat-abi=soft -mlittle-endian -mthumb
-CFLAGS := -O2
+OUTPUT_DIR := build
+BOOTINFO_DIR := ../boot_info
 
-APP_BIN := ti_firmware.out
-TARGET = ti_boot_info
-BOOT_INFO_FILE = boot_info_data.c
+APP_BIN := ti_firmware.bin
+LINKER_SCRIPT :=$(BOOTINFO_DIR)/linker.cmd
+BOOTINFO_SRC := boot_info_data.c
+BOOTINFO_OBJ := $(OUTPUT_DIR)/boot_info_data.o
+BOOTINFO_ELF := $(OUTPUT_DIR)/boot_info.out
+BOOTINFO_HEX := $(OUTPUT_DIR)/boot_info.hex
 
-OUTPUT_DIR := boot_info
+DEVICE := MSPM0G3507
+CPU_FLAGS := -march=thumbv6m -mcpu=cortex-m0plus -mfloat-abi=soft -mlittle-endian -mthumb
+CFLAGS := -D__$(DEVICE)__ $(CPU_FLAGS) -O2 -Wall -Wextra
+LDFLAGS := -Wl,-m"$(OUTPUT_DIR)/boot_info.map" \
+		   -Wl,--diag_wrap=off -Wl,--display_error_number -Wl,--warn_sections \
+		   -Wl,--xml_link_info="$(OUTPUT_DIR)/boot_info_linkInfo.xml" \
+		   -Wl,--rom_model -Wl,--entry_point=_dummy_entry -Wl,--disable_auto_rts
+
+
+EXT := .exe
+RM := DEL /F
+RMDIR := RMDIR /S/Q
 
 .PHONY: all clean
 
-all: $(OUTPUT_DIR)/$(TARGET).hex
+all: $(BOOTINFO_HEX)
 
-$(OUTPUT_DIR)/$(TARGET).hex: $(OUTPUT_DIR)/$(TARGET).out
+$(OUTPUT_DIR):
+	@if not exist "$(OUTPUT_DIR)" mkdir "$(OUTPUT_DIR)"
 
+$(BOOTINFO_HEX): $(BOOTINFO_ELF)
+	@echo 'Building HEX target: "$@"'
+	@$(OBJCOPY) --memwidth=8 --romwidth=8 --diag_wrap=off --intel -o $@ $<
+	@echo 'Finished building target: "$@"'
+	@echo ' '
 
-$(OUTPUT_DIR)/$(TARGET).out: $(BOOT_INFO_FILE)
+$(BOOTINFO_ELF): $(BOOTINFO_OBJ) $(LINKER_SCRIPT)
+	@echo 'Building ELF target: "$@"'
+	@$(LD) $(CFLAGS) $(LDFLAGS) -o $@ $^
+	@echo 'Finished building target: "$@"'
+	@echo ' '
 
+$(BOOTINFO_OBJ): $(BOOTINFO_SRC) | $(OUTPUT_DIR)
+	@echo 'Compiling source: "$@"'
+	@$(CC) $(CFLAGS) -o $@ -c $<
+	@echo 'Finished compiling source: "$@"'
+	@echo ' '
 
-$(BOOT_INFO_FILE): $(APP_BIN)
+$(BOOTINFO_SRC): $(BOOTINFO_DIR)/generate_bootinfo_file$(EXT) $(APP_BIN)
+	@echo 'Creating source file: "$@"'
+	@$(BOOTINFO_DIR)/generate_bootinfo_file$(EXT) $(APP_BIN)
+	@echo 'Finished creating file: "$@"'
+	@echo ' '
+
+clean:
+	-@$(RMDIR) $(OUTPUT_DIR)
+	-@$(RM) $(BOOTINFO_SRC)
