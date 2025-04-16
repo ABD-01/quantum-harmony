@@ -10,6 +10,9 @@
  *
  * Changelog:
  *
+ * 2025-04-16   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
+ *   - File size in boot_info_data.c will not account for the CRC bytes
+ *
  * 2025-04-15   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
  *   - Updated BootInfo_t structure. Added fields: debug, curr_retries, prev_retries
  *
@@ -152,7 +155,7 @@ int main(int argc, char * argv[])
                       "0x00009000,"
                       "0x00013000,"
                       "0x00000000,"
-                      "0x" << std::hex << std::uppercase << file_size << ","
+                      "0x" << std::hex << std::uppercase << file_size - (skip_append ? 0 : 4) << ","
                       "0x00000000,"
                       "0x" << std::hex << std::uppercase << crc_value << ","
                       "0xFFFFFFFF"
