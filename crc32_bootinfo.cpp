@@ -10,6 +10,9 @@
  *
  * Changelog:
  *
+ * 2025-04-17   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
+ *   - Add CRC32 calculation for boot info buffer to ensure data integrity verification
+ *
  * 2025-04-16   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
  *   - File size in boot_info_data.c will not account for the CRC bytes
  *
@@ -48,6 +51,7 @@ constexpr auto crc_table = [] {
 
 uint32_t crc32(const std::vector<char>& data);
 uint32_t crc32(const char * data, size_t size);
+int generate_bootinfo_file(uint32_t, uint32_t);
 
 
 int main(int argc, char * argv[])
@@ -125,41 +129,88 @@ int main(int argc, char * argv[])
         }
         outfile.close();
         cout << "File CRC: 0x" << std::hex << std::uppercase << crc_value << endl;
-        file_size += 4;
     }
 
-    cout << "File Size (After): " << std::dec << file_size << endl;
+    cout << "File Size (After): " << std::dec << file_size + (skip_append ? 0 : 4) << endl;
     delete[] buffer;
     
     /**
      * Creating boot_info_data.c file
      */
+    generate_bootinfo_file(file_size, crc_value);
+
+    return 0;
+}
+
+int generate_bootinfo_file(uint32_t file_size, uint32_t crc_value)
+{
+     
     ofstream boot_info_file("boot_info_data.c", std::ios::trunc);
     if(!boot_info_file.is_open())
     {
         cerr << "Unable to open boot_info_data.c" << endl;
         return 1;
     }
+
+    constexpr size_t FLASH_SECTOR_SIZE = 1024;
+    union {struct __attribute__((__packed__)) {
+            uint8_t img_update;
+            uint8_t debug;
+            uint8_t curr_retries;
+            uint16_t prev_retries;
+            uint32_t initialized;
+            uint32_t start_bl;
+            uint32_t start_app;
+            uint32_t part_size_bl;
+            uint32_t part_size_app;
+            uint32_t img_len_bl;
+            uint32_t img_len_app;
+            uint32_t crc_bl;
+            uint32_t crc_app;
+            uint32_t crc32;
+        } st;
+        uint8_t buff[FLASH_SECTOR_SIZE];
+    } _boot_info = {
+        {0x00,0x00,0x00,0x0000,0xA5A5A5A5,0x00000000,0x00009400,0x00009000,0x00013000,0x00009000,file_size,0x00000000,crc_value,0x00000000},
+    };
+
+    uint32_t block_crc32 = crc32(reinterpret_cast<const char*>(_boot_info.buff), FLASH_SECTOR_SIZE);
+
     boot_info_file << "// Automatically-generated file. Do not edit!\n" << endl;
     boot_info_file << "#include <stdint.h>" << endl;
-    boot_info_file << "#define APP_START_ADDR 0x00009400" << endl;
-    boot_info_file << "typedef union{struct __attribute__((__packed__)){uint8_t img_update;uint8_t debug;uint8_t curr_retries;uint16_t prev_retries;uint32_t initialized;uint32_t start_bl;uint32_t start_app;uint32_t part_size_bl;uint32_t part_size_app;uint32_t img_len_bl;uint32_t img_len_app;uint32_t crc_bl;uint32_t crc_app;uint32_t crc32;}st;uint8_t buff[1024];} BootInfo_t;" << endl;
-    boot_info_file << "const BootInfo_t _boot_info __attribute__((section(\".boot_info\"),used)) = {{"
-                      "0x00,"
-                      "0x00,"
-                      "0x00,"
-                      "0x0000,"
-                      "0xA5A5A5A5,"
-                      "0x00000000,"
-                      "APP_START_ADDR,"
-                      "0x00009000,"
-                      "0x00013000,"
-                      "0x00000000,"
-                      "0x" << std::hex << std::uppercase << file_size - (skip_append ? 0 : 4) << ","
-                      "0x00000000,"
-                      "0x" << std::hex << std::uppercase << crc_value << ","
-                      "0xFFFFFFFF"
-                      "}};" << endl;
+    boot_info_file << "#define FLASH_SECTOR_SIZE 1024" << endl;
+    boot_info_file << "const union {struct __attribute__((__packed__)) {"
+                        "uint8_t img_update;"
+                        "uint8_t debug;"
+                        "uint8_t curr_retries;"
+                        "uint16_t prev_retries;"
+                        "uint32_t initialized;"
+                        "uint32_t start_bl;"
+                        "uint32_t start_app;"
+                        "uint32_t part_size_bl;"
+                        "uint32_t part_size_app;"
+                        "uint32_t img_len_bl;"
+                        "uint32_t img_len_app;"
+                        "uint32_t crc_bl;"
+                        "uint32_t crc_app;"
+                        "uint32_t crc32;"
+                      "} st;"
+                      "uint8_t buff[FLASH_SECTOR_SIZE];"
+                      "} _boot_info __attribute__((section(\".boot_info\"),used)) = {{"
+                        "0x00,"
+                        "0x00,"
+                        "0x00,"
+                        "0x0000,"
+                        "0xA5A5A5A5,"
+                        "0x00000000,"
+                        "0x00009400,"
+                        "0x00009000,"
+                        "0x00013000,"
+                        "0x00009000,"
+                        "0x" << std::hex << std::uppercase << file_size << ","
+                        "0x00000000,"
+                        "0x" << std::hex << std::uppercase << crc_value << ","
+                        "0x" << std::hex << std::uppercase << block_crc32 << "}};" << endl;
     boot_info_file << "__attribute__((section(\".text\"))) void _dummy_entry(){}" << endl;
     boot_info_file.close();
     cout << "boot_info_data.c created successfully" << endl;
