@@ -12,6 +12,9 @@
 #
 # Changelog:
 #
+# 2025-04-23   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
+#   - Added target "boot_info.bin" to be created alongside the hex.
+#
 # 2025-04-15   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
 #   - Initial creation of the Makefile for crc32_bootinfo project.
 #
@@ -34,6 +37,7 @@ BOOTINFO_SRC := boot_info_data.c
 BOOTINFO_OBJ := $(OUTPUT_DIR)/boot_info_data.o
 BOOTINFO_ELF := $(OUTPUT_DIR)/boot_info.out
 BOOTINFO_HEX := $(OUTPUT_DIR)/boot_info.hex
+BOOTINFO_BIN := $(OUTPUT_DIR)/boot_info.bin
 
 DEVICE := MSPM0G3507
 CPU_FLAGS := -march=thumbv6m -mcpu=cortex-m0plus -mfloat-abi=soft -mlittle-endian -mthumb
@@ -50,10 +54,16 @@ RMDIR := RMDIR /S/Q
 
 .PHONY: all clean
 
-all: $(BOOTINFO_HEX)
+all: $(BOOTINFO_HEX) $(BOOTINFO_BIN)
 
 $(OUTPUT_DIR):
 	@if not exist "$(OUTPUT_DIR)" mkdir "$(OUTPUT_DIR)"
+
+$(BOOTINFO_BIN): $(BOOTINFO_ELF)
+	@echo 'Building Binary target: "$@"'
+	@$(OBJCOPY) --diag_wrap=off --binary -o $@ $<
+	@echo 'Finished building target: "$@"'
+	@echo ' '
 
 $(BOOTINFO_HEX): $(BOOTINFO_ELF)
 	@echo 'Building HEX target: "$@"'
