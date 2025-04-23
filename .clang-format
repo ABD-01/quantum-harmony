@@ -1,0 +1,10 @@
+BasedOnStyle: LLVM
+
+ColumnLimit:     100
+IndentWidth:     4
+TabWidth:        4
+
+BreakBeforeBraces: Linux
+
+AllowShortBlocksOnASingleLine: Always
+AllowShortIfStatementsOnASingleLine: WithoutElse
