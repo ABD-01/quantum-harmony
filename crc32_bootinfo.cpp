@@ -10,6 +10,9 @@
  *
  * Changelog:
  *
+ * 2025-04-29   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
+ *   - Added additional fields in struct: update_source, update_type, backup_pending
+ *
  * 2025-04-17   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
  *   - Add CRC32 calculation for boot info buffer to ensure data integrity verification
  *
@@ -141,8 +144,11 @@ int generate_bootinfo_file(uint32_t file_size, uint32_t crc_value)
     constexpr size_t FLASH_SECTOR_SIZE = 1024;
     union {
         struct __attribute__((__packed__)) {
-            uint8_t img_update;
             uint8_t debug;
+            uint8_t update;
+            uint8_t update_source;
+            uint8_t update_type;
+            uint8_t backup_pending;
             uint8_t curr_retries;
             uint16_t prev_retries;
             uint32_t initialized;
@@ -158,8 +164,8 @@ int generate_bootinfo_file(uint32_t file_size, uint32_t crc_value)
         } st;
         uint8_t buff[FLASH_SECTOR_SIZE];
     } _boot_info = {
-        {0x00, 0x00, 0x00, 0x0000, 0xA5A5A5A5, 0x00000000, 0x00009400, 0x00009000, 0x00013000,
-         0x00009000, file_size, 0x00000000, crc_value, 0x00000000},
+        {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0000, 0xA5A5A5A5, 0x00000000, 0x00009400, 0x00009000,
+         0x00013000, 0x00009000, file_size, 0xFFFFFFFF, crc_value, 0xFFFFFFFF},
     };
 
     uint32_t block_crc32 =
@@ -169,8 +175,11 @@ int generate_bootinfo_file(uint32_t file_size, uint32_t crc_value)
     boot_info_file << "#include <stdint.h>" << endl;
     boot_info_file << "#define FLASH_SECTOR_SIZE 1024" << endl;
     boot_info_file << "const union {struct __attribute__((__packed__)) {"
-                      "uint8_t img_update;"
                       "uint8_t debug;"
+                      "uint8_t update;"
+                      "uint8_t update_source;"
+                      "uint8_t update_type;"
+                      "uint8_t backup_pending;"
                       "uint8_t curr_retries;"
                       "uint16_t prev_retries;"
                       "uint32_t initialized;"
@@ -189,6 +198,9 @@ int generate_bootinfo_file(uint32_t file_size, uint32_t crc_value)
                       "0x00,"
                       "0x00,"
                       "0x00,"
+                      "0x00,"
+                      "0x00,"
+                      "0x00,"
                       "0x0000,"
                       "0xA5A5A5A5,"
                       "0x00000000,"
@@ -199,7 +211,7 @@ int generate_bootinfo_file(uint32_t file_size, uint32_t crc_value)
                       "0x"
                    << std::hex << std::uppercase << file_size
                    << ","
-                      "0x00000000,"
+                      "0xFFFFFFFF,"
                       "0x"
                    << std::hex << std::uppercase << crc_value
                    << ","
