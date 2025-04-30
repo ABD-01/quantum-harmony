@@ -10,6 +10,11 @@
  *
  * Changelog:
  *
+ * 2025-04-30   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
+ *   - Bugfix: Using `unsigned char` to deal with raw file buffer.(converting signed char to 32 bit
+ *     int is unsafe)
+ *   - Refactored crc32 function as a template function
+ *
  * 2025-04-29   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
  *   - Added additional fields in struct: update_source, update_type, backup_pending
  *
@@ -31,7 +36,6 @@
 #include <cstdint>
 #include <fstream>
 #include <iostream>
-#include <vector>
 
 using std::cerr;
 using std::cout;
@@ -51,8 +55,12 @@ constexpr auto crc_table = [] {
     return table;
 }();
 
-uint32_t crc32(const std::vector<char> &data);
-uint32_t crc32(const char *data, size_t size);
+template <typename T>
+using crc32_result_t = typename std::enable_if<std::is_integral<T>::value, uint32_t>::type;
+
+template <typename T>
+crc32_result_t<T> crc32(const T *data, size_t size);
+
 int generate_bootinfo_file(uint32_t, uint32_t);
 
 int main(int argc, char *argv[])
@@ -73,8 +81,8 @@ int main(int argc, char *argv[])
 
     // std::vector<char> buffer(file_size);
     // if(!file.read(reinterpret_cast<char*>(buffer.data()), file_size))
-    char *buffer = new char[file_size];
-    if (!file.read(buffer, file_size)) {
+    auto *buffer = new unsigned char[file_size];
+    if (!file.read(reinterpret_cast<char *>(buffer), file_size)) {
         cerr << "Unable to read file " << argv[1] << endl;
         delete[] buffer;
         return 1;
@@ -168,8 +176,7 @@ int generate_bootinfo_file(uint32_t file_size, uint32_t crc_value)
          0x00013000, 0x00009000, file_size, 0xFFFFFFFF, crc_value, 0xFFFFFFFF},
     };
 
-    uint32_t block_crc32 =
-        crc32(reinterpret_cast<const char *>(_boot_info.buff), FLASH_SECTOR_SIZE);
+    uint32_t block_crc32 = crc32(_boot_info.buff, FLASH_SECTOR_SIZE);
 
     boot_info_file << "// Automatically-generated file. Do not edit!\n" << endl;
     boot_info_file << "#include <stdint.h>" << endl;
@@ -224,17 +231,8 @@ int generate_bootinfo_file(uint32_t file_size, uint32_t crc_value)
     return 0;
 }
 
-uint32_t crc32(const std::vector<char> &data)
-{
-    uint32_t crc = 0xFFFFFFFF;
-    for (const char &byte : data) {
-        uint8_t index = ((crc >> 24) ^ static_cast<uint8_t>(byte)) & 0xFF;
-        crc = crc_table[index] ^ (crc << 8);
-    }
-    return crc;
-}
-
-uint32_t crc32(const char *data, size_t size)
+template <typename T>
+crc32_result_t<T> crc32(const T *data, size_t size)
 {
     uint32_t crc = 0xFFFFFFFF;
     for (size_t i = 0; i < size; ++i) {
