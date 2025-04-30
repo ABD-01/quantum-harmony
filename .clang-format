@@ -8,3 +8,5 @@ BreakBeforeBraces: Linux
 
 AllowShortBlocksOnASingleLine: Always
 AllowShortIfStatementsOnASingleLine: WithoutElse
+
+AlwaysBreakTemplateDeclarations: Yes
