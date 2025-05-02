@@ -2,7 +2,7 @@
  * @file    crc32_bootinfo.cpp
  * @author  Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
  * @date    14 April 2025
- * @version 1.0
+ * @version 1.1
  * @brief   Appends CRC32 checksum to a binary file (if needed) and generates a boot_info_data.c
  *          with embedded metadata, including the computed CRC and file size.
  *
@@ -10,21 +10,24 @@
  *
  * Changelog:
  *
- * 2025-04-30   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
+ * 2025-05-02   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
+ *   - Added generate_appcrc_file and generate_srec_cmd_file functions
+ *
+ * 2025-04-30   Muhammed Abdullah Shaikh
  *   - Bugfix: Using `unsigned char` to deal with raw file buffer.(converting signed char to 32 bit
  *     int is unsafe)
  *   - Refactored crc32 function as a template function
  *
- * 2025-04-29   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
+ * 2025-04-29   Muhammed Abdullah Shaikh
  *   - Added additional fields in struct: update_source, update_type, backup_pending
  *
- * 2025-04-17   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
+ * 2025-04-17   Muhammed Abdullah Shaikh
  *   - Add CRC32 calculation for boot info buffer to ensure data integrity verification
  *
- * 2025-04-16   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
+ * 2025-04-16   Muhammed Abdullah Shaikh
  *   - File size in boot_info_data.c will not account for the CRC bytes
  *
- * 2025-04-15   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
+ * 2025-04-15   Muhammed Abdullah Shaikh
  *   - Updated BootInfo_t structure. Added fields: debug, curr_retries, prev_retries
  *
  * 2025-04-14   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
@@ -43,7 +46,6 @@ using std::endl;
 using std::ofstream;
 
 constexpr uint32_t POLYNOMIAL = 0x04C11DB7;
-
 constexpr auto crc_table = [] {
     std::array<uint32_t, 256> table{};
     for (uint32_t i = 0; i < 256; i++) {
@@ -62,6 +64,8 @@ template <typename T>
 crc32_result_t<T> crc32(const T *data, size_t size);
 
 int generate_bootinfo_file(uint32_t, uint32_t);
+int generate_appcrc_file(uint32_t);
+int generate_srec_cmd_file(uint32_t, uint32_t);
 
 int main(int argc, char *argv[])
 {
@@ -79,8 +83,6 @@ int main(int argc, char *argv[])
     file.seekg(0, std::ios::beg);
     cout << "File Size (Before): " << file_size << endl;
 
-    // std::vector<char> buffer(file_size);
-    // if(!file.read(reinterpret_cast<char*>(buffer.data()), file_size))
     auto *buffer = new unsigned char[file_size];
     if (!file.read(reinterpret_cast<char *>(buffer), file_size)) {
         cerr << "Unable to read file " << argv[1] << endl;
@@ -104,8 +106,8 @@ int main(int argc, char *argv[])
         if (existing_crc == recomputed_crc) {
             crc_value = existing_crc;
             cout << "File CRC already exists as the trailing 4 bytes" << endl;
-            cout << "File CRC: 0x" << std::hex << std::uppercase << crc_value << endl;
             skip_append = true;
+            file_size -= 4;
         }
     }
 
@@ -126,10 +128,10 @@ int main(int argc, char *argv[])
             return 1;
         }
         outfile.close();
-        cout << "File CRC: 0x" << std::hex << std::uppercase << crc_value << endl;
     }
 
-    cout << "File Size (After): " << std::dec << file_size + (skip_append ? 0 : 4) << endl;
+    cout << "File CRC: 0x" << std::hex << std::uppercase << crc_value << endl;
+    cout << "File Size (After): " << std::dec << file_size + 4 << endl;
     delete[] buffer;
 
     /**
@@ -145,10 +147,11 @@ int generate_bootinfo_file(uint32_t file_size, uint32_t crc_value)
 
     ofstream boot_info_file("boot_info_data.c", std::ios::trunc);
     if (!boot_info_file.is_open()) {
-        cerr << "Unable to open boot_info_data.c" << endl;
+        cerr << "Unable to create boot_info_data.c" << endl;
         return 1;
     }
 
+    constexpr uint32_t APP_START_REGION = 0x00009400;
     constexpr size_t FLASH_SECTOR_SIZE = 1024;
     union {
         struct __attribute__((__packed__)) {
@@ -172,8 +175,8 @@ int generate_bootinfo_file(uint32_t file_size, uint32_t crc_value)
         } st;
         uint8_t buff[FLASH_SECTOR_SIZE];
     } _boot_info = {
-        {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0000, 0xA5A5A5A5, 0x00000000, 0x00009400, 0x00009000,
-         0x00013000, 0x00009000, file_size, 0xFFFFFFFF, crc_value, 0xFFFFFFFF},
+        {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0000, 0xA5A5A5A5, 0x00000000, APP_START_REGION,
+         0x00009000, 0x00013000, 0x00009000, file_size, 0xFFFFFFFF, crc_value, 0xFFFFFFFF},
     };
 
     uint32_t block_crc32 = crc32(_boot_info.buff, FLASH_SECTOR_SIZE);
@@ -181,6 +184,8 @@ int generate_bootinfo_file(uint32_t file_size, uint32_t crc_value)
     boot_info_file << "// Automatically-generated file. Do not edit!\n" << endl;
     boot_info_file << "#include <stdint.h>" << endl;
     boot_info_file << "#define FLASH_SECTOR_SIZE 1024" << endl;
+    boot_info_file << "#define APP_START_REGION 0x" << std::hex << std::uppercase
+                   << APP_START_REGION << endl;
     boot_info_file << "const union {struct __attribute__((__packed__)) {"
                       "uint8_t debug;"
                       "uint8_t update;"
@@ -211,7 +216,7 @@ int generate_bootinfo_file(uint32_t file_size, uint32_t crc_value)
                       "0x0000,"
                       "0xA5A5A5A5,"
                       "0x00000000,"
-                      "0x00009400,"
+                      "APP_START_REGION,"
                       "0x00009000,"
                       "0x00013000,"
                       "0x00009000,"
@@ -228,6 +233,93 @@ int generate_bootinfo_file(uint32_t file_size, uint32_t crc_value)
     boot_info_file.close();
     cout << "boot_info_data.c created successfully" << endl;
 
+    /**
+     * Creating app_crc32.bin file
+     */
+    generate_appcrc_file(crc_value);
+
+    /**
+     * Creating srec_cmd_hex_with_appcrc.txt file
+     */
+    generate_srec_cmd_file(file_size, APP_START_REGION);
+
+    return 0;
+}
+
+int generate_appcrc_file(uint32_t crc_value)
+{
+    /**
+     * Dev Note:
+     * This function generates `app_crc32.bin` for appending to the firmware hex image.
+     *
+     * The same result can also be achieved by using `srec_cat`
+     *
+     *  Example:
+     *    APP_START = 0x9400, APP_LENGTH = 0x4D70 → CRC address = 0xE170
+     *
+     *    srec_cat ti_firmware.hex -Intel \
+     *        -Bit_Reverse \
+     *        -CRC32_Little_Endian 0xE170 \
+     *        -Bit_Reverse \
+     *        -XOR 0xFF \
+     *        -crop 0xE170 0xE174 \
+     *        -Output app_crc32-mpeg2.hex
+     *
+     * This calculates a CRC32 MPEG-2 over the entire application and places the result at
+     * 0xE170–0xE173.
+     */
+
+    ofstream crcfile("app_crc32.bin", std::ios::binary | std::ios::trunc);
+    if (!crcfile.is_open()) {
+        cerr << "Unable to create app_crc32.bin" << endl;
+        return 1;
+    }
+    crc_value = __builtin_bswap32(crc_value);
+    if (!crcfile.write(reinterpret_cast<const char *>(&crc_value), 4 * sizeof(char))) {
+        cerr << "Unable to write to file app_crc32.bin" << endl;
+        return 1;
+    }
+    cout << "app_crc32.bin created successfully" << endl;
+    return 0;
+}
+
+int generate_srec_cmd_file(uint32_t file_size, uint32_t app_start_region)
+{
+
+    const char hex_cmd_file[] = "srec_cmd_create_hex_with_appcrc.txt";
+    const char bin_cmd_file[] = "srec_cmd_create_bin_with_appcrc.txt";
+    const char header[] = "# Automatically-generated file.\n\n"
+                          "# uncomment this line or pass source file from the command line\n"
+                          "# ti_firmware.hex\n";
+
+    ofstream cmd_file(hex_cmd_file, std::ios::trunc);
+    if (!cmd_file.is_open()) {
+        cerr << "Unable to create " << hex_cmd_file << endl;
+        return 1;
+    }
+    cmd_file << header << "-Intel\n"
+             << "app_crc32.bin -Binary\n"
+             << "-offset 0x" << std::hex << std::uppercase << (app_start_region + file_size) << "\n"
+             << "-Output\n"
+             << "# uncomment this line or pass output file from command line\n"
+             << "# ti_firmware_with_appcrc.hex -Intel\n";
+    cmd_file.close();
+
+    cmd_file.open(bin_cmd_file, std::ios::trunc);
+    if (!cmd_file.is_open()) {
+        std::cerr << "Unable to create " << bin_cmd_file << std::endl;
+        return 1;
+    }
+    cmd_file << header << "-Intel\n"
+             << "-offset -0x" << std::hex << std::uppercase << app_start_region << "\n"
+             << "app_crc32.bin -Binary\n"
+             << "-offset 0x" << file_size << "\n"
+             << "-Output\n"
+             << "# uncomment this line or pass output file from command line\n"
+             << "# ti_firmware_with_appcrc.bin -Binary\n";
+    cmd_file.close();
+
+    cout << "srec command files created successfully" << endl;
     return 0;
 }
 
