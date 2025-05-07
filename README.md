@@ -5,7 +5,7 @@
 - [Fota server in python, punching CRC to Bin and other CRC related scripts](#server-fota-crc-multithreading)
 - [Service Tool for 2G telematic using PyQt5](#tcu-2g-service-tool-dealer)
 - [A work timer watchdog created in C using GTK3](#task-control-gtk3)
-- []()
+- [Post Build program for boot_info and CRC punch](#bootinfo-and-appcrc)
 - [CMake based buildsystem for MC25 OpenCPU Quectel](#cmake-build-embedded)
 - [Bumblenet - A Network Library (Incomplete)](#network-library-bumblenet)
 - [Data Structures Algorithms Practice](#data-structures-algorithms)
@@ -133,6 +133,7 @@ The first thing I wrote which satisfies the requirements in python file
 
 ## [server-fota-crc-multithreading](https://github.com/ABD-01/quantum-harmony/tree/server-fota-crc-multithreading)
 
+\# TODO: Add readme
 
 ## [tcu-2g-service-tool-dealer](https://github.com/ABD-01/quantum-harmony/tree/tcu-2g-service-tool-dealer)
 
@@ -236,4 +237,8 @@ For more see [cmake-build-embedded/README.md](https://github.com/ABD-01/quantum-
 
 ## [network-library-bumblenet](https://github.com/ABD-01/quantum-harmony/tree/network-library-bumblenet)
 
+\# TODO: Add Readme
+
 ## [data-structures-algorithms](https://github.com/ABD-01/quantum-harmony/tree/DSA)
+
+\# TODO: Add Readme
