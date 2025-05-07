@@ -5,6 +5,7 @@
 - [Fota server in python, punching CRC to Bin and other CRC related scripts](#server-fota-crc-multithreading)
 - [Service Tool for 2G telematic using PyQt5](#tcu-2g-service-tool-dealer)
 - [A work timer watchdog created in C using GTK3](#task-control-gtk3)
+- []()
 - [CMake based buildsystem for MC25 OpenCPU Quectel](#cmake-build-embedded)
 - [Bumblenet - A Network Library (Incomplete)](#network-library-bumblenet)
 - [Data Structures Algorithms Practice](#data-structures-algorithms)
@@ -24,7 +25,7 @@ Branches:
 * Wrote my own CMakeLists.txt. 
 
 **File Details**:
-#### 1. [hexdump](hexdump/hexdump.c)
+#### 1. [hexdump](https://github.com/ABD-01/quantum-harmony/blob/mqtt-client-sub/hexdump/hexdump.c)
 Contains a function to print or dump the content of a buffer in hex format.
 Compiling the hexdump.c file: 
 * `cl .\hexdump\hexdump.c /I .\hexdump\ /c /Fo.\hexdump\hexdump.o`
@@ -40,7 +41,7 @@ set(NUMCOLS 24 CACHE INTEGER "Number of columns in hexdump")
 target_compile_definitions(${target_name} PRIVATE NUMCOLS=${NUMCOLS})
 ```
 
-#### 2. [mkPktRand](mkPktRand.c)
+#### 2. [mkPktRand](https://github.com/ABD-01/quantum-harmony/blob/mqtt-client-sub/mkPktRand.c)
 Creates a random buffer for given size using [XOR Shift](https://en.wikipedia.org/wiki/Xorshift) random number generator.
 
 <details>
@@ -60,7 +61,7 @@ Creates a random buffer for given size using [XOR Shift](https://en.wikipedia.or
 </code></pre>
 </details>
 
-#### 3. [**mqtt_client.c**](mqtt_client.c)
+#### 3. [**mqtt_client.c**](https://github.com/ABD-01/quantum-harmony/blob/mqtt-client-sub/mqtt_client.c)
 This is the main file that creates a client with(out) SSL, connetcs to broker and subcribes to a topic. 
 This file uses the paho.mqtt.c library and the hexdump.
 
@@ -110,7 +111,7 @@ clang .\mqtt_client.c -I 'C:\dev\vcpkg\packages\paho-mqtt_x64-windows\include\' 
 
 Refernce: [MQTTClient_subscribe.c](https://github.com/eclipse/paho.mqtt.c/blob/master/src/samples/MQTTClient_subscribe.c)
 
-#### 4. [CMakeLists.txt](CMakeLists.txt)
+#### 4. [CMakeLists.txt](https://github.com/ABD-01/quantum-harmony/blob/mqtt-client-sub/CMakeLists.txt)
 
 Used to create my package. Also see [CMakeLists.txt.bak](CMakeLists.txt.bak) wich uses `vcpkg` cmake toolchain.
 
@@ -122,11 +123,11 @@ Running cmake:
 * `cmake .. -DCMAKE_C_COMPILER='C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/Llvm/bin/clang.exe'`
 * `cmake .. -G "MSYS Makefiles" -DCMAKE_C_COMPILER=C:/msys64/ucrt64/bin/gcc.exe -DCMAKE_AR=C:/msys64/ucrt64/bin/ar.exe`
 
-#### 5. [cmake_command_for_building_paho.bat/sh](cmake_command_for_building_paho.sh)
+#### 5. [cmake_command_for_building_paho.bat/sh](https://github.com/ABD-01/quantum-harmony/blob/mqtt-client-sub/cmake_command_for_building_paho.sh)
 
 The command I used to build paho.mqtt.c
 
-#### 6. [mqtt_server.py](mqtt_server.py)
+#### 6. [mqtt_server.py](https://github.com/ABD-01/quantum-harmony/blob/mqtt-client-sub/mqtt_server.py)
 The first thing I wrote which satisfies the requirements in python file
 
 
@@ -139,11 +140,99 @@ Created a replacement of a legacy flashing utility for 2G devices. Integrated th
 
 ## [task-control-gtk3](https://github.com/ABD-01/quantum-harmony/tree/taskControlC)
 
+A tool created  tool for enforcing strict work-hour boundaries. It uses a scheduled GTK3-based visual timer and app killer to automatically shut down your PC and close running applications at the end of a configured work session.
+
+### 1. [`schedule_task.c`](https://github.com/ABD-01/quantum-harmony/blob/taskControlC/schedule_task.c)
+- Auto-starts on Windows boot.
+- Asks user for confirmation or input of work start time.
+- Calculates shutdown time = `start_time + 9h30m - 15min`.
+- Creates a scheduled task (`stop_tasks.exe`) at the calculated time using `schtasks`.
+
+### 2. [`stop_tasks.c`](https://github.com/ABD-01/quantum-harmony/blob/taskControlC/stop_tasks.c)
+- Launches a warning popup (Window's blue colored screen with text).
+- Starts a 15-minute GTK3 countdown timer.
+- When timer hits 0:
+  - Kills specified applications (e.g., VSCode, Edge, etc.)
+  - Shuts down the PC.
+
+
+## [bootinfo-and-appcrc](https://github.com/ABD-01/quantum-harmony/tree/bootinfo-and-appcrc)
+
+Performs post build tasks
+- Generate `bin` and `hex` files from `elf` frile created from project compilation  
+- Puches CRC32 MPEG-2 at the end of the binary file.
+- Creates `boot_info_data.c` file with structure containing firmware related metadata such as BL start address, APP start address, lenght, crc, debug flags, etc.
+- Provides a linker script and a make file to compile the boot information file into `boot_info.hex`
+- Clang Format file
+
+Important Files' Details:
+### 1. [**crc32_bootinfo.cpp**](https://github.com/ABD-01/quantum-harmony/blob/bootinfo-and-appcrc/crc32_bootinfo.cpp)
+CPP program that reads binary file, calculates CRC32 and appends it. Generates `boot_info_data.c` file and also 3 other files, two srec commad files, crc32.bin (a 4 byte size file).
+
+Using [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) to create a crc table
+
+```cpp
+constexpr uint32_t POLYNOMIAL = 0x04C11DB7;
+constexpr auto crc_table = [] {
+    std::array<uint32_t, 256> table{};
+    for (uint32_t i = 0; i < 256; i++) {
+        uint32_t crc = i << 24;
+        for (int j = 0; j < 8; j++)
+            crc = (crc << 1) ^ (crc & 0x80000000 ? POLYNOMIAL : 0);
+        table[i] = crc;
+    }
+    return table;
+}();
+```
+
+Learnt about [SFINAE](https://en.cppreference.com/w/cpp/language/sfinae) and unnecessarily used [`std::enable_if`](https://en.cppreference.com/w/cpp/types/enable_if) for crc function.
+
+```cpp
+template <typename T>
+using crc32_result_t = typename std::enable_if<std::is_integral<T>::value, uint32_t>::type;
+
+template <typename T>
+crc32_result_t<T> crc32(const T *data, size_t size);
+
+
+template <typename T>
+crc32_result_t<T> crc32(const T *data, size_t size)
+{
+    uint32_t crc = 0xFFFFFFFF;
+    for (size_t i = 0; i < size; ++i) {
+        uint8_t index = ((crc >> 24) ^ static_cast<uint8_t>(data[i])) & 0xFF;
+        crc = crc_table[index] ^ (crc << 8);
+    }
+    return crc;
+}
+```
+
+Compilation:
+```
+clang crc32_bootinfo.cpp \
+        -std=c++20 \
+        -Wall -Wpedantic -Wextra \
+        -O3 \
+        -o generate_bootinfo_file.exe
+```
+
+### 2. [boot_info.mk](https://github.com/ABD-01/quantum-harmony/blob/bootinfo-and-appcrc/boot_info.mk)
+
+Makefile that uses toochain compiler for making boot_info.hex.
+
+```
+{CG_TOOL_MAKE} -f boot_info.mk -k -j 8 all -O
+```
+
+### 3. [linker.cmd](https://github.com/ABD-01/quantum-harmony/blob/bootinfo-and-appcrc/linker.cmd)
+Linker file to place boot_info strcture in proper memory address.
+
+
 ## [cmake-build-embedded](https://github.com/ABD-01/quantum-harmony/tree/cmake-for-mc25)
 
 Created a build system using CMake for OpenCPU based project on Quectel's MC25 4G LTE module.
 
-For more see [cmake-build-embedded/README.md](cmake-build-embedded/README.md)
+For more see [cmake-build-embedded/README.md](https://github.com/ABD-01/quantum-harmony/blob/cmake-for-mc25/README.md)
 
 ## [network-library-bumblenet](https://github.com/ABD-01/quantum-harmony/tree/network-library-bumblenet)
 
