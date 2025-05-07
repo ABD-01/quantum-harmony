@@ -1,8 +1,17 @@
 # Random stuff I keep doing to learn about new topics, packages, languages, frameworks and whatever else is out there
 
+## Table of Contents
+- [Building Paho Library and writing MQTT Client in C](#mqtt-client-sub)
+- [Fota server in python, punching CRC to Bin and other CRC related scripts](#server-fota-crc-multithreading)
+- [Service Tool for 2G telematic using PyQt5](#tcu-2g-service-tool-dealer)
+- [A work timer watchdog created in C using GTK3](#task-control-gtk3)
+- [CMake based buildsystem for MC25 OpenCPU Quectel](#cmake-build-embedded)
+- [Bumblenet - A Network Library (Incomplete)](#network-library-bumblenet)
+- [Data Structures Algorithms Practice](#data-structures-algorithms)
+
 Branches:
 
-## mqtt-client-sub
+## [mqtt-client-sub](https://github.com/ABD-01/quantum-harmony/tree/mqtt-client-sub)
 
 **Theme**: The requirement was to provide a firmware for testing EC20 Modem. The telematics device connects to test.mosquitto.org public broker and publishes packet of size 60kB (default, configurable) at interval of 30secs (default, configurable).
 
@@ -121,8 +130,21 @@ The command I used to build paho.mqtt.c
 The first thing I wrote which satisfies the requirements in python file
 
 
-## server-fota-crc-multithreading
+## [server-fota-crc-multithreading](https://github.com/ABD-01/quantum-harmony/tree/server-fota-crc-multithreading)
 
-## network-library-bumblenet
 
-## tcu-2g-service-tool-dealer
+## [tcu-2g-service-tool-dealer](https://github.com/ABD-01/quantum-harmony/tree/tcu-2g-service-tool-dealer)
+
+Created a replacement of a legacy flashing utility for 2G devices. Integrated the the original UART communication C program with Python based GUI using ctypes. Also used IPC for communication progress to GUI.
+
+## [task-control-gtk3](https://github.com/ABD-01/quantum-harmony/tree/taskControlC)
+
+## [cmake-build-embedded](https://github.com/ABD-01/quantum-harmony/tree/cmake-for-mc25)
+
+Created a build system using CMake for OpenCPU based project on Quectel's MC25 4G LTE module.
+
+For more see [cmake-build-embedded/README.md](cmake-build-embedded/README.md)
+
+## [network-library-bumblenet](https://github.com/ABD-01/quantum-harmony/tree/network-library-bumblenet)
+
+## [data-structures-algorithms](https://github.com/ABD-01/quantum-harmony/tree/DSA)

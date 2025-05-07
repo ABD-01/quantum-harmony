@@ -22,3 +22,11 @@
 	path = cmake-build-embedded
 	url = https://github.com/ABD-01/quantum-harmony.git
 	branch = cmake-for-mc25
+[submodule "bootinfo-and-appcrc"]
+	path = bootinfo-and-appcrc
+	url = https://github.com/ABD-01/quantum-harmony.git
+	branch = bootinfo-and-appcrc
+[submodule "task-control-gtk3"]
+	path = task-control-gtk3
+	url = https://github.com/ABD-01/quantum-harmony.git
+	branch = taskControlC
