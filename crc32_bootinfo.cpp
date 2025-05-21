@@ -10,6 +10,10 @@
  *
  * Changelog:
  *
+ * 2025-05-20   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
+ *   - Bootloader length and app start region updated
+ *   - Initial CRC of block set to `0`.
+ *
  * 2025-05-02   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
  *   - Added generate_appcrc_file and generate_srec_cmd_file functions
  *
@@ -151,7 +155,7 @@ int generate_bootinfo_file(uint32_t file_size, uint32_t crc_value)
         return 1;
     }
 
-    constexpr uint32_t APP_START_REGION = 0x00009400;
+    constexpr uint32_t APP_START_REGION = 0x0000A400;
     constexpr size_t FLASH_SECTOR_SIZE = 1024;
     union {
         struct __attribute__((__packed__)) {
@@ -176,7 +180,7 @@ int generate_bootinfo_file(uint32_t file_size, uint32_t crc_value)
         uint8_t buff[FLASH_SECTOR_SIZE];
     } _boot_info = {
         {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0000, 0xA5A5A5A5, 0x00000000, APP_START_REGION,
-         0x00009000, 0x00013000, 0x00009000, file_size, 0xFFFFFFFF, crc_value, 0xFFFFFFFF},
+         0x0000A000, 0x00012000, 0x0000A000, file_size, 0xFFFFFFFF, crc_value, 0x00},
     };
 
     uint32_t block_crc32 = crc32(_boot_info.buff, FLASH_SECTOR_SIZE);
@@ -217,9 +221,9 @@ int generate_bootinfo_file(uint32_t file_size, uint32_t crc_value)
                       "0xA5A5A5A5,"
                       "0x00000000,"
                       "APP_START_REGION,"
-                      "0x00009000,"
-                      "0x00013000,"
-                      "0x00009000,"
+                      "0x0000A000,"
+                      "0x00012000,"
+                      "0x0000A000,"
                       "0x"
                    << std::hex << std::uppercase << file_size
                    << ","
