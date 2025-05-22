@@ -1,5 +1,5 @@
 /**
- * @file    crc32_bootinfo.cpp
+ * @file    bootinfo_and_postbuild.cpp
  * @author  Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
  * @date    14 April 2025
  * @version 1.1
