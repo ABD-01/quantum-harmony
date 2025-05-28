@@ -23,10 +23,10 @@ EXT		= .exe
 RM 		= DEL /F
 RMDIR 	= RMDIR /S/Q
 
-TOOLCHAIN_PATH	:= /c/ti/ccs2002/ccs/tools/compiler/ti-cgt-armllvm_4.0.1.LTS
-CC 				:= $(TOOLCHAIN_PATH)/bin/tiarmclang
-LD 				:= $(TOOLCHAIN_PATH)/bin/tiarmlnk
-OBJCOPY 		:= $(TOOLCHAIN_PATH)/bin/tiarmhex
+TOOLCHAIN_PATH	:= C:/ti/ccs2002/ccs/tools/compiler/ti-cgt-armllvm_4.0.1.LTS
+CC 				:= $(TOOLCHAIN_PATH)/bin/tiarmclang$(EXT)
+LD 				:= $(TOOLCHAIN_PATH)/bin/tiarmlnk$(EXT)
+TOOL_HEX 		:= $(TOOLCHAIN_PATH)/bin/tiarmhex$(EXT)
 
 OUTPUT_DIR := .
 
@@ -43,13 +43,13 @@ $(OUTPUT_DIR):
 
 $(APP_BIN): $(APP_ELF) | $(OUTPUT_DIR)
 	@echo 'Building Binary target: "$@"'
-	$(OBJCOPY) --diag_wrap=off --binary -o $@ $<
+	$(TOOL_HEX) --diag_wrap=off --binary -o $@ $<
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 
 $(APP_HEX): $(APP_ELF) | $(OUTPUT_DIR)
 	@echo 'Building HEX target: "$@"'
-	$(OBJCOPY) --memwidth=8 --romwidth=8 --diag_wrap=off --intel -o $@ $<
+	$(TOOL_HEX) --memwidth=8 --romwidth=8 --diag_wrap=off --intel -o $@ $<
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 
