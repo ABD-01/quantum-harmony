@@ -2,15 +2,25 @@
  * @file    bootinfo_and_postbuild.cpp
  * @author  Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
  * @date    14 April 2025
- * @version 2.0
- * @brief   Appends CRC32 checksum to a binary file (if needed) and generates a boot_info_data.c
+ * @version 3.0
+ * @brief   Appends CRC32 checksum to a binary file (if needed) and generates a boot_info_image.c
  *          with embedded metadata, including the computed CRC and file size.
+ *          Also, generates app_image.c, application as a C array.
  *
  * Copyright (c) 2024-2025 Accolade Electronics Pvt. Ltd. All Rights Reserved.
  *
  * Changelog:
  *
- * 2025-05-28   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
+ * 2025-06-27   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
+ *    - (v3.0) Added support for generating `app_image.c` containing application binary as a C array
+ *    - Boot info now emitted as `boot_info_image.c` with `.boot_info_image` section attribute
+ *    - Introduced `PACK()` macro for cross-compiler struct packing (GCC/MSVC/Clang)
+ *    - Introduced `BSWAP32()` macro for cross-platform CRC endianness correction
+ *    - Updated application version default to `A2TV_0.0.0_TST00`
+ *    - Replaced raw hex loop with reusable `emit_hex_array()` function
+ *    - Renamed SREC command file to `cmd_create_hex.srec`
+ *
+ * 2025-05-28   Muhammed Abdullah Shaikh
  *   - (v2.0) Appends a fixed-length (28-byte) application version before the CRC32 bytes in the
  * binary image. [   APPLICATION        |    VERSION (28 bytes)   |   CRC32 (4 bytes)  ]
  *   - Generates a new binary file instead of modifying the input file in-place.
@@ -37,7 +47,7 @@
  *   - Add CRC32 calculation for boot info buffer to ensure data integrity verification
  *
  * 2025-04-16   Muhammed Abdullah Shaikh
- *   - File size in boot_info_data.c will not account for the CRC bytes
+ *   - File size in boot_info_image.c will not account for the CRC bytes
  *
  * 2025-04-15   Muhammed Abdullah Shaikh
  *   - Updated BootInfo_t structure. Added fields: debug, curr_retries, prev_retries
@@ -53,6 +63,21 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+
+#if defined(__GNUC__) || defined(__clang__)
+#define PACK(__Declaration__) __Declaration__ __attribute__((__packed__))
+#elif defined(_MSC_VER)
+#define PACK(__Declaration__) __pragma(pack(push, 1)) __Declaration__ __pragma(pack(pop))
+#endif
+
+#if defined(__GNUC__) || defined(__clang__)
+#define BSWAP32(x) __builtin_bswap32(x)
+#elif defined(_MSC_VER)
+#include <stdlib.h>
+#define BSWAP32(x) _byteswap_ulong(x)
+#else
+#error "Byte-swap not supported on this compiler"
+#endif
 
 using std::cerr;
 using std::cout;
@@ -76,9 +101,10 @@ using crc32_result_t = typename std::enable_if<std::is_integral<T>::value, uint3
 template <typename T>
 crc32_result_t<T> crc32(const T *data, size_t size);
 
-int generate_bootinfo_file(uint32_t, uint32_t);
-int generate_appcrc_file(uint32_t);
-int generate_srec_cmd_file(uint32_t, std::string);
+inline void emit_hex_array(std::ostream &os, const uint8_t *data, size_t size, size_t line_width = 12);
+int         generate_bootinfo_file(uint32_t, uint32_t);
+int         generate_appcrc_file(uint32_t);
+int         generate_srec_cmd_file(uint32_t, std::string);
 
 constexpr unsigned CRC32_SIZE       = 4;
 constexpr unsigned VERSION_SIZE     = 28;
@@ -91,9 +117,8 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    std::string      filename = argv[1];
-    std::string_view app_version =
-        (argc == 3 && strlen(argv[2]) > 0) ? argv[2] : "A2TP_0.0.0_TST00";
+    std::string      filename    = argv[1];
+    std::string_view app_version = (argc == 3 && strlen(argv[2]) > 0) ? argv[2] : "A2TV_0.0.0_TST00";
     if (app_version.length() > VERSION_SIZE) {
         cerr << "Version size cannot be greater than " << VERSION_SIZE << endl;
         return 1;
@@ -168,10 +193,8 @@ int main(int argc, char *argv[])
         outfile.close();
     }
 
-    delete[] buffer;
-
     /**
-     * Creating boot_info_data.c file
+     * Creating boot_info_image.c file
      */
     generate_bootinfo_file(file_size, crc_value);
 
@@ -181,19 +204,38 @@ int main(int argc, char *argv[])
     generate_appcrc_file(crc_value);
 
     /**
-     * Creating srec_cmd_create_hex.txt file
+     * Creating cmd_create_hex.srec file
      */
     generate_srec_cmd_file(file_size, new_filename);
 
+    /**
+     * Generate application as C-array
+     */
+    std::ofstream outfile("app_image.c", std::ios::trunc);
+    if (!outfile.is_open()) {
+        cerr << "Unable to create app_image.c" << endl;
+        delete[] buffer;
+        return 1;
+    }
+    outfile << "// Automatically-generated file. Do not edit!\n"
+            << "#define APP_IMAGE_SIZE (" << file_size + CRC32_SIZE << ")\n"
+            << "unsigned char const _app_image[APP_IMAGE_SIZE] "
+            << "__attribute__((section(\".app_image\"),used)) = {\n";
+    emit_hex_array(outfile, buffer, file_size + CRC32_SIZE, 16);
+    outfile << "};\n";
+    outfile.close();
+    cout << "app_image.c created successfully" << endl;
+
+    delete[] buffer;
     return 0;
 }
 
 int generate_bootinfo_file(uint32_t file_size, uint32_t app_crc_value)
 {
 
-    std::ofstream boot_info_file("boot_info_data.c", std::ios::trunc);
+    std::ofstream boot_info_file("boot_info_image.c", std::ios::trunc);
     if (!boot_info_file.is_open()) {
-        cerr << "Unable to create boot_info_data.c" << endl;
+        cerr << "Unable to create boot_info_image.c" << endl;
         return 1;
     }
 
@@ -201,7 +243,7 @@ int generate_bootinfo_file(uint32_t file_size, uint32_t app_crc_value)
     constexpr uint32_t BOOTLOADER_SIZE   = 0x0000A000;
     constexpr uint32_t APPLICATION_SIZE  = 0x00012000;
     union {
-        struct __attribute__((__packed__)) {
+        PACK(struct {
             uint8_t  debug;
             uint8_t  update;
             uint8_t  update_source;
@@ -219,12 +261,12 @@ int generate_bootinfo_file(uint32_t file_size, uint32_t app_crc_value)
             uint32_t crc_bl;
             uint32_t crc_app;
             uint32_t crc32;
-        } st;
+        })
+        st;
         uint8_t buff[FLASH_SECTOR_SIZE];
     } _boot_info = {
-        {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0000, 0xA5A5A5A5, 0x00000000, APP_START_REGION,
-         BOOTLOADER_SIZE, APPLICATION_SIZE, BOOTLOADER_SIZE, file_size, 0xFFFFFFFF, app_crc_value,
-         0x00},
+        {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0000, 0xA5A5A5A5, 0x00000000, APP_START_REGION, BOOTLOADER_SIZE,
+         APPLICATION_SIZE, BOOTLOADER_SIZE, file_size, 0xFFFFFFFF, app_crc_value, 0x00},
     };
 
     uint32_t block_crc32 = crc32(_boot_info.buff, FLASH_SECTOR_SIZE);
@@ -233,18 +275,14 @@ int generate_bootinfo_file(uint32_t file_size, uint32_t app_crc_value)
     boot_info_file << "// Automatically-generated file. Do not edit!\n"
                    << "#define FLASH_SECTOR_SIZE (1024)\n"
                    << "unsigned char const _boot_info[FLASH_SECTOR_SIZE] "
-                   << "__attribute__((section(\".boot_info\"),used)) = {\n";
+                   << "__attribute__((section(\".boot_info_image\"),used)) = {\n";
 
-    for (size_t i = 0; i < FLASH_SECTOR_SIZE; ++i) {
-        boot_info_file << "0x" << std::hex << std::uppercase << std::setw(2) << std::setfill('0')
-                       << static_cast<int>(_boot_info.buff[i]) << ", ";
-        if ((i + 1) % 12 == 0) boot_info_file << "\n";
-    }
-    boot_info_file << "\n};\n";
+    emit_hex_array(boot_info_file, _boot_info.buff, FLASH_SECTOR_SIZE, 16);
+    boot_info_file << "};\n";
 
     boot_info_file << "__attribute__((section(\".text\"))) void _dummy_entry(){}" << endl;
     boot_info_file.close();
-    cout << "boot_info_data.c created successfully" << endl;
+    cout << "boot_info_image.c created successfully" << endl;
 
     return 0;
 }
@@ -277,7 +315,7 @@ int generate_appcrc_file(uint32_t crc_value)
         cerr << "Unable to create app_crc32.bin" << endl;
         return 1;
     }
-    crc_value = __builtin_bswap32(crc_value);
+    crc_value = BSWAP32(crc_value);
     if (!crcfile.write(reinterpret_cast<const char *>(&crc_value), 4 * sizeof(char))) {
         cerr << "Unable to write to file app_crc32.bin" << endl;
         return 1;
@@ -289,7 +327,7 @@ int generate_appcrc_file(uint32_t crc_value)
 int generate_srec_cmd_file(uint32_t file_size, std::string filename)
 {
 
-    const char hex_cmd_file[] = "srec_cmd_create_hex.txt";
+    const char hex_cmd_file[] = "cmd_create_hex.srec";
     const char header[]       = "# Automatically-generated file.\n\n";
 
     std::ofstream cmd_file(hex_cmd_file, std::ios::trunc);
@@ -304,6 +342,16 @@ int generate_srec_cmd_file(uint32_t file_size, std::string filename)
 
     cout << "srec command files created successfully" << endl;
     return 0;
+}
+
+inline void emit_hex_array(std::ostream &os, const uint8_t *data, size_t size, size_t line_width)
+{
+    for (size_t i = 0; i < size; ++i) {
+        os << "0x" << std::hex << std::uppercase << std::setw(2) << std::setfill('0') << static_cast<int>(data[i])
+           << ", ";
+        if ((i + 1) % line_width == 0) os << "\n";
+    }
+    if (size % line_width != 0) os << "\n";
 }
 
 template <typename T>

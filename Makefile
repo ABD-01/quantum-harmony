@@ -11,15 +11,24 @@
 
 SHELL      := /usr/bin/bash
 
-CC_DEFAULT  = i686-w64-mingw32-gcc.exe
-CXX_DEFAULT = i686-w64-mingw32-g++.exe
+CC_DEFAULT  := clang.exe
+CXX_DEFAULT := clang++.exe
 
-CC         := $(shell command -v i686-w64-mingw32-gcc.exe 2>/dev/null || command -v gcc)
-CXX        := $(shell command -v i686-w64-mingw32-g++.exe 2>/dev/null || command -v g++)
+# Fallback to gcc/g++ if clang not found
+CC  := "$(shell command -v clang.exe 2>/dev/null || command -v gcc)"
+CXX := "$(shell command -v clang++.exe 2>/dev/null || command -v g++)"
 
-CFLAGS      = -Wall -Os -static -std=c99 -s
-CXXFLAGS    = -Wall -Os -static -std=c++17 -s
+# Error if no compiler found
+ifndef CC
+$(error No suitable C compiler found (clang or gcc))
+endif
+
+CFLAGS      = -Wall -Os -std=c99
+CXXFLAGS    = -Wall -Os -std=c++17
 MAKEFLAGS  += --no-print-directory
+
+CFLAGS		+= $(CUSTOM_CFLAGS)
+CXXFLAGS	+= $(CUSTOM_CFLAGS)
 
 SRC_FILE    = bootinfo_and_postbuild.cpp
 EXE_FILE    = generate_bootinfo_file.exe

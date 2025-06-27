@@ -4,13 +4,16 @@
 # File:		boot_info.mk
 # Author:	Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
 # Date:		15 April 2025
-# Version:	1.2
+# Version:	1.3
 # Brief:	Builds a boot information hex file. Depends on application
 # 			bin file to generate boot info such as file size, crc etc.
 #
 # Copyright (c) 2024-2025 Accolade Electronics Pvt. Ltd. All Rights Reserved.
 #
 # Changelog:
+# 2025-06-27   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
+#   - (v1.3) Renamed boot_info_data.c to boot_info_image.c
+#
 # 2025-05-27   Muhammed Abdullah Shaikh <muhammed.shaikh@accoladeelectronics.com>
 #   - (v1.2) Updated binary file to be generated from $(POST_BUILD_UTIL) rather
 #     rather than srec.
@@ -53,13 +56,13 @@ LINKER_SCRIPT 	:= $(BOOTINFO_DIR)/linker.cmd
 VERSION_H	:= ..\\src\\application\\version.h
 APP_VERSION	:= $(shell for /f "tokens=3 delims= " %%A in ('findstr /C:APP_VERSION_STRING $(VERSION_H) 2^>NUL') do @echo %%~A)
 
-BOOTINFO_SRC 	:= boot_info_data.c
-BOOTINFO_OBJ 	:= $(OUTPUT_DIR)/boot_info_data.o
+BOOTINFO_SRC 	:= boot_info_image.c
+BOOTINFO_OBJ 	:= $(OUTPUT_DIR)/boot_info_image.o
 BOOTINFO_ELF 	:= $(OUTPUT_DIR)/boot_info.out
 BOOTINFO_HEX 	:= $(OUTPUT_DIR)/boot_info.hex
 BOOTINFO_BIN 	:= $(OUTPUT_DIR)/boot_info.bin
 
-CMD_FILE	:= srec_cmd_create_hex.txt
+CMD_FILE	:= cmd_create_hex.srec
 APP_CRC_BIN	:= app_crc32.bin
 APP_BIN_NEW	:= ti_firmware_ver_and_appcrc.bin
 APP_HEX_NEW	:= ti_firmware_ver_and_appcrc.hex
