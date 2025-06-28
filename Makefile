@@ -23,15 +23,16 @@ ifndef CC
 $(error No suitable C compiler found (clang or gcc))
 endif
 
-CFLAGS      = -Wall -Os -std=c99
-CXXFLAGS    = -Wall -Os -std=c++17
-MAKEFLAGS  += --no-print-directory
+CFLAGS		= -Wall -Os -std=c99
+CXXFLAGS	= -Wall -Os -std=c++17
+MAKEFLAGS	+= --no-print-directory
 
 CFLAGS		+= $(CUSTOM_CFLAGS)
 CXXFLAGS	+= $(CUSTOM_CFLAGS)
 
-SRC_FILE    = bootinfo_and_postbuild.cpp
-EXE_FILE    = generate_bootinfo_file.exe
+OUTPUT_DIR	:= build
+EXE_FILE	:= $(OUTPUT_DIR)/generate_bootinfo_file.exe
+SRC_FILE	:= bootinfo_and_postbuild.cpp
 
 .PHONY: all clean check
 
@@ -43,6 +44,7 @@ all: $(EXE_FILE)
 
 $(EXE_FILE): $(SRC_FILE) 
 	@$(MAKE) check
+	@mkdir -p $(OUTPUT_DIR)
 	@echo "Compiling $< to $@..."
 	@$(CXX) $(CXXFLAGS) -o $(EXE_FILE) $(SRC_FILE)
 	@echo "Done."
@@ -54,4 +56,4 @@ check:
 
 clean:
 	@echo "Cleaning up..."
-	-@rm -f $(EXE_FILE)
+	-@rm -f $(OUTPUT_DIR)/*.exe

@@ -31,49 +31,49 @@
 #
 ##############################################################################
 
-SHELL 		= cmd.exe
+SHELL	= cmd.exe
 
 EXT		= .exe
 RM 		= DEL /F
-RMDIR 		= RMDIR /S/Q
+RMDIR	= RMDIR /S/Q
 
 TOOLCHAIN_PATH	:= C:/ti/ccs2002/ccs/tools/compiler/ti-cgt-armllvm_4.0.1.LTS
-CC 		:= $(TOOLCHAIN_PATH)/bin/tiarmclang
-#LD 		:= $(TOOLCHAIN_PATH)/bin/tiarmlnk
-LD 		:= $(CC)
-OBJCOPY 	:= $(TOOLCHAIN_PATH)/bin/tiarmhex
+CC				:= $(TOOLCHAIN_PATH)/bin/tiarmclang
+# LD				:= $(TOOLCHAIN_PATH)/bin/tiarmlnk
+LD				:= $(CC)
+OBJCOPY			:= $(TOOLCHAIN_PATH)/bin/tiarmhex
 
-OUTPUT_DIR	:= build
-BOOTINFO_DIR 	:= ../post_build_pipeline
+OUTPUT_DIR		:= build
+BOOTINFO_DIR	:= ../post_build_pipeline
 
 POST_BUILD_UTIL	:= $(BOOTINFO_DIR)/generate_bootinfo_file$(EXT)
-SREC_CAT 	:= srec_cat$(EXT)
-SREC_CMP 	:= srec_cmp$(EXT)
+SREC_CAT		:= srec_cat$(EXT)
+SREC_CMP		:= srec_cmp$(EXT)
 
-APP_HEX		:= ti_firmware.hex
-APP_BIN		:= ti_firmware.bin
-LINKER_SCRIPT 	:= $(BOOTINFO_DIR)/linker.cmd
-VERSION_H	:= ..\\src\\application\\version.h
-APP_VERSION	:= $(shell for /f "tokens=3 delims= " %%A in ('findstr /C:APP_VERSION_STRING $(VERSION_H) 2^>NUL') do @echo %%~A)
+APP_HEX			:= ti_firmware.hex
+APP_BIN			:= ti_firmware.bin
+LINKER_SCRIPT	:= $(BOOTINFO_DIR)/linker.cmd
+VERSION_H		:= ..\\src\\application\\version.h
+APP_VERSION		:= $(shell for /f "tokens=3 delims= " %%A in ('findstr /C:APP_VERSION_STRING $(VERSION_H) 2^>NUL') do @echo %%~A)
 
-BOOTINFO_SRC 	:= boot_info_image.c
-BOOTINFO_OBJ 	:= $(OUTPUT_DIR)/boot_info_image.o
-BOOTINFO_ELF 	:= $(OUTPUT_DIR)/boot_info.out
-BOOTINFO_HEX 	:= $(OUTPUT_DIR)/boot_info.hex
-BOOTINFO_BIN 	:= $(OUTPUT_DIR)/boot_info.bin
+BOOTINFO_SRC	:= boot_info_image.c
+BOOTINFO_OBJ	:= $(OUTPUT_DIR)/boot_info_image.o
+BOOTINFO_ELF	:= $(OUTPUT_DIR)/boot_info.out
+BOOTINFO_HEX	:= $(OUTPUT_DIR)/boot_info.hex
+BOOTINFO_BIN	:= $(OUTPUT_DIR)/boot_info.bin
 
-CMD_FILE	:= cmd_create_hex.srec
-APP_CRC_BIN	:= app_crc32.bin
-APP_BIN_NEW	:= ti_firmware_ver_and_appcrc.bin
-APP_HEX_NEW	:= ti_firmware_ver_and_appcrc.hex
+CMD_FILE		:= cmd_create_hex.srec
+APP_CRC_BIN		:= app_crc32.bin
+APP_BIN_NEW		:= ti_firmware_ver_and_appcrc.bin
+APP_HEX_NEW		:= ti_firmware_ver_and_appcrc.hex
 
 DEVICE		:= MSPM0G3507
 CPU_FLAGS	:= -march=thumbv6m -mcpu=cortex-m0plus -mfloat-abi=soft -mlittle-endian -mthumb
-CFLAGS 		:= -D__$(DEVICE)__ $(CPU_FLAGS) -O2 -Wall -Wextra
-LDFLAGS 	:= -Wl,-m"$(OUTPUT_DIR)/boot_info.map" \
-			   -Wl,--diag_wrap=off -Wl,--display_error_number -Wl,--warn_sections \
-			   -Wl,--xml_link_info="$(OUTPUT_DIR)/boot_info_linkInfo.xml" \
-			   -Wl,--rom_model -Wl,--entry_point=_dummy_entry -Wl,--disable_auto_rts
+CFLAGS		:= -D__$(DEVICE)__ $(CPU_FLAGS) -O2 -Wall -Wextra
+LDFLAGS		:= -Wl,-m"$(OUTPUT_DIR)/boot_info.map" \
+				-Wl,--diag_wrap=off -Wl,--display_error_number -Wl,--warn_sections \
+				-Wl,--xml_link_info="$(OUTPUT_DIR)/boot_info_linkInfo.xml" \
+				-Wl,--rom_model -Wl,--entry_point=_dummy_entry -Wl,--disable_auto_rts
 
 
 ifeq (,$(wildcard $(POST_BUILD_UTIL)))
