@@ -19,8 +19,8 @@ References:
 
 MEMORY
 {
-    DUMMY           (RX)  : origin = 0x00000000, length = 0x00009000
-    BOOT_INFO_1     (RX)  : origin = 0x00009000, length = 0x00000400
+    DUMMY           (RX)  : origin = 0x00000000, length = 0x0000A000
+    BOOT_INFO_1     (RX)  : origin = 0x0000A000, length = 0x00000400
 }
 
 SECTIONS
