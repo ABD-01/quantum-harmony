@@ -2,7 +2,8 @@
 cmake_minimum_required(VERSION 3.14)
 
 # Project definition.
-project(asl VERSION 0.0.2 LANGUAGES C)
+project(asl VERSION 0.0.1 LANGUAGES C)
+message(STATUS "ATP_ROOT is ${ATP_ROOT}")
 message(STATUS "TARGET_PLATFORM is ${TARGET_PLATFORM}")
 message(STATUS "CMAKE_TOOLCHAIN_FILE is ${CMAKE_TOOLCHAIN_FILE}")
 
@@ -11,12 +12,14 @@ set(MOD_NAME "${PROJECT_NAME}")
 # Namespace used for export.
 set(MOD_NAMESPACE "${MOD_NAME}::")
 
-# Configure packaging helpers.
-include(GNUInstallDirs)
-include(CMakePackageConfigHelpers)
+# Include tools.
 set(CPACK_GENERATOR "TGZ")
 set(CPACK_PACKAGE_NAME "${MOD_NAME}")
 set(CPACK_PACKAGE_FILE_NAME "${TARGET_PLATFORM}_lib${MOD_NAME}")
+include(FetchContent)
+include(CMakePackageConfigHelpers)
+include(GNUInstallDirs)
+include(CPack)
 
 # Define source files for this module.
 set(MOD_SOURCES
@@ -51,6 +54,8 @@ set(MOD_PUBLIC_HEADERS
     asl/defs/asl_iface_types.h
     asl/defs/asl_pointer_types.h
     asl/defs/asl_types.h
+    # Standard types that are missing in some toolchains.
+    asl/std/inttypes.h
 )
 
 # Specify static library.
@@ -61,6 +66,7 @@ target_include_directories(${MOD_NAME}
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/asl/library>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/asl/defs>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/asl/std>
     $<INSTALL_INTERFACE:include/${MOD_NAME}>
 )
 
@@ -110,5 +116,9 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${MOD_NAME}ConfigVersion.cmake"
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${MOD_NAME}
 )
 
-# CPack configuration to create a TGZ package.
-include(CPack)
+# Custom target to package and publish
+add_custom_target(package_and_publish
+    COMMAND ${CMAKE_COMMAND} --build . --target package
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${ATP_ROOT}/libs/${MOD_NAME}
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/${TARGET_PLATFORM}_lib${MOD_NAME}.tar.gz ${ATP_ROOT}/libs/${MOD_NAME}/
+)

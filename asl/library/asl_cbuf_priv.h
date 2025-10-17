@@ -8,9 +8,9 @@
  *              CONFIDENTIAL AND PROPRIETARY INFORMATION
  *              WHICH IS THE PROPERTY OF M/s Accolade Electronics.
  *
- *  @version    0.0.2
+ *  @version    0.0.1
  *
- *  @date       22 August 2025
+ *  @date       17 October 2025
  *
  *  @brief      Private header for the 'asl_cbuf' Class.
 *******************************************************************************/
