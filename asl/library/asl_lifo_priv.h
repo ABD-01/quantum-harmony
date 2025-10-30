@@ -10,7 +10,7 @@
  *
  *  @version    0.0.1
  *
- *  @date       17 October 2025
+ *  @date       27 October 2025
  *
  *  @brief      Private header for the 'asl_lifo' Class.
 *******************************************************************************/
@@ -47,7 +47,7 @@ extern "C" {
  * ASL_LIFO_E_ILLEGAL       - The operation cannot be performed because the LIFO state is corrupt.
  * ASL_LIFO_E_EMPTY         - Operation is not possible since stack is empty.
  */
-static asl_lifo_error_e peek_pop(asl_lifo_s* ptr_lifo, asl_buffer_s* element, bool is_pop);
+static asl_lifo_error_e asl_lifo__peek_pop_private(asl_lifo_s* ptr_lifo, asl_buffer_s* element, bool is_pop);
 
 #ifdef __cplusplus
 }

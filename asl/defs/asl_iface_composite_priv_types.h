@@ -10,7 +10,7 @@
  *
  *  @version    0.0.1
  *
- *  @date       17 October 2025
+ *  @date       27 October 2025
  *
  *  @brief      Header for the 'asl_iface_composite_priv_types' Class.
  *              Composite function pointer prototypes.
@@ -35,7 +35,7 @@ extern "C" {
  * @brief
  * Function prototype that transmits/receives serial data.
  */
-typedef size_t (*asl_iface_composite_rx_tx_t)(asl_buffer_s buffer, size_t req);
+typedef size_t (*asl_iface_composite_rx_tx_cb)(asl_buffer_s buffer, size_t req);
 
 #ifdef __cplusplus
 }

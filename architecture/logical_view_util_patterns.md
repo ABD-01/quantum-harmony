@@ -32,8 +32,8 @@ config:
 ---
 classDiagram
     class ASL_UTIL {
-        +asl_util_buffer_memset()
-        +asl_util_buffer_memcpy()
+        +asl_util__buffer_memset()
+        +asl_util__buffer_memcpy()
     }
     
     class CBUF_Module {
@@ -61,7 +61,7 @@ classDiagram
 ```c
 // Initialize data structure with pattern
 asl_buffer_s buffer = { .ptr = memory, .size = size };
-asl_util_buffer_memset(buffer, 0x00);  // Clear memory
+asl_util__buffer_memset(buffer, 0x00);  // Clear memory
 ```
 
 ### 1.3 Data Transfer Pattern
@@ -70,7 +70,7 @@ asl_util_buffer_memset(buffer, 0x00);  // Clear memory
 // Safe buffer-to-buffer copy
 asl_buffer_s source = { .ptr = src_mem, .size = src_size };
 asl_buffer_s dest = { .ptr = dst_mem, .size = dst_size };
-asl_util_buffer_memcpy(dest, source);
+asl_util__buffer_memcpy(dest, source);
 ```
 
 ---
@@ -83,14 +83,14 @@ asl_util_buffer_memcpy(dest, source);
 ```c
 // Clear sensitive data
 asl_buffer_s sensitive = { .ptr = password_buffer, .size = pwd_len };
-asl_util_buffer_memset(sensitive, 0x00);
+asl_util__buffer_memset(sensitive, 0x00);
 ```
 
 **Debug Patterns**:
 ```c
 // Fill with debug pattern
 asl_buffer_s debug_buf = { .ptr = test_memory, .size = test_size };
-asl_util_buffer_memset(debug_buf, 0xAA);  // Debug pattern
+asl_util__buffer_memset(debug_buf, 0xAA);  // Debug pattern
 ```
 
 ### 2.2 Validation Patterns
@@ -111,8 +111,8 @@ bool validate_buffer_operation(asl_buffer_s* buf) {
 
 ### 3.1 Initialization Sequences
 
-1. **Structure Setup**: Clear memory with `asl_util_buffer_memset`
-2. **Data Population**: Copy initial data with `asl_util_buffer_memcpy`
+1. **Structure Setup**: Clear memory with `asl_util__buffer_memset`
+2. **Data Population**: Copy initial data with `asl_util__buffer_memcpy`
 3. **State Validation**: Verify buffer integrity
 
 ### 3.2 Cleanup Sequences

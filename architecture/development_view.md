@@ -38,8 +38,8 @@ config:
 graph TD
     subgraph ASL[ASL Root]
         B[build_all.sh]
-        BS[build.sh]
-        C[clean.sh]
+        BS[build_module.sh]
+        C[clean_all.sh]
         subgraph SRC[asl/]
             D[defs/]
             L[library/]
@@ -110,8 +110,8 @@ The ASL build system supports multiple platforms through a flexible toolchain co
 
 - **Build Scripts**:
   - `build_all.sh`: Builds for all supported platforms
-  - `build.sh`: Platform-specific build script
-  - `clean.sh`: Cleanup script
+  - `build_module.sh`: Platform-specific build script
+  - `clean_all.sh`: Cleanup script
 
 - **Supported Platforms**:
   - STM32 (ARM)
@@ -199,7 +199,7 @@ ASL is designed to be self-contained with minimal external dependencies:
 ### Implementation Files
 - Source Tree: `asl/` directory
 - Build Scripts: Root directory
-- Platform Toolchains: As configured in `build.sh`
+- Platform Toolchains: As configured in `build_module.sh`
 
 ### Related Views
 - [Logical View](logical_view.md) - Component structure and relationships

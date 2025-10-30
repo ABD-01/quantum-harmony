@@ -10,7 +10,7 @@
  *
  *  @version    0.0.1
  *
- *  @date       17 October 2025
+ *  @date       27 October 2025
  *
  *  @brief      Implementation of the 'basic_cbuf' Example.
 *******************************************************************************/
@@ -45,10 +45,10 @@ basic_cbuf_error_e basic_cbuf_init(basic_cbuf_context_s* ptr_context, size_t cbu
             ptr_context->buffer_size = cbuf_size;
             
             /* Initialize ASL CBUF. */
-            cbuf_error = asl_cbuf_init(&ptr_context->cbuf);
+            cbuf_error = asl_cbuf__init(&ptr_context->cbuf);
             if (ASL_CBUF_E_OK == cbuf_error) {
                 /* Determine maximum usable capacity. */
-                cbuf_error = asl_cbuf_available_write(&ptr_context->cbuf, &available_write);
+                cbuf_error = asl_cbuf__available_write(&ptr_context->cbuf, &available_write);
                 if (ASL_CBUF_E_OK == cbuf_error) {
                     ptr_context->max_capacity = available_write;
                     ptr_context->test_complete = false;
@@ -90,7 +90,7 @@ basic_cbuf_error_e basic_cbuf_run_test(basic_cbuf_context_s* ptr_context) {
         /* Test all sizes from 1 to maximum capacity. */
         for (size_t test_size = 1; test_size <= ptr_context->max_capacity; test_size++) {
             /* Reset CBUF for each test. */
-            asl_cbuf_error_e cbuf_error = asl_cbuf_init(&ptr_context->cbuf);
+            asl_cbuf_error_e cbuf_error = asl_cbuf__init(&ptr_context->cbuf);
             if (ASL_CBUF_E_OK != cbuf_error) {
                 printf("ERROR: Failed to reinitialize CBUF for test size %zu\n", test_size);
                 error = BASIC_CBUF_E_TEST_FAIL;
@@ -201,7 +201,7 @@ void basic_cbuf_print_results(basic_cbuf_context_s* ptr_context) {
     printf("Overall Status: %s\n", ptr_context->test_passed ? "PASSED" : "FAILED");
 }
 
-// Private function implementations
+/* Private function implementations */
 
 static void* basic_cbuf_producer_thread(void* arg) {
     basic_cbuf_context_s* context = (basic_cbuf_context_s*)arg;
@@ -226,7 +226,7 @@ static void* basic_cbuf_producer_thread(void* arg) {
     data_buffer.size = test_size;
     
     /* Enqueue test data. */
-    cbuf_error = asl_cbuf_enqueue(&context->cbuf, data_buffer, test_size);
+    cbuf_error = asl_cbuf__enqueue(&context->cbuf, data_buffer, test_size);
     
     if (ASL_CBUF_E_OK == cbuf_error) {
         if (test_size <= 10 || (test_size % 100) == 0 || test_size > (context->max_capacity - 10)) {
@@ -265,7 +265,7 @@ static void* basic_cbuf_consumer_thread(void* arg) {
     data_buffer.size = test_size;
     
     /* Dequeue test data. */
-    cbuf_error = asl_cbuf_dequeue(&context->cbuf, data_buffer, test_size);
+    cbuf_error = asl_cbuf__dequeue(&context->cbuf, data_buffer, test_size);
     
     if (ASL_CBUF_E_OK == cbuf_error) {
         if (test_size <= 10 || (test_size % 100) == 0 || test_size > (context->max_capacity - 10)) {

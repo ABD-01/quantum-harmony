@@ -10,7 +10,7 @@
  *
  *  @version    0.0.1
  *
- *  @date       17 October 2025
+ *  @date       27 October 2025
  *
  *  @brief      Private header for the 'asl_fifo' Class.
 *******************************************************************************/
@@ -47,7 +47,7 @@ extern "C" {
  * ASL_FIFO_E_ILLEGAL       - The operation cannot be performed because the FIFO state is corrupt.
  * ASL_FIFO_E_EMPTY         - Operation is not possible since queue is empty.
  */
-static asl_fifo_error_e preview_dequeue(asl_fifo_s* ptr_fifo, asl_buffer_s* element, bool is_dequeue);
+static asl_fifo_error_e asl_fifo__preview_dequeue_private(asl_fifo_s* ptr_fifo, asl_buffer_s* element, bool is_dequeue);
 
 /**
  * @brief
@@ -68,7 +68,7 @@ static asl_fifo_error_e preview_dequeue(asl_fifo_s* ptr_fifo, asl_buffer_s* elem
  * @return
  * The index after performing circular next.
  */
-static size_t circular_next(size_t now, size_t step, size_t capacity);
+static size_t asl_fifo__circular_next_private(size_t now, size_t step, size_t capacity);
 
 /**
  * @brief
@@ -89,7 +89,7 @@ static size_t circular_next(size_t now, size_t step, size_t capacity);
  * @return
  * The number of elements that are already present.
  */
-static size_t available_read(size_t index_read, size_t index_write, size_t capacity);
+static size_t asl_fifo__available_read_private(size_t index_read, size_t index_write, size_t capacity);
 
 /**
  * @brief
@@ -110,7 +110,7 @@ static size_t available_read(size_t index_read, size_t index_write, size_t capac
  * @return
  * Max number of elements that can be written.
  */
-static size_t available_write(size_t index_read, size_t index_write, size_t capacity);
+static size_t asl_fifo__available_write_private(size_t index_read, size_t index_write, size_t capacity);
 
 #ifdef __cplusplus
 }

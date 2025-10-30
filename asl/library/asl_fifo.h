@@ -10,11 +10,11 @@
  *
  *  @version    0.0.1
  *
- *  @date       17 October 2025
+ *  @date       27 October 2025
  *
  *  @brief      Header for the 'asl_fifo' Class.
- *              A generic circular FIFO for fixed size element size.
- *              This circular FIFO is meant to be implemented to be producer-consumer thread-safe only.
+ *              A generic circular FIFO for fixed-size elements.
+ *              This circular FIFO is designed to be producer-consumer thread-safe only.
  *              i.e. only two threads are possible, one of which is producer and another one is consumer.
 *******************************************************************************/
 
@@ -42,7 +42,7 @@ extern "C" {
  * ASL_FIFO_E_PARAM         - NULL pointer or zero sized buffer or other parameter inconsistency.
  * ASL_FIFO_E_ILLEGAL       - The operation cannot be performed because the FIFO state is corrupt.
  */
-asl_fifo_error_e asl_fifo_reset(asl_fifo_s* ptr_fifo);
+asl_fifo_error_e asl_fifo__reset(asl_fifo_s* ptr_fifo);
 
 /**
  * @brief
@@ -61,7 +61,7 @@ asl_fifo_error_e asl_fifo_reset(asl_fifo_s* ptr_fifo);
  * ASL_FIFO_E_PARAM         - NULL pointers or zero sized buffer or other parameter inconsistency.
  * ASL_FIFO_E_ILLEGAL       - The operation cannot be performed because the FIFO state is corrupt.
  */
-asl_fifo_error_e asl_fifo_get_count_capacity(asl_fifo_s* ptr_fifo, size_t* capacity);
+asl_fifo_error_e asl_fifo__get_count_capacity(asl_fifo_s* ptr_fifo, size_t* capacity);
 
 /**
  * @brief
@@ -80,7 +80,7 @@ asl_fifo_error_e asl_fifo_get_count_capacity(asl_fifo_s* ptr_fifo, size_t* capac
  * ASL_FIFO_E_PARAM         - NULL pointers or zero sized buffer or other parameter inconsistency.
  * ASL_FIFO_E_ILLEGAL       - The operation cannot be performed because the FIFO state is corrupt.
  */
-asl_fifo_error_e asl_fifo_get_count_used(asl_fifo_s* ptr_fifo, size_t* used);
+asl_fifo_error_e asl_fifo__get_count_used(asl_fifo_s* ptr_fifo, size_t* used);
 
 /**
  * @brief
@@ -99,7 +99,7 @@ asl_fifo_error_e asl_fifo_get_count_used(asl_fifo_s* ptr_fifo, size_t* used);
  * ASL_FIFO_E_PARAM         - NULL pointers or zero sized buffer or other parameter inconsistency.
  * ASL_FIFO_E_ILLEGAL       - The operation cannot be performed because the FIFO state is corrupt.
  */
-asl_fifo_error_e asl_fifo_get_count_free(asl_fifo_s* ptr_fifo, size_t* free);
+asl_fifo_error_e asl_fifo__get_count_free(asl_fifo_s* ptr_fifo, size_t* free);
 
 /**
  * @brief
@@ -120,7 +120,7 @@ asl_fifo_error_e asl_fifo_get_count_free(asl_fifo_s* ptr_fifo, size_t* free);
  * ASL_FIFO_E_ILLEGAL       - The operation cannot be performed because the FIFO state is corrupt.
  * ASL_FIFO_E_EMPTY         - Operation is not possible since queue is empty.
  */
-asl_fifo_error_e asl_fifo_preview(asl_fifo_s* ptr_fifo, asl_buffer_s* element);
+asl_fifo_error_e asl_fifo__preview(asl_fifo_s* ptr_fifo, asl_buffer_s* element);
 
 /**
  * @brief
@@ -144,7 +144,7 @@ asl_fifo_error_e asl_fifo_preview(asl_fifo_s* ptr_fifo, asl_buffer_s* element);
  * ASL_FIFO_E_ILLEGAL       - The operation cannot be performed because the FIFO state is corrupt.
  * ASL_FIFO_E_EMPTY         - Operation is not possible since queue is empty.
  */
-asl_fifo_error_e asl_fifo_dequeue(asl_fifo_s* ptr_fifo, asl_buffer_s* element);
+asl_fifo_error_e asl_fifo__dequeue(asl_fifo_s* ptr_fifo, asl_buffer_s* element);
 
 /**
  * @brief
@@ -164,7 +164,7 @@ asl_fifo_error_e asl_fifo_dequeue(asl_fifo_s* ptr_fifo, asl_buffer_s* element);
  * ASL_FIFO_E_ILLEGAL       - The operation cannot be performed because the FIFO state is corrupt.
  * ASL_FIFO_E_FULL          - Operation is not possible since queue is full.
  */
-asl_fifo_error_e asl_fifo_enqueue(asl_fifo_s* ptr_fifo, asl_buffer_s element);
+asl_fifo_error_e asl_fifo__enqueue(asl_fifo_s* ptr_fifo, asl_buffer_s element);
 
 #ifdef __cplusplus
 }

@@ -50,10 +50,10 @@ classDiagram
     
     class asl_iface_priv_types {
         <<private>>
-        +asl_iface_v_v_t
-        +asl_iface_v_pv_t
-        +asl_iface_pv_s_t
-        +asl_iface_s_pv_t
+        +asl_iface_v_v_cb
+        +asl_iface_v_pv_cb
+        +asl_iface_pv_s_cb
+        +asl_iface_s_pv_cb
     }
     
     class asl_iface_composite_types {
@@ -62,7 +62,7 @@ classDiagram
     
     class asl_iface_composite_priv_types {
         <<private>>
-        +asl_iface_composite_rx_tx_t
+        +asl_iface_composite_rx_tx_cb
     }
     
     asl_iface_types --> asl_iface_priv_types : includes
@@ -83,7 +83,7 @@ classDiagram
 
 ### 3.1 Naming Convention
 
-ASL follows systematic naming: `asl_iface_[return]_[param]_t`
+ASL follows systematic naming: `asl_iface_[return]_[param]_cb`
 
 **Type Codes**:
 - `v` = void, `pv` = pvoid, `s` = size_t, `ps` = psize_t
@@ -109,35 +109,35 @@ config:
 classDiagram
     class Void_Return_Functions {
         <<function_pointers>>
-        +asl_iface_v_v_t void(*)(void)
-        +asl_iface_v_pv_t void(*)(pvoid)
-        +asl_iface_v_s_t void(*)(size_t)
-        +asl_iface_v_u8_t void(*)(uint8_t)
-        +asl_iface_v_u16_t void(*)(uint16_t)
-        +asl_iface_v_u32_t void(*)(uint32_t)
-        +asl_iface_v_u64_t void(*)(uint64_t)
+        +asl_iface_v_v_cb void(*)(void)
+        +asl_iface_v_pv_cb void(*)(pvoid)
+        +asl_iface_v_s_cb void(*)(size_t)
+        +asl_iface_v_u8_cb void(*)(uint8_t)
+        +asl_iface_v_u16_cb void(*)(uint16_t)
+        +asl_iface_v_u32_cb void(*)(uint32_t)
+        +asl_iface_v_u64_cb void(*)(uint64_t)
     }
     
     class Pointer_Return_Functions {
         <<function_pointers>>
-        +asl_iface_pv_v_t pvoid(*)(void)
-        +asl_iface_pv_pv_t pvoid(*)(pvoid)
-        +asl_iface_pv_s_t pvoid(*)(size_t)
-        +asl_iface_pv_u8_t pvoid(*)(uint8_t)
-        +asl_iface_pv_u16_t pvoid(*)(uint16_t)
-        +asl_iface_pv_u32_t pvoid(*)(uint32_t)
-        +asl_iface_pv_u64_t pvoid(*)(uint64_t)
+        +asl_iface_pv_v_cb pvoid(*)(void)
+        +asl_iface_pv_pv_cb pvoid(*)(pvoid)
+        +asl_iface_pv_s_cb pvoid(*)(size_t)
+        +asl_iface_pv_u8_cb pvoid(*)(uint8_t)
+        +asl_iface_pv_u16_cb pvoid(*)(uint16_t)
+        +asl_iface_pv_u32_cb pvoid(*)(uint32_t)
+        +asl_iface_pv_u64_cb pvoid(*)(uint64_t)
     }
     
     class Size_Return_Functions {
         <<function_pointers>>
-        +asl_iface_s_v_t size_t(*)(void)
-        +asl_iface_s_pv_t size_t(*)(pvoid)
-        +asl_iface_s_s_t size_t(*)(size_t)
-        +asl_iface_s_u8_t size_t(*)(uint8_t)
-        +asl_iface_s_u16_t size_t(*)(uint16_t)
-        +asl_iface_s_u32_t size_t(*)(uint32_t)
-        +asl_iface_s_u64_t size_t(*)(uint64_t)
+        +asl_iface_s_v_cb size_t(*)(void)
+        +asl_iface_s_pv_cb size_t(*)(pvoid)
+        +asl_iface_s_s_cb size_t(*)(size_t)
+        +asl_iface_s_u8_cb size_t(*)(uint8_t)
+        +asl_iface_s_u16_cb size_t(*)(uint16_t)
+        +asl_iface_s_u32_cb size_t(*)(uint32_t)
+        +asl_iface_s_u64_cb size_t(*)(uint64_t)
     }
     
     classDef void_funcs fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
@@ -191,23 +191,23 @@ classDiagram
 **Coverage**: 320+ function pointer patterns for all return/parameter combinations.
 
 **Common Patterns**:
-- `asl_iface_v_v_t` - void(*)(void) - Simple callbacks
-- `asl_iface_pv_s_t` - pvoid(*)(size_t) - Allocation patterns  
-- `asl_iface_s_pv_t` - size_t(*)(pvoid) - Size query patterns
-- `asl_iface_v_pv_t` - void(*)(pvoid) - Cleanup patterns
+- `asl_iface_v_v_cb` - void(*)(void) - Simple callbacks
+- `asl_iface_pv_s_cb` - pvoid(*)(size_t) - Allocation patterns  
+- `asl_iface_s_pv_cb` - size_t(*)(pvoid) - Size query patterns
+- `asl_iface_v_pv_cb` - void(*)(pvoid) - Cleanup patterns
 
 **Usage Examples**:
 ```c
 // Allocator uses interface types
 typedef struct asl_allocator_t {
-    asl_iface_pv_s_t alloc_f;  // pvoid (*)(size_t)
-    asl_iface_v_pv_t free_f;   // void (*)(pvoid)
+    asl_iface_pv_s_cb alloc_f;  // pvoid (*)(size_t)
+    asl_iface_v_pv_cb free_f;   // void (*)(pvoid)
 } asl_allocator_t;
 
 // Mutex uses interface types  
 typedef struct asl_mutex_t {
-    asl_iface_v_v_t lock_f;    // void (*)(void)
-    asl_iface_v_v_t unlock_f;  // void (*)(void)
+    asl_iface_v_v_cb lock_f;    // void (*)(void)
+    asl_iface_v_v_cb unlock_f;  // void (*)(void)
 } asl_mutex_t;
 ```
 ---
@@ -216,7 +216,7 @@ typedef struct asl_mutex_t {
 
 **Callback Registration**:
 ```c
-asl_iface_v_pu8_t callback = my_data_handler;
+asl_iface_v_pu8_cb callback = my_data_handler;
 register_callback(callback);
 ```
 

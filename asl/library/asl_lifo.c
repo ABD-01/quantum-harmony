@@ -10,7 +10,7 @@
  *
  *  @version    0.0.1
  *
- *  @date       17 October 2025
+ *  @date       27 October 2025
  *
  *  @brief      Implementation of the 'asl_lifo' Class.
 *******************************************************************************/
@@ -22,7 +22,7 @@
 /* ASL Util. */
 #include "asl_util.h"
 
-asl_lifo_error_e asl_lifo_reset(asl_lifo_s* ptr_lifo) {
+asl_lifo_error_e asl_lifo__reset(asl_lifo_s* ptr_lifo) {
     asl_lifo_error_e error = ASL_LIFO_E_MAX;
     asl_lifo_s* const lifo = ptr_lifo;
     asl_buffer_s paint;
@@ -44,18 +44,18 @@ asl_lifo_error_e asl_lifo_reset(asl_lifo_s* ptr_lifo) {
             for ( size_t i = 0 ; i < k_count_max_elements ; ++i ) {
                 paint.ptr = lifo->elements.ptr + ( i * k_size_element );
                 paint.size = k_size_element;
-                asl_util_buffer_memset(paint, (uint8_t) i);
+                asl_util__buffer_memset(paint, (uint8_t) i);
             }
             paint.ptr = lifo->elements.ptr + ( k_count_max_elements * k_size_element );
             paint.size = lifo->elements.size - ( k_count_max_elements * k_size_element );
-            asl_util_buffer_memset(paint, (uint8_t) 0xFF);
+            asl_util__buffer_memset(paint, (uint8_t) 0xFF);
             error = ASL_LIFO_E_OK;
         }
     }
     return error;
 }
 
-asl_lifo_error_e asl_lifo_get_count_capacity(asl_lifo_s* ptr_lifo, size_t* capacity) {
+asl_lifo_error_e asl_lifo__get_count_capacity(asl_lifo_s* ptr_lifo, size_t* capacity) {
     asl_lifo_error_e error = ASL_LIFO_E_MAX;
     asl_lifo_s* const lifo = ptr_lifo;
     if ( !lifo || !lifo->elements.ptr || !lifo->elements.size || !lifo->size_element || !capacity ) {
@@ -79,7 +79,7 @@ asl_lifo_error_e asl_lifo_get_count_capacity(asl_lifo_s* ptr_lifo, size_t* capac
     return error;
 }
 
-asl_lifo_error_e asl_lifo_get_count_used(asl_lifo_s* ptr_lifo, size_t* used) {
+asl_lifo_error_e asl_lifo__get_count_used(asl_lifo_s* ptr_lifo, size_t* used) {
     asl_lifo_error_e error = ASL_LIFO_E_MAX;
     asl_lifo_s* const lifo = ptr_lifo;
     if ( !lifo || !lifo->elements.ptr || !lifo->elements.size || !lifo->size_element || !used ) {
@@ -103,7 +103,7 @@ asl_lifo_error_e asl_lifo_get_count_used(asl_lifo_s* ptr_lifo, size_t* used) {
     return error;
 }
 
-asl_lifo_error_e asl_lifo_get_count_free(asl_lifo_s* ptr_lifo, size_t* free) {
+asl_lifo_error_e asl_lifo__get_count_free(asl_lifo_s* ptr_lifo, size_t* free) {
     asl_lifo_error_e error = ASL_LIFO_E_MAX;
     asl_lifo_s* const lifo = ptr_lifo;
     if ( !lifo || !lifo->elements.ptr || !lifo->elements.size || !lifo->size_element || !free ) {
@@ -127,15 +127,15 @@ asl_lifo_error_e asl_lifo_get_count_free(asl_lifo_s* ptr_lifo, size_t* free) {
     return error;
 }
 
-asl_lifo_error_e asl_lifo_peek(asl_lifo_s* ptr_lifo, asl_buffer_s* element) {
-    return peek_pop(ptr_lifo, element, false);
+asl_lifo_error_e asl_lifo__peek(asl_lifo_s* ptr_lifo, asl_buffer_s* element) {
+    return asl_lifo__peek_pop_private(ptr_lifo, element, false);
 }
 
-asl_lifo_error_e asl_lifo_pop(asl_lifo_s* ptr_lifo, asl_buffer_s* element) {
-    return peek_pop(ptr_lifo, element, true);
+asl_lifo_error_e asl_lifo__pop(asl_lifo_s* ptr_lifo, asl_buffer_s* element) {
+    return asl_lifo__peek_pop_private(ptr_lifo, element, true);
 }
 
-asl_lifo_error_e asl_lifo_push(asl_lifo_s* ptr_lifo, asl_buffer_s element) {
+asl_lifo_error_e asl_lifo__push(asl_lifo_s* ptr_lifo, asl_buffer_s element) {
     asl_lifo_error_e error = ASL_LIFO_E_MAX;
     asl_lifo_s* const lifo = ptr_lifo;
     asl_buffer_s dest;
@@ -161,7 +161,7 @@ asl_lifo_error_e asl_lifo_push(asl_lifo_s* ptr_lifo, asl_buffer_s element) {
             /* Success - push element and increment top. */
             dest.ptr = lifo->elements.ptr + ( lifo->top * k_size_element );
             dest.size = k_size_element;
-            asl_util_buffer_memcpy(dest, element);
+            asl_util__buffer_memcpy(dest, element);
             lifo->top++;
             error = ASL_LIFO_E_OK;
         }
@@ -169,7 +169,7 @@ asl_lifo_error_e asl_lifo_push(asl_lifo_s* ptr_lifo, asl_buffer_s element) {
     return error;
 }
 
-static asl_lifo_error_e peek_pop(asl_lifo_s* ptr_lifo, asl_buffer_s* element, bool is_pop) {
+static asl_lifo_error_e asl_lifo__peek_pop_private(asl_lifo_s* ptr_lifo, asl_buffer_s* element, bool is_pop) {
     asl_lifo_error_e error = ASL_LIFO_E_MAX;
     asl_lifo_s* const lifo = ptr_lifo;
     asl_buffer_s src;
@@ -195,7 +195,7 @@ static asl_lifo_error_e peek_pop(asl_lifo_s* ptr_lifo, asl_buffer_s* element, bo
             /* Success - push element and increment top. */
             src.ptr = lifo->elements.ptr + ( ( lifo->top - 1 ) * k_size_element );
             src.size = k_size_element;
-            asl_util_buffer_memcpy(*element, src);
+            asl_util__buffer_memcpy(*element, src);
             if ( is_pop ) {
                 lifo->top--;
             }

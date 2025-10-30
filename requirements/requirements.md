@@ -1,8 +1,8 @@
-# ASL (Application Support Library) Requirements Specification
+# ASL (Abstract Software Library) Requirements Specification
 
 ## 1. System Overview
 
-The Application Support Library (ASL) provides a set of portable data structures and utilities for embedded and desktop applications. The library implements core abstractions for memory management and common data structures with platform-independent interfaces.
+The Abstract Software Library (ASL) provides a set of portable data structures and utilities for embedded and desktop applications. The library implements core abstractions for memory management and common data structures with platform-independent interfaces.
 
 The ASL library encompasses:
 - Core type system with C99 standard type abstractions
@@ -34,9 +34,9 @@ The ASL library encompasses:
 - **Requirement**: The library SHALL define comprehensive function pointer types for common signatures
 - **Pre-Condition**: Basic C99 types and interface type definitions are available
 - **Input**: Standard C99 function signature patterns (void, pvoid, size_t, uint8_t, uint16_t, uint32_t, uint64_t)
-- **Output**: Standardized function pointer type definitions following asl_iface_<return>_<param>_t naming convention
+- **Output**: Standardized function pointer type definitions following asl_iface_<return>_<param>_cb naming convention
 - **Acceptance Criteria**:
-  - Function pointer types follow naming convention asl_iface_<return>_<param>_t (e.g., asl_iface_v_v_t, asl_iface_pv_s_t)
+  - Function pointer types follow naming convention asl_iface_<return>_<param>_cb (e.g., asl_iface_v_v_cb, asl_iface_pv_s_cb)
   - Support for void (v), pvoid (pv), size_t (s) return types
   - Support for various parameter combinations (void, pvoid, size_t, uint8_t, uint16_t, uint32_t, uint64_t)
   - Parameter types abbreviated: v=void, pv=pvoid, s=size_t, u8=uint8_t, u16=uint16_t, u32=uint32_t, u64=uint64_t
@@ -68,48 +68,48 @@ The ASL library encompasses:
 #### ASL_REQ_005
 - **Requirement ID**: ASL_REQ_005
 - **Objective**: Provide CBUF initialization function
-- **Requirement**: The CBUF module SHALL provide asl_cbuf_init() function to reset buffer state
+- **Requirement**: The CBUF module SHALL provide asl_cbuf__init() function to reset buffer state
 - **Pre-Condition**: asl_cbuf_s structure is allocated and available
 - **Input**: Pointer to asl_cbuf_s structure (asl_cbuf_s* ptr_cbuf)
-- **Output**: asl_cbuf_error_n return code indicating success or failure
+- **Output**: asl_cbuf_error_e return code indicating success or failure
 - **Acceptance Criteria**:
-  - Function signature: asl_cbuf_error_n asl_cbuf_init(asl_cbuf_s* ptr_cbuf)
+  - Function signature: asl_cbuf_error_e asl_cbuf__init(asl_cbuf_s* ptr_cbuf)
   - Returns ASL_CBUF_E_OK on success
   - Returns ASL_CBUF_E_PARAM for NULL pointer input
 
 #### ASL_REQ_006
 - **Requirement ID**: ASL_REQ_006
 - **Objective**: Support bulk enqueue operations
-- **Requirement**: The CBUF module SHALL provide asl_cbuf_enqueue() for adding multiple bytes
+- **Requirement**: The CBUF module SHALL provide asl_cbuf__enqueue() for adding multiple bytes
 - **Pre-Condition**: Initialized asl_cbuf_s structure with sufficient available space
 - **Input**: asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, size_t req_enqueue
-- **Output**: asl_cbuf_error_n return code and updated buffer state
+- **Output**: asl_cbuf_error_e return code and updated buffer state
 - **Acceptance Criteria**:
-  - Function signature: asl_cbuf_error_n asl_cbuf_enqueue(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, size_t req_enqueue)
+  - Function signature: asl_cbuf_error_e asl_cbuf__enqueue(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, size_t req_enqueue)
   - Returns ASL_CBUF_E_FORBID when insufficient space available
   - Supports atomic bulk operations
 
 #### ASL_REQ_007
 - **Requirement ID**: ASL_REQ_007
 - **Objective**: Support bulk dequeue operations  
-- **Requirement**: The CBUF module SHALL provide asl_cbuf_dequeue() for removing multiple bytes
+- **Requirement**: The CBUF module SHALL provide asl_cbuf__dequeue() for removing multiple bytes
 - **Pre-Condition**: Initialized asl_cbuf_s structure with sufficient available data
 - **Input**: asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, size_t req_dequeue
-- **Output**: asl_cbuf_error_n return code and extracted data in buffer
+- **Output**: asl_cbuf_error_e return code and extracted data in buffer
 - **Acceptance Criteria**:
-  - Function signature: asl_cbuf_error_n asl_cbuf_dequeue(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, size_t req_dequeue)
+  - Function signature: asl_cbuf_error_e asl_cbuf__dequeue(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, size_t req_dequeue)
   - Returns ASL_CBUF_E_FORBID when insufficient data available
   - Removes data from buffer
 
 #### ASL_REQ_008
 - **Requirement ID**: ASL_REQ_008
 - **Objective**: Support non-destructive preview operations
-- **Requirement**: The CBUF module SHALL provide asl_cbuf_preview() for reading without removing data
+- **Requirement**: The CBUF module SHALL provide asl_cbuf__preview() for reading without removing data
 - **Pre-Condition**: Initialized asl_cbuf_s structure with available data
 - **Input**: asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, size_t req_preview
-- **Output**: asl_cbuf_error_n return code and preview data in buffer (buffer state unchanged)
+- **Output**: asl_cbuf_error_e return code and preview data in buffer (buffer state unchanged)
 - **Acceptance Criteria**:
-  - Function signature: asl_cbuf_error_n asl_cbuf_preview(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, size_t req_preview)
+  - Function signature: asl_cbuf_error_e asl_cbuf__preview(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, size_t req_preview)
   - Does not modify buffer state
   - Returns same data as equivalent dequeue would
 
@@ -119,19 +119,19 @@ The ASL library encompasses:
 - **Requirement**: The CBUF module SHALL provide functions to query available read and write space
 - **Pre-Condition**: Initialized asl_cbuf_s structure
 - **Input**: asl_cbuf_s* ptr_cbuf and size_t* output parameters
-- **Output**: asl_cbuf_error_n return code and size_t values via output parameters
+- **Output**: asl_cbuf_error_e return code and size_t values via output parameters
 - **Acceptance Criteria**:
-  - asl_cbuf_available_read() returns asl_cbuf_error_n and provides bytes available for reading via output parameter
-  - asl_cbuf_available_write() returns asl_cbuf_error_n and provides bytes available for writing via output parameter
-  - Both functions follow pattern: asl_cbuf_error_n func(asl_cbuf_s* ptr_cbuf, size_t* output)
+  - asl_cbuf__available_read() returns asl_cbuf_error_e and provides bytes available for reading via output parameter
+  - asl_cbuf__available_write() returns asl_cbuf_error_e and provides bytes available for writing via output parameter
+  - Both functions follow pattern: asl_cbuf_error_e func(asl_cbuf_s* ptr_cbuf, size_t* output)
 
 #### ASL_REQ_010
 - **Requirement ID**: ASL_REQ_010
 - **Objective**: Define comprehensive error codes
-- **Requirement**: The CBUF module SHALL use asl_cbuf_error_n enumeration for all error conditions
+- **Requirement**: The CBUF module SHALL use asl_cbuf_error_e enumeration for all error conditions
 - **Pre-Condition**: C99 enumeration support available
 - **Input**: CBUF operation conditions requiring error classification
-- **Output**: asl_cbuf_error_n enumeration values for error handling
+- **Output**: asl_cbuf_error_e enumeration values for error handling
 - **Acceptance Criteria**:
   - ASL_CBUF_E_OK for successful operations
   - ASL_CBUF_E_PARAM for invalid parameters
@@ -149,17 +149,16 @@ The ASL library encompasses:
   - asl_fifo_s structure contains elements (asl_buffer_s), size_element (size_t), index_write (size_t), index_read (int) fields
   - Supports arbitrary element sizes configured at initialization
   - Maintains FIFO ordering
-  - Maintains FIFO ordering
 
 #### ASL_REQ_012
 - **Requirement ID**: ASL_REQ_012
 - **Objective**: Provide FIFO reset function
-- **Requirement**: The FIFO module SHALL provide asl_fifo_reset() to initialize queue state
+- **Requirement**: The FIFO module SHALL provide asl_fifo__reset() to initialize queue state
 - **Pre-Condition**: asl_fifo_s structure is allocated and available
 - **Input**: Pointer to asl_fifo_s structure (asl_fifo_s* ptr_fifo)
 - **Output**: asl_fifo_error_e return code indicating success or failure
 - **Acceptance Criteria**:
-  - Function signature: asl_fifo_error_e asl_fifo_reset(asl_fifo_s* ptr_fifo)
+  - Function signature: asl_fifo_error_e asl_fifo__reset(asl_fifo_s* ptr_fifo)
   - Resets read and write indices
   - Returns appropriate error codes
 
@@ -171,43 +170,43 @@ The ASL library encompasses:
 - **Input**: asl_fifo_s* ptr_fifo and size_t* output parameters
 - **Output**: asl_fifo_error_e return code and size_t values via output parameters
 - **Acceptance Criteria**:
-  - asl_fifo_get_count_capacity() returns asl_fifo_error_e and provides total element capacity via output parameter
-  - asl_fifo_get_count_used() returns asl_fifo_error_e and provides currently used elements via output parameter
-  - asl_fifo_get_count_free() returns asl_fifo_error_e and provides available element slots via output parameter
+  - asl_fifo__get_count_capacity() returns asl_fifo_error_e and provides total element capacity via output parameter
+  - asl_fifo__get_count_used() returns asl_fifo_error_e and provides currently used elements via output parameter
+  - asl_fifo__get_count_free() returns asl_fifo_error_e and provides available element slots via output parameter
 
 #### ASL_REQ_014
 - **Requirement ID**: ASL_REQ_014
 - **Objective**: Support element enqueue operations
-- **Requirement**: The FIFO module SHALL provide asl_fifo_enqueue() to add elements
+- **Requirement**: The FIFO module SHALL provide asl_fifo__enqueue() to add elements
 - **Pre-Condition**: Initialized asl_fifo_s structure with available capacity
 - **Input**: asl_fifo_s* ptr_fifo, asl_buffer_s element
 - **Output**: asl_fifo_error_e return code and element added to queue
 - **Acceptance Criteria**:
-  - Function signature: asl_fifo_error_e asl_fifo_enqueue(asl_fifo_s* ptr_fifo, asl_buffer_s element)
+  - Function signature: asl_fifo_error_e asl_fifo__enqueue(asl_fifo_s* ptr_fifo, asl_buffer_s element)
   - Returns ASL_FIFO_E_FULL when queue is full
   - Copies element data into queue
 
 #### ASL_REQ_015
 - **Requirement ID**: ASL_REQ_015
 - **Objective**: Support element dequeue operations
-- **Requirement**: The FIFO module SHALL provide asl_fifo_dequeue() to remove elements
+- **Requirement**: The FIFO module SHALL provide asl_fifo__dequeue() to remove elements
 - **Pre-Condition**: Initialized asl_fifo_s structure with available elements
 - **Input**: asl_fifo_s* ptr_fifo, asl_buffer_s* element
 - **Output**: asl_fifo_error_e return code and extracted element data
 - **Acceptance Criteria**:
-  - Function signature: asl_fifo_error_e asl_fifo_dequeue(asl_fifo_s* ptr_fifo, asl_buffer_s* element)
+  - Function signature: asl_fifo_error_e asl_fifo__dequeue(asl_fifo_s* ptr_fifo, asl_buffer_s* element)
   - Returns ASL_FIFO_E_EMPTY when queue is empty
   - Removes element from queue
 
 #### ASL_REQ_016
 - **Requirement ID**: ASL_REQ_016
 - **Objective**: Support non-destructive preview
-- **Requirement**: The FIFO module SHALL provide asl_fifo_preview() to read without removing
+- **Requirement**: The FIFO module SHALL provide asl_fifo__preview() to read without removing
 - **Pre-Condition**: Initialized asl_fifo_s structure with available elements
 - **Input**: asl_fifo_s* ptr_fifo, asl_buffer_s* element
 - **Output**: asl_fifo_error_e return code and preview element data (queue state unchanged)
 - **Acceptance Criteria**:
-  - Function signature: asl_fifo_error_e asl_fifo_preview(asl_fifo_s* ptr_fifo, asl_buffer_s* element)
+  - Function signature: asl_fifo_error_e asl_fifo__preview(asl_fifo_s* ptr_fifo, asl_buffer_s* element)
   - Does not modify queue state
   - Returns next element that would be dequeued
 
@@ -238,12 +237,12 @@ The ASL library encompasses:
 #### ASL_REQ_019
 - **Requirement ID**: ASL_REQ_019
 - **Objective**: Provide LIFO reset function
-- **Requirement**: The LIFO module SHALL provide asl_lifo_reset() to initialize stack state
+- **Requirement**: The LIFO module SHALL provide asl_lifo__reset() to initialize stack state
 - **Pre-Condition**: asl_lifo_s structure is allocated and available
 - **Input**: Pointer to asl_lifo_s structure (asl_lifo_s* ptr_lifo)
 - **Output**: asl_lifo_error_e return code indicating success or failure
 - **Acceptance Criteria**:
-  - Function signature: asl_lifo_error_e asl_lifo_reset(asl_lifo_s* ptr_lifo)
+  - Function signature: asl_lifo_error_e asl_lifo__reset(asl_lifo_s* ptr_lifo)
   - Sets top index to zero (empty state)
   - Debug fills elements buffer
 
@@ -255,43 +254,43 @@ The ASL library encompasses:
 - **Input**: asl_lifo_s* ptr_lifo and size_t* output parameters
 - **Output**: asl_lifo_error_e return code and size_t values via output parameters
 - **Acceptance Criteria**:
-  - asl_lifo_get_count_capacity() returns asl_lifo_error_e and provides total element capacity via output parameter
-  - asl_lifo_get_count_used() returns asl_lifo_error_e and provides currently used elements via output parameter
-  - asl_lifo_get_count_free() returns asl_lifo_error_e and provides available element slots via output parameter
+  - asl_lifo__get_count_capacity() returns asl_lifo_error_e and provides total element capacity via output parameter
+  - asl_lifo__get_count_used() returns asl_lifo_error_e and provides currently used elements via output parameter
+  - asl_lifo__get_count_free() returns asl_lifo_error_e and provides available element slots via output parameter
 
 #### ASL_REQ_021
 - **Requirement ID**: ASL_REQ_021
 - **Objective**: Support element push operations
-- **Requirement**: The LIFO module SHALL provide asl_lifo_push() to add elements
+- **Requirement**: The LIFO module SHALL provide asl_lifo__push() to add elements
 - **Pre-Condition**: Initialized asl_lifo_s structure with available capacity
 - **Input**: asl_lifo_s* ptr_lifo, asl_buffer_s element
 - **Output**: asl_lifo_error_e return code and element added to stack
 - **Acceptance Criteria**:
-  - Function signature: asl_lifo_error_e asl_lifo_push(asl_lifo_s* ptr_lifo, asl_buffer_s element)
+  - Function signature: asl_lifo_error_e asl_lifo__push(asl_lifo_s* ptr_lifo, asl_buffer_s element)
   - Returns ASL_LIFO_E_FULL when stack is full
   - Increments top index after successful push
 
 #### ASL_REQ_022
 - **Requirement ID**: ASL_REQ_022
 - **Objective**: Support element pop operations
-- **Requirement**: The LIFO module SHALL provide asl_lifo_pop() to remove elements
+- **Requirement**: The LIFO module SHALL provide asl_lifo__pop() to remove elements
 - **Pre-Condition**: Initialized asl_lifo_s structure with available elements
 - **Input**: asl_lifo_s* ptr_lifo, asl_buffer_s* element
 - **Output**: asl_lifo_error_e return code and extracted element data
 - **Acceptance Criteria**:
-  - Function signature: asl_lifo_error_e asl_lifo_pop(asl_lifo_s* ptr_lifo, asl_buffer_s* element)
+  - Function signature: asl_lifo_error_e asl_lifo__pop(asl_lifo_s* ptr_lifo, asl_buffer_s* element)
   - Returns ASL_LIFO_E_EMPTY when stack is empty
   - Decrements top index after successful pop
 
 #### ASL_REQ_023
 - **Requirement ID**: ASL_REQ_023
 - **Objective**: Support non-destructive peek
-- **Requirement**: The LIFO module SHALL provide asl_lifo_peek() to read without removing
+- **Requirement**: The LIFO module SHALL provide asl_lifo__peek() to read without removing
 - **Pre-Condition**: Initialized asl_lifo_s structure with available elements
 - **Input**: asl_lifo_s* ptr_lifo, asl_buffer_s* element
 - **Output**: asl_lifo_error_e return code and peek element data (stack state unchanged)
 - **Acceptance Criteria**:
-  - Function signature: asl_lifo_error_e asl_lifo_peek(asl_lifo_s* ptr_lifo, asl_buffer_s* element)
+  - Function signature: asl_lifo_error_e asl_lifo__peek(asl_lifo_s* ptr_lifo, asl_buffer_s* element)
   - Does not modify stack state
   - Returns top element that would be popped
 
@@ -310,24 +309,24 @@ The ASL library encompasses:
 #### ASL_REQ_025
 - **Requirement ID**: ASL_REQ_025
 - **Objective**: Provide buffer memory set function
-- **Requirement**: The utility module SHALL provide asl_util_buffer_memset() for filling buffers
+- **Requirement**: The utility module SHALL provide asl_util__buffer_memset() for filling buffers
 - **Pre-Condition**: Valid asl_buffer_s destination buffer with allocated memory
 - **Input**: asl_buffer_s dest, uint8_t value
 - **Output**: Destination buffer filled with specified byte value
 - **Acceptance Criteria**:
-  - Function signature: void asl_util_buffer_memset(asl_buffer_s dest, uint8_t value)
+  - Function signature: void asl_util__buffer_memset(asl_buffer_s dest, uint8_t value)
   - Fills entire destination buffer with specified byte value
   - Uses asl_buffer_s for consistent buffer handling
 
 #### ASL_REQ_026
 - **Requirement ID**: ASL_REQ_026
 - **Objective**: Provide buffer memory copy function
-- **Requirement**: The utility module SHALL provide asl_util_buffer_memcpy() for copying buffers
+- **Requirement**: The utility module SHALL provide asl_util__buffer_memcpy() for copying buffers
 - **Pre-Condition**: Valid asl_buffer_s source and destination buffers with allocated memory
 - **Input**: asl_buffer_s dest, asl_buffer_s src
 - **Output**: Data copied from source buffer to destination buffer
 - **Acceptance Criteria**:
-  - Function signature: void asl_util_buffer_memcpy(asl_buffer_s dest, asl_buffer_s src)
+  - Function signature: void asl_util__buffer_memcpy(asl_buffer_s dest, asl_buffer_s src)
   - Copies data from source buffer to destination buffer
   - Uses asl_buffer_s for consistent buffer handling
 

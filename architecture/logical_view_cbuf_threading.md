@@ -37,14 +37,14 @@ sequenceDiagram
     participant B as CBUF
     participant C as Consumer
     
-    P->>B: asl_cbuf_enqueue()
+    P->>B: asl_cbuf__enqueue()
     Note over B: Lock buffer
     B->>B: Write data
     B->>B: Update rear pointer
     Note over B: Unlock buffer
     B-->>P: Return bytes written
     
-    C->>B: asl_cbuf_dequeue()  
+    C->>B: asl_cbuf__dequeue()  
     Note over B: Lock buffer
     B->>B: Read data
     B->>B: Update front pointer
@@ -62,7 +62,7 @@ sequenceDiagram
 **Critical Sections**:
 ```c
 // Pseudo-code showing internal locking
-size_t asl_cbuf_enqueue(asl_cbuf_s* cbuf, const puint8_t data, size_t data_size) {
+size_t asl_cbuf__enqueue(asl_cbuf_s* cbuf, const puint8_t data, size_t data_size) {
     ACQUIRE_LOCK(cbuf->mutex);
     
     // Critical section
@@ -96,11 +96,11 @@ The CBUF module uses size-based return values and parameter validation for error
 **Return Value Conventions**:
 ```c
 // Boolean functions
-bool result = asl_cbuf_init(cbuf, mem, size);
+bool result = asl_cbuf__init(cbuf, mem, size);
 // true: Success, false: Error
 
 // Size functions  
-size_t bytes = asl_cbuf_enqueue(cbuf, data, size);
+size_t bytes = asl_cbuf__enqueue(cbuf, data, size);
 // Returns actual bytes processed (0-size)
 ```
 

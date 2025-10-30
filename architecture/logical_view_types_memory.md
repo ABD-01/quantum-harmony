@@ -118,8 +118,8 @@ config:
 ---
 classDiagram
     class asl_allocator_t {
-        +asl_iface_pv_s_t alloc_f
-        +asl_iface_v_pv_t free_f
+        +asl_iface_pv_s_cb alloc_f
+        +asl_iface_v_pv_cb free_f
         +Memory Allocation
         +Memory Deallocation
     }
@@ -131,8 +131,8 @@ classDiagram
 **Implementation**:
 ```c
 typedef struct asl_allocator_t {
-    asl_iface_pv_s_t alloc_f;  // pvoid (*)(size_t) - allocates memory
-    asl_iface_v_pv_t free_f;   // void (*)(pvoid) - releases memory
+    asl_iface_pv_s_cb alloc_f;  // pvoid (*)(size_t) - allocates memory
+    asl_iface_v_pv_cb free_f;   // void (*)(pvoid) - releases memory
 } asl_allocator_t;
 ```
 

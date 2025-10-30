@@ -10,7 +10,7 @@
  *
  *  @version    0.0.1
  *
- *  @date       17 October 2025
+ *  @date       27 October 2025
  *
  *  @brief      Implementation of the 'asl_util' Class.
 *******************************************************************************/
@@ -19,7 +19,7 @@
 #include "asl_util.h"
 #include "asl_util_priv.h"
 
-void asl_util_buffer_memset(asl_buffer_s dest, uint8_t value) {
+void asl_util__buffer_memset(asl_buffer_s dest, uint8_t value) {
     if ( dest.ptr ) {
         for ( size_t i = 0 ; i < dest.size ; ++i ) {
             dest.ptr[i] = value;
@@ -27,7 +27,7 @@ void asl_util_buffer_memset(asl_buffer_s dest, uint8_t value) {
     }
 }
 
-void asl_util_buffer_memcpy(asl_buffer_s dest, asl_buffer_s src) {
+void asl_util__buffer_memcpy(asl_buffer_s dest, asl_buffer_s src) {
     const size_t copy_size = dest.size < src.size ? dest.size : src.size;
     if ( dest.ptr && src.ptr ) {
         for ( size_t i = 0 ; i < copy_size ; ++i ) {

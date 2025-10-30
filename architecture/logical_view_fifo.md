@@ -20,5 +20,5 @@ Core queue concepts, internal structure, and operation flow.
 
 | Function | Purpose | Module |
 |----------|---------|--------|
-| `asl_fifo_reset()` | Clear queue | [Overview](logical_view_fifo_overview.md) |
-| `asl_fifo_enqueue()` | Add element | [Overview](logical_view_fifo_overview.md) |
+| `asl_fifo__reset()` | Clear queue | [Overview](logical_view_fifo_overview.md) |
+| `asl_fifo__enqueue()` | Add element | [Overview](logical_view_fifo_overview.md) |

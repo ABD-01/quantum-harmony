@@ -143,7 +143,7 @@ Common features across all modules:
 
 ### Implementation Files
 - ASL Source Code: `asl/` directory
-- Build System: `build.sh`, `build_all.sh`
+- Build System: `build_module.sh`, `build_all.sh`
 - Platform Configurations: Supported toolchains in build scripts
 
 ### Related Views

@@ -10,7 +10,7 @@
  *
  *  @version    0.0.1
  *
- *  @date       17 October 2025
+ *  @date       27 October 2025
  *
  *  @brief      Implementation of the 'basic_lifo' Example.
 *******************************************************************************/
@@ -52,7 +52,7 @@ basic_lifo_error_e basic_lifo_init(
             ptr_context->max_elements = num_elements;
             
             /* Reset ASL LIFO. */
-            lifo_error = asl_lifo_reset(&ptr_context->lifo);
+            lifo_error = asl_lifo__reset(&ptr_context->lifo);
             if (ASL_LIFO_E_OK == lifo_error) {
                 ptr_context->test_passed = false;
                 printf("LIFO initialized: %zu elements x %zu bytes each = %zu bytes total\n", 
@@ -155,9 +155,9 @@ void basic_lifo_print_results(basic_lifo_context_s* ptr_context) {
     }
     
     /* Get current LIFO status. */
-    asl_lifo_get_count_capacity(&ptr_context->lifo, &capacity);
-    asl_lifo_get_count_used(&ptr_context->lifo, &used);
-    asl_lifo_get_count_free(&ptr_context->lifo, &free_count);
+    asl_lifo__get_count_capacity(&ptr_context->lifo, &capacity);
+    asl_lifo__get_count_used(&ptr_context->lifo, &used);
+    asl_lifo__get_count_free(&ptr_context->lifo, &free_count);
     
     printf("\nTest Results:\n");
     printf("LIFO Configuration:\n");
@@ -171,7 +171,7 @@ void basic_lifo_print_results(basic_lifo_context_s* ptr_context) {
     printf("Overall Status: %s\n", ptr_context->test_passed ? "PASSED" : "FAILED");
 }
 
-// Private function implementations
+/* Private function implementations */
 
 static basic_lifo_error_e basic_lifo_test_empty(basic_lifo_context_s* ptr_context) {
     basic_lifo_error_e error = BASIC_LIFO_E_OK;
@@ -189,24 +189,24 @@ static basic_lifo_error_e basic_lifo_test_empty(basic_lifo_context_s* ptr_contex
             element_buffer.size = ptr_context->element_size;
             
             /* Verify LIFO is empty. */
-            lifo_error = asl_lifo_get_count_used(&ptr_context->lifo, &used);
+            lifo_error = asl_lifo__get_count_used(&ptr_context->lifo, &used);
             if ((ASL_LIFO_E_OK == lifo_error) && (0 == used)) {
                 printf("  - LIFO is initially empty: PASSED\n");
                 
                 /* Test pop from empty LIFO (should fail). */
-                lifo_error = asl_lifo_pop(&ptr_context->lifo, &element_buffer);
+                lifo_error = asl_lifo__pop(&ptr_context->lifo, &element_buffer);
                 if (ASL_LIFO_E_EMPTY == lifo_error) {
                     printf("  - Pop from empty LIFO correctly failed: PASSED\n");
                     
                     /* Test peek from empty LIFO (should fail). */
-                    lifo_error = asl_lifo_peek(&ptr_context->lifo, &element_buffer);
+                    lifo_error = asl_lifo__peek(&ptr_context->lifo, &element_buffer);
                     if (ASL_LIFO_E_EMPTY == lifo_error) {
                         printf("  - Peek from empty LIFO correctly failed: PASSED\n");
                         
                         /* Verify free count equals capacity. */
                         size_t capacity = 0;
-                        asl_lifo_error_e capacity_error = asl_lifo_get_count_capacity(&ptr_context->lifo, &capacity);
-                        lifo_error = asl_lifo_get_count_free(&ptr_context->lifo, &free_count);
+                        asl_lifo_error_e capacity_error = asl_lifo__get_count_capacity(&ptr_context->lifo, &capacity);
+                        lifo_error = asl_lifo__get_count_free(&ptr_context->lifo, &free_count);
                         if ((ASL_LIFO_E_OK == capacity_error) && (ASL_LIFO_E_OK == lifo_error) && (free_count == capacity)) {
                             printf("  - Free count equals capacity: PASSED\n");
                         } else {
@@ -248,7 +248,7 @@ static basic_lifo_error_e basic_lifo_fill_to_capacity(
     
     if ((NULL != ptr_context) && (NULL != test_element) && (NULL != element_buffer)) {
         /* Get LIFO capacity. */
-        lifo_error = asl_lifo_get_count_capacity(&ptr_context->lifo, &capacity);
+        lifo_error = asl_lifo__get_count_capacity(&ptr_context->lifo, &capacity);
         if (ASL_LIFO_E_OK == lifo_error) {
             printf("  - LIFO capacity: %zu elements\n", capacity);
             
@@ -261,7 +261,7 @@ static basic_lifo_error_e basic_lifo_fill_to_capacity(
                 memset(test_element, (int)(i & 0xFF), ptr_context->element_size);
                 
                 /* Push element. */
-                lifo_error = asl_lifo_push(&ptr_context->lifo, *element_buffer);
+                lifo_error = asl_lifo__push(&ptr_context->lifo, *element_buffer);
                 if (ASL_LIFO_E_OK != lifo_error) {
                     printf("  - Push element %zu FAILED (error 0x%X)\n", i, lifo_error);
                     error = BASIC_LIFO_E_TEST_FAIL;
@@ -295,22 +295,22 @@ static basic_lifo_error_e basic_lifo_verify_full_state(
     
     if ((NULL != ptr_context) && (NULL != test_element) && (NULL != element_buffer)) {
         /* Get capacity for verification. */
-        lifo_error = asl_lifo_get_count_capacity(&ptr_context->lifo, &capacity);
+        lifo_error = asl_lifo__get_count_capacity(&ptr_context->lifo, &capacity);
         if (ASL_LIFO_E_OK == lifo_error) {
             /* Verify LIFO is full. */
-            lifo_error = asl_lifo_get_count_used(&ptr_context->lifo, &used);
+            lifo_error = asl_lifo__get_count_used(&ptr_context->lifo, &used);
             if ((ASL_LIFO_E_OK == lifo_error) && (used == capacity)) {
                 printf("  - LIFO is full: PASSED\n");
                 
                 /* Verify free count is 0. */
-                lifo_error = asl_lifo_get_count_free(&ptr_context->lifo, &free_count);
+                lifo_error = asl_lifo__get_count_free(&ptr_context->lifo, &free_count);
                 if ((ASL_LIFO_E_OK == lifo_error) && (0 == free_count)) {
                     printf("  - Free count is 0: PASSED\n");
                     
                     /* Test push to full LIFO (should fail). */
                     memset(test_element, 0xFF, ptr_context->element_size);
                     element_buffer->ptr = test_element;
-                    lifo_error = asl_lifo_push(&ptr_context->lifo, *element_buffer);
+                    lifo_error = asl_lifo__push(&ptr_context->lifo, *element_buffer);
                     if (ASL_LIFO_E_FULL == lifo_error) {
                         printf("  - Push to full LIFO correctly failed: PASSED\n");
                     } else {
@@ -349,12 +349,12 @@ static basic_lifo_error_e basic_lifo_test_peek_full(
     
     if ((NULL != ptr_context) && (NULL != peek_element) && (NULL != element_buffer)) {
         /* Get capacity for expected value calculation. */
-        lifo_error = asl_lifo_get_count_capacity(&ptr_context->lifo, &capacity);
+        lifo_error = asl_lifo__get_count_capacity(&ptr_context->lifo, &capacity);
         if (ASL_LIFO_E_OK == lifo_error) {
             /* Test peek from full LIFO. */
             element_buffer->ptr = peek_element;
             element_buffer->size = ptr_context->element_size;
-            lifo_error = asl_lifo_peek(&ptr_context->lifo, element_buffer);
+            lifo_error = asl_lifo__peek(&ptr_context->lifo, element_buffer);
             if (ASL_LIFO_E_OK == lifo_error) {
                 /* Verify peeked data matches last pushed element (LIFO order). */
                 uint8_t expected_value = (uint8_t)((capacity - 1) & 0xFF);
@@ -400,7 +400,7 @@ static basic_lifo_error_e basic_lifo_pop_all_elements(
     
     if ((NULL != ptr_context) && (NULL != peek_element) && (NULL != element_buffer)) {
         /* Get capacity for loop and validation. */
-        lifo_error = asl_lifo_get_count_capacity(&ptr_context->lifo, &capacity);
+        lifo_error = asl_lifo__get_count_capacity(&ptr_context->lifo, &capacity);
         if (ASL_LIFO_E_OK == lifo_error) {
             /* Pop all elements and verify data integrity in LIFO order. */
             for (size_t i = capacity; (i > 0) && (BASIC_LIFO_E_OK == error); i--) {
@@ -408,7 +408,7 @@ static basic_lifo_error_e basic_lifo_pop_all_elements(
                 element_buffer->ptr = peek_element;
                 element_buffer->size = ptr_context->element_size;
                 
-                lifo_error = asl_lifo_pop(&ptr_context->lifo, element_buffer);
+                lifo_error = asl_lifo__pop(&ptr_context->lifo, element_buffer);
                 if (ASL_LIFO_E_OK == lifo_error) {
                     /* Verify data matches expected pattern (LIFO order). */
                     uint8_t expected_value = (uint8_t)((i - 1) & 0xFF);
@@ -434,7 +434,7 @@ static basic_lifo_error_e basic_lifo_pop_all_elements(
                 printf("  - Popped all elements with valid data: PASSED\n");
                 
                 /* Verify LIFO is empty again. */
-                lifo_error = asl_lifo_get_count_used(&ptr_context->lifo, &used);
+                lifo_error = asl_lifo__get_count_used(&ptr_context->lifo, &used);
                 if ((ASL_LIFO_E_OK == lifo_error) && (0 == used)) {
                     printf("  - LIFO is empty after pop all: PASSED\n");
                 } else {

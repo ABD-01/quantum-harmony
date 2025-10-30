@@ -57,13 +57,13 @@ classDiagram
     
     class FIFO_API {
         <<module>>
-        +asl_fifo_reset(asl_fifo_s*) asl_fifo_error_e
-        +asl_fifo_enqueue(asl_fifo_s*, asl_buffer_s) asl_fifo_error_e
-        +asl_fifo_dequeue(asl_fifo_s*, asl_buffer_s*) asl_fifo_error_e
-        +asl_fifo_preview(asl_fifo_s*, asl_buffer_s*) asl_fifo_error_e
-        +asl_fifo_get_count_used(asl_fifo_s*, size_t*) asl_fifo_error_e
-        +asl_fifo_get_count_capacity(asl_fifo_s*, size_t*) asl_fifo_error_e
-        +asl_fifo_get_count_free(asl_fifo_s*, size_t*) asl_fifo_error_e
+        +asl_fifo__reset(asl_fifo_s*) asl_fifo_error_e
+        +asl_fifo__enqueue(asl_fifo_s*, asl_buffer_s) asl_fifo_error_e
+        +asl_fifo__dequeue(asl_fifo_s*, asl_buffer_s*) asl_fifo_error_e
+        +asl_fifo__preview(asl_fifo_s*, asl_buffer_s*) asl_fifo_error_e
+        +asl_fifo__get_count_used(asl_fifo_s*, size_t*) asl_fifo_error_e
+        +asl_fifo__get_count_capacity(asl_fifo_s*, size_t*) asl_fifo_error_e
+        +asl_fifo__get_count_free(asl_fifo_s*, size_t*) asl_fifo_error_e
     }
     
     FIFO_API --> asl_fifo_s : operates_on
@@ -112,14 +112,14 @@ config:
 ---
 stateDiagram-v2
     [*] --> Empty
-    Empty --> HasData : asl_fifo_enqueue()
-    HasData --> HasData : asl_fifo_enqueue()
-    HasData --> Empty : asl_fifo_dequeue() when count=1
-    HasData --> HasData : asl_fifo_dequeue() when count>1
-    HasData --> Full : asl_fifo_enqueue() when count=capacity-1
-    Full --> HasData : asl_fifo_dequeue()
-    Full --> Full : asl_fifo_enqueue() Error Queue Full
-    Empty --> Empty : asl_fifo_dequeue() Error Queue Empty
+    Empty --> HasData : asl_fifo__enqueue()
+    HasData --> HasData : asl_fifo__enqueue()
+    HasData --> Empty : asl_fifo__dequeue() when count=1
+    HasData --> HasData : asl_fifo__dequeue() when count>1
+    HasData --> Full : asl_fifo__enqueue() when count=capacity-1
+    Full --> HasData : asl_fifo__dequeue()
+    Full --> Full : asl_fifo__enqueue() Error Queue Full
+    Empty --> Empty : asl_fifo__dequeue() Error Queue Empty
     
     Empty : count = 0, front = rear
     HasData : 0 < count < capacity

@@ -274,4 +274,4 @@ sequenceDiagram
 
 - ASL API Documentation: Header files in `asl/defs/`
 - Implementation Details: Source files in `asl/library/`
-- Build Configuration: Platform-specific settings in `build.sh`
+- Build Configuration: Platform-specific settings in `build_module.sh`

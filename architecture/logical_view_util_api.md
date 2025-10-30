@@ -13,13 +13,13 @@
 
 ## 1. Memory Fill Operations
 
-### asl_util_buffer_memset()
+### asl_util__buffer_memset()
 
 Fills a buffer with a specified value using type-safe operations.
 
 **Signature**:
 ```c
-void asl_util_buffer_memset(asl_buffer_s dest, uint8_t value);
+void asl_util__buffer_memset(asl_buffer_s dest, uint8_t value);
 ```
 
 **Parameters**:
@@ -37,10 +37,10 @@ uint8_t memory[1024];
 asl_buffer_s buffer = { .ptr = memory, .size = sizeof(memory) };
 
 // Fill buffer with zeros
-asl_util_buffer_memset(buffer, 0x00);
+asl_util__buffer_memset(buffer, 0x00);
 
 // Fill with pattern
-asl_util_buffer_memset(buffer, 0xAA);
+asl_util__buffer_memset(buffer, 0xAA);
 ```
 
 **Safety Features**:
@@ -52,13 +52,13 @@ asl_util_buffer_memset(buffer, 0xAA);
 
 ## 2. Memory Copy Operations
 
-### asl_util_buffer_memcpy()
+### asl_util__buffer_memcpy()
 
 Copies data between buffers with internal bounds checking.
 
 **Signature**:
 ```c
-void asl_util_buffer_memcpy(asl_buffer_s dest, asl_buffer_s src);
+void asl_util__buffer_memcpy(asl_buffer_s dest, asl_buffer_s src);
 ```
 
 **Parameters**:
@@ -87,8 +87,8 @@ The UTIL module provides buffer manipulation functions as defined in the actual 
 **Buffer Operations** (from `asl_util.h`):
 ```c
 // Actual function signatures from codebase
-void asl_util_buffer_memset(asl_buffer_s dest, uint8_t value);
-void asl_util_buffer_memcpy(asl_buffer_s dest, asl_buffer_s src);
+void asl_util__buffer_memset(asl_buffer_s dest, uint8_t value);
+void asl_util__buffer_memcpy(asl_buffer_s dest, asl_buffer_s src);
 ```
 
 **Function Categories**:
@@ -112,7 +112,7 @@ void init_cbuf_memory(asl_cbuf_s* cbuf) {
     };
     
     // Clear buffer memory
-    asl_util_buffer_memset(&buffer, 0x00, buffer.size);
+    asl_util__buffer_memset(&buffer, 0x00, buffer.size);
     
     // Reset indices
     cbuf->front = 0;
@@ -136,7 +136,7 @@ bool transfer_data(asl_buffer_s* from, asl_buffer_s* to, size_t amount) {
     }
     
     // Perform safe copy
-    return asl_util_buffer_memcpy(to, from, amount);
+    return asl_util__buffer_memcpy(to, from, amount);
 }
 ```
 
@@ -151,7 +151,7 @@ void fill_test_pattern(asl_buffer_s* buffer) {
     }
     
     // Or use utility function with repeated pattern
-    asl_util_buffer_memset(buffer, 0x55, buffer->size);
+    asl_util__buffer_memset(buffer, 0x55, buffer->size);
 }
 ```
 
@@ -170,11 +170,11 @@ bool validate_buffer_pattern(const asl_buffer_s* buffer, uint8_t pattern) {
 
 // Clear sensitive data
 void secure_clear_buffer(asl_buffer_s* buffer) {
-    asl_util_buffer_memset(buffer, 0x00, buffer->size);
+    asl_util__buffer_memset(buffer, 0x00, buffer->size);
     
     // Additional security: multiple passes
-    asl_util_buffer_memset(buffer, 0xFF, buffer->size);
-    asl_util_buffer_memset(buffer, 0x00, buffer->size);
+    asl_util__buffer_memset(buffer, 0xFF, buffer->size);
+    asl_util__buffer_memset(buffer, 0x00, buffer->size);
 }
 ```
 

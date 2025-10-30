@@ -15,7 +15,7 @@ set(MOD_NAMESPACE "${MOD_NAME}::")
 # Include tools.
 set(CPACK_GENERATOR "TGZ")
 set(CPACK_PACKAGE_NAME "${MOD_NAME}")
-set(CPACK_PACKAGE_FILE_NAME "${TARGET_PLATFORM}_lib${MOD_NAME}")
+set(CPACK_PACKAGE_FILE_NAME "lib${MOD_NAME}_${PROJECT_VERSION}_${TARGET_PLATFORM}")
 include(FetchContent)
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
@@ -60,6 +60,9 @@ set(MOD_PUBLIC_HEADERS
 
 # Specify static library.
 add_library(${MOD_NAME} STATIC ${MOD_SOURCES})
+set_target_properties(${MOD_NAME} PROPERTIES
+    OUTPUT_NAME "${MOD_NAME}_${PROJECT_VERSION}_${TARGET_PLATFORM}"
+)
 
 # Set build interfaces and install (export) interfaces.
 target_include_directories(${MOD_NAME}
@@ -120,5 +123,5 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${MOD_NAME}ConfigVersion.cmake"
 add_custom_target(package_and_publish
     COMMAND ${CMAKE_COMMAND} --build . --target package
     COMMAND ${CMAKE_COMMAND} -E make_directory ${ATP_ROOT}/libs/${MOD_NAME}
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/${TARGET_PLATFORM}_lib${MOD_NAME}.tar.gz ${ATP_ROOT}/libs/${MOD_NAME}/
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/lib${MOD_NAME}_${PROJECT_VERSION}_${TARGET_PLATFORM}.tar.gz ${ATP_ROOT}/libs/${MOD_NAME}/
 )

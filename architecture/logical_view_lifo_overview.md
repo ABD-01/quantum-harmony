@@ -56,13 +56,13 @@ classDiagram
     
     class LIFO_API {
         <<module>>
-        +asl_lifo_reset(asl_lifo_s*) asl_lifo_error_e
-        +asl_lifo_push(asl_lifo_s*, pcvoid) asl_lifo_error_e
-        +asl_lifo_pop(asl_lifo_s*, pvoid) asl_lifo_error_e
-        +asl_lifo_peek(asl_lifo_s*, pvoid) asl_lifo_error_e
-        +asl_lifo_get_count_used(asl_lifo_s*) size_t
-        +asl_lifo_get_count_free(asl_lifo_s*) size_t
-        +asl_lifo_get_count_capacity(asl_lifo_s*) size_t
+        +asl_lifo__reset(asl_lifo_s*) asl_lifo_error_e
+        +asl_lifo__push(asl_lifo_s*, pcvoid) asl_lifo_error_e
+        +asl_lifo__pop(asl_lifo_s*, pvoid) asl_lifo_error_e
+        +asl_lifo__peek(asl_lifo_s*, pvoid) asl_lifo_error_e
+        +asl_lifo__get_count_used(asl_lifo_s*) size_t
+        +asl_lifo__get_count_free(asl_lifo_s*) size_t
+        +asl_lifo__get_count_capacity(asl_lifo_s*) size_t
     }
     
     LIFO_API --> asl_lifo_s : operates_on
@@ -110,14 +110,14 @@ config:
 ---
 stateDiagram-v2
     [*] --> Empty
-    Empty --> HasData : asl_lifo_push()
-    HasData --> HasData : asl_lifo_push()
-    HasData --> Empty : asl_lifo_pop() [count=1]
-    HasData --> HasData : asl_lifo_pop() [count>1]
-    HasData --> Full : asl_lifo_push() [count=capacity-1]
-    Full --> HasData : asl_lifo_pop()
-    Full --> Full : asl_lifo_push() Error Stack Full
-    Empty --> Empty : asl_lifo_pop() Error Stack Empty
+    Empty --> HasData : asl_lifo__push()
+    HasData --> HasData : asl_lifo__push()
+    HasData --> Empty : asl_lifo__pop() [count=1]
+    HasData --> HasData : asl_lifo__pop() [count>1]
+    HasData --> Full : asl_lifo__push() [count=capacity-1]
+    Full --> HasData : asl_lifo__pop()
+    Full --> Full : asl_lifo__push() Error Stack Full
+    Empty --> Empty : asl_lifo__pop() Error Stack Empty
     
     Empty : count = 0
     HasData : 0 < count < capacity

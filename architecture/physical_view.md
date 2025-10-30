@@ -180,6 +180,6 @@ Platform Support: STM32, TI MCU, NXP, Microchip (ARM/MIPS architectures)
 
 ## 7. References
 
-- Build System: `build.sh`, `build_all.sh`
+- Build System: `build_module.sh`, `build_all.sh`
 - Platform Configurations: Toolchain setups in build scripts
 - Resource Usage: Implementation files in `library/`

@@ -10,7 +10,7 @@
  *
  *  @version    0.0.1
  *
- *  @date       17 October 2025
+ *  @date       27 October 2025
  *
  *  @brief      Main entry point for basic FIFO example.
  *              Demonstrates FIFO enqueue/dequeue operations with configurable
@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
     printf("ASL Basic FIFO Example\n");
     printf("======================\n\n");
     
-    // Parse command line arguments
+    /* Parse command line arguments */
     if (argc == 3) {
         num_elements = (size_t)atoi(argv[1]);
         element_size = (size_t)atoi(argv[2]);
@@ -69,7 +69,7 @@ int main(int argc, char* argv[]) {
     printf("  Elements: %zu\n", num_elements);
     printf("  Element size: %zu bytes\n\n", element_size);
     
-    // Initialize, run tests, cleanup
+    /* Initialize, run tests, cleanup */
     error = basic_fifo_init(&context, num_elements, element_size);
     if (error == BASIC_FIFO_E_OK) {
         error = basic_fifo_run_tests(&context);

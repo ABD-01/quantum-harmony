@@ -17,7 +17,7 @@ The ASL Composite Types module defines specialized data structures that combine 
 **Key Features**:
 - Memory management composites (asl_buffer_s, asl_allocator_t)
 - Thread synchronization primitives (asl_mutex_t)
-- Composite interface patterns (asl_iface_composite_rx_tx_t)
+- Composite interface patterns (asl_iface_composite_rx_tx_cb)
 - Type dependency management
 
 ---
@@ -86,8 +86,8 @@ config:
 classDiagram
     class asl_allocator_t {
         <<struct>>
-        +asl_iface_pv_s_t alloc_f
-        +asl_iface_v_pv_t free_f
+        +asl_iface_pv_s_cb alloc_f
+        +asl_iface_v_pv_cb free_f
     }
     
     classDef mem fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
@@ -97,8 +97,8 @@ classDiagram
 **Implementation**:
 ```c
 typedef struct asl_allocator_t {
-    asl_iface_pv_s_t alloc_f;  // pvoid (*)(size_t) - allocates memory
-    asl_iface_v_pv_t free_f;   // void (*)(pvoid) - releases memory
+    asl_iface_pv_s_cb alloc_f;  // pvoid (*)(size_t) - allocates memory
+    asl_iface_v_pv_cb free_f;   // void (*)(pvoid) - releases memory
 } asl_allocator_t;
 ```
 
@@ -125,8 +125,8 @@ config:
 classDiagram
     class asl_mutex_t {
         <<struct>>
-        +asl_iface_v_v_t lock_f
-        +asl_iface_v_v_t unlock_f
+        +asl_iface_v_v_cb lock_f
+        +asl_iface_v_v_cb unlock_f
     }
     
     classDef thread fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
@@ -136,8 +136,8 @@ classDiagram
 **Implementation**:
 ```c
 typedef struct asl_mutex_t {
-    asl_iface_v_v_t lock_f;     // void (*)(void) - acquire lock
-    asl_iface_v_v_t unlock_f;   // void (*)(void) - release lock
+    asl_iface_v_v_cb lock_f;     // void (*)(void) - acquire lock
+    asl_iface_v_v_cb unlock_f;   // void (*)(void) - release lock
 } asl_mutex_t;
 ```
 
@@ -166,18 +166,18 @@ config:
     fontSize: "12px"
 ---
 classDiagram
-    class asl_iface_composite_rx_tx_t {
+    class asl_iface_composite_rx_tx_cb {
         <<typedef>>
         +size_t (*)(asl_buffer_s, size_t)
     }
     
     classDef iface fill:#f0f8ff,stroke:#4169e1,stroke-width:2px
-    class asl_iface_composite_rx_tx_t:::iface
+    class asl_iface_composite_rx_tx_cb:::iface
 ```
 
 **Implementation**:
 ```c
-typedef size_t (*asl_iface_composite_rx_tx_t)(asl_buffer_s buffer, size_t req);
+typedef size_t (*asl_iface_composite_rx_tx_cb)(asl_buffer_s buffer, size_t req);
 ```
 
 ---

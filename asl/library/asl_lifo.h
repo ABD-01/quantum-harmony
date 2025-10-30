@@ -10,7 +10,7 @@
  *
  *  @version    0.0.1
  *
- *  @date       17 October 2025
+ *  @date       27 October 2025
  *
  *  @brief      Header for the 'asl_lifo' Class.
  *              A generic LIFO.
@@ -40,7 +40,7 @@ extern "C" {
  * ASL_LIFO_E_PARAM         - NULL pointer or zero sized buffer or other parameter inconsistency.
  * ASL_LIFO_E_ILLEGAL       - The operation cannot be performed because the LIFO state is corrupt.
  */
-asl_lifo_error_e asl_lifo_reset(asl_lifo_s* ptr_lifo);
+asl_lifo_error_e asl_lifo__reset(asl_lifo_s* ptr_lifo);
 
 /**
  * @brief
@@ -59,7 +59,7 @@ asl_lifo_error_e asl_lifo_reset(asl_lifo_s* ptr_lifo);
  * ASL_LIFO_E_PARAM         - NULL pointers or zero sized buffer or other parameter inconsistency.
  * ASL_LIFO_E_ILLEGAL       - The operation cannot be performed because the LIFO state is corrupt.
  */
-asl_lifo_error_e asl_lifo_get_count_capacity(asl_lifo_s* ptr_lifo, size_t* capacity);
+asl_lifo_error_e asl_lifo__get_count_capacity(asl_lifo_s* ptr_lifo, size_t* capacity);
 
 /**
  * @brief
@@ -78,7 +78,7 @@ asl_lifo_error_e asl_lifo_get_count_capacity(asl_lifo_s* ptr_lifo, size_t* capac
  * ASL_LIFO_E_PARAM         - NULL pointers or zero sized buffer or other parameter inconsistency.
  * ASL_LIFO_E_ILLEGAL       - The operation cannot be performed because the LIFO state is corrupt.
  */
-asl_lifo_error_e asl_lifo_get_count_used(asl_lifo_s* ptr_lifo, size_t* used);
+asl_lifo_error_e asl_lifo__get_count_used(asl_lifo_s* ptr_lifo, size_t* used);
 
 /**
  * @brief
@@ -97,7 +97,7 @@ asl_lifo_error_e asl_lifo_get_count_used(asl_lifo_s* ptr_lifo, size_t* used);
  * ASL_LIFO_E_PARAM         - NULL pointers or zero sized buffer or other parameter inconsistency.
  * ASL_LIFO_E_ILLEGAL       - The operation cannot be performed because the LIFO state is corrupt.
  */
-asl_lifo_error_e asl_lifo_get_count_free(asl_lifo_s* ptr_lifo, size_t* free);
+asl_lifo_error_e asl_lifo__get_count_free(asl_lifo_s* ptr_lifo, size_t* free);
 
 /**
  * @brief
@@ -118,7 +118,7 @@ asl_lifo_error_e asl_lifo_get_count_free(asl_lifo_s* ptr_lifo, size_t* free);
  * ASL_LIFO_E_ILLEGAL       - The operation cannot be performed because the LIFO state is corrupt.
  * ASL_LIFO_E_EMPTY         - Operation is not possible since stack is empty.
  */
-asl_lifo_error_e asl_lifo_peek(asl_lifo_s* ptr_lifo, asl_buffer_s* element);
+asl_lifo_error_e asl_lifo__peek(asl_lifo_s* ptr_lifo, asl_buffer_s* element);
 
 /**
  * @brief
@@ -138,7 +138,7 @@ asl_lifo_error_e asl_lifo_peek(asl_lifo_s* ptr_lifo, asl_buffer_s* element);
  * ASL_LIFO_E_ILLEGAL       - The operation cannot be performed because the LIFO state is corrupt.
  * ASL_LIFO_E_EMPTY         - Operation is not possible since stack is empty.
  */
-asl_lifo_error_e asl_lifo_pop(asl_lifo_s* ptr_lifo, asl_buffer_s* element);
+asl_lifo_error_e asl_lifo__pop(asl_lifo_s* ptr_lifo, asl_buffer_s* element);
 
 /**
  * @brief
@@ -158,7 +158,7 @@ asl_lifo_error_e asl_lifo_pop(asl_lifo_s* ptr_lifo, asl_buffer_s* element);
  * ASL_LIFO_E_ILLEGAL       - The operation cannot be performed because the LIFO state is corrupt.
  * ASL_LIFO_E_FULL          - Operation is not possible since stack is full.
  */
-asl_lifo_error_e asl_lifo_push(asl_lifo_s* ptr_lifo, asl_buffer_s element);
+asl_lifo_error_e asl_lifo__push(asl_lifo_s* ptr_lifo, asl_buffer_s element);
 
 #ifdef __cplusplus
 }

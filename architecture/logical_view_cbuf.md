@@ -28,7 +28,7 @@ Concurrency model and error management.
 
 | Function | Purpose | Module |
 |----------|---------|--------|
-| `asl_cbuf_init()` | Initialize buffer | [Overview](logical_view_cbuf_overview.md) |
-| `asl_cbuf_enqueue()` | Add data | [Overview](logical_view_cbuf_overview.md) |
-| `asl_cbuf_dequeue()` | Remove data | [Overview](logical_view_cbuf_overview.md) |
-| `asl_cbuf_preview()` | Inspect data | [Overview](logical_view_cbuf_overview.md) |
+| `asl_cbuf__init()` | Initialize buffer | [Overview](logical_view_cbuf_overview.md) |
+| `asl_cbuf__enqueue()` | Add data | [Overview](logical_view_cbuf_overview.md) |
+| `asl_cbuf__dequeue()` | Remove data | [Overview](logical_view_cbuf_overview.md) |
+| `asl_cbuf__preview()` | Inspect data | [Overview](logical_view_cbuf_overview.md) |

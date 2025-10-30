@@ -10,7 +10,7 @@
  *
  *  @version    0.0.1
  *
- *  @date       17 October 2025
+ *  @date       27 October 2025
  *
  *  @brief      Implementation of the 'basic_fifo' Example.
 *******************************************************************************/
@@ -53,7 +53,7 @@ basic_fifo_error_e basic_fifo_init(
             ptr_context->max_elements = num_elements;
             
             /* Reset ASL FIFO. */
-            fifo_error = asl_fifo_reset(&ptr_context->fifo);
+            fifo_error = asl_fifo__reset(&ptr_context->fifo);
             if (ASL_FIFO_E_OK == fifo_error) {
                 ptr_context->test_passed = false;
                 printf("FIFO initialized: %zu elements x %zu bytes each = %zu bytes total\n", 
@@ -156,9 +156,9 @@ void basic_fifo_print_results(basic_fifo_context_s* ptr_context) {
     }
     
     /* Get current FIFO status. */
-    asl_fifo_get_count_capacity(&ptr_context->fifo, &capacity);
-    asl_fifo_get_count_used(&ptr_context->fifo, &used);
-    asl_fifo_get_count_free(&ptr_context->fifo, &free_count);
+    asl_fifo__get_count_capacity(&ptr_context->fifo, &capacity);
+    asl_fifo__get_count_used(&ptr_context->fifo, &used);
+    asl_fifo__get_count_free(&ptr_context->fifo, &free_count);
     
     printf("\nTest Results:\n");
     printf("FIFO Configuration:\n");
@@ -172,7 +172,7 @@ void basic_fifo_print_results(basic_fifo_context_s* ptr_context) {
     printf("Overall Status: %s\n", ptr_context->test_passed ? "PASSED" : "FAILED");
 }
 
-// Private function implementations
+/* Private function implementations */
 
 static basic_fifo_error_e basic_fifo_test_empty(basic_fifo_context_s* ptr_context) {
     basic_fifo_error_e error = BASIC_FIFO_E_OK;
@@ -190,24 +190,24 @@ static basic_fifo_error_e basic_fifo_test_empty(basic_fifo_context_s* ptr_contex
             element_buffer.size = ptr_context->element_size;
             
             /* Verify FIFO is empty. */
-            fifo_error = asl_fifo_get_count_used(&ptr_context->fifo, &used);
+            fifo_error = asl_fifo__get_count_used(&ptr_context->fifo, &used);
             if ((ASL_FIFO_E_OK == fifo_error) && (0 == used)) {
                 printf("  - FIFO is initially empty: PASSED\n");
                 
                 /* Test dequeue from empty FIFO (should fail). */
-                fifo_error = asl_fifo_dequeue(&ptr_context->fifo, &element_buffer);
+                fifo_error = asl_fifo__dequeue(&ptr_context->fifo, &element_buffer);
                 if (ASL_FIFO_E_EMPTY == fifo_error) {
                     printf("  - Dequeue from empty FIFO correctly failed: PASSED\n");
                     
                     /* Test preview from empty FIFO (should fail). */
-                    fifo_error = asl_fifo_preview(&ptr_context->fifo, &element_buffer);
+                    fifo_error = asl_fifo__preview(&ptr_context->fifo, &element_buffer);
                     if (ASL_FIFO_E_EMPTY == fifo_error) {
                         printf("  - Preview from empty FIFO correctly failed: PASSED\n");
                         
                         /* Verify free count equals capacity. */
                         size_t capacity = 0;
-                        asl_fifo_error_e capacity_error = asl_fifo_get_count_capacity(&ptr_context->fifo, &capacity);
-                        fifo_error = asl_fifo_get_count_free(&ptr_context->fifo, &free_count);
+                        asl_fifo_error_e capacity_error = asl_fifo__get_count_capacity(&ptr_context->fifo, &capacity);
+                        fifo_error = asl_fifo__get_count_free(&ptr_context->fifo, &free_count);
                         if ((ASL_FIFO_E_OK == capacity_error) && (ASL_FIFO_E_OK == fifo_error) && (free_count == capacity)) {
                             printf("  - Free count equals capacity: PASSED\n");
                         } else {
@@ -259,7 +259,7 @@ static basic_fifo_error_e basic_fifo_fill_to_capacity(
             element_buffer.ptr = test_element;
             element_buffer.size = ptr_context->element_size;
             
-            fifo_error = asl_fifo_enqueue(&ptr_context->fifo, element_buffer);
+            fifo_error = asl_fifo__enqueue(&ptr_context->fifo, element_buffer);
             if (ASL_FIFO_E_OK != fifo_error) {
                 printf("  - Enqueue element %zu FAILED\n", i);
                 error = BASIC_FIFO_E_TEST_FAIL;
@@ -283,12 +283,12 @@ static basic_fifo_error_e basic_fifo_test_enqueue_full(
     
     if (NULL != ptr_context) {
         /* Verify FIFO is full. */
-        fifo_error = asl_fifo_get_count_free(&ptr_context->fifo, &free_count);
+        fifo_error = asl_fifo__get_count_free(&ptr_context->fifo, &free_count);
         if ((ASL_FIFO_E_OK == fifo_error) && (0 == free_count)) {
             printf("  - FIFO is full: PASSED\n");
             
             /* Test enqueue to full FIFO (should fail). */
-            fifo_error = asl_fifo_enqueue(&ptr_context->fifo, element_buffer);
+            fifo_error = asl_fifo__enqueue(&ptr_context->fifo, element_buffer);
             if (ASL_FIFO_E_FULL == fifo_error) {
                 printf("  - Enqueue to full FIFO correctly failed: PASSED\n");
             } else {
@@ -324,7 +324,7 @@ static basic_fifo_error_e basic_fifo_dequeue_and_verify(
             element_buffer.ptr = received_element;
             element_buffer.size = ptr_context->element_size;
             
-            fifo_error = asl_fifo_dequeue(&ptr_context->fifo, &element_buffer);
+            fifo_error = asl_fifo__dequeue(&ptr_context->fifo, &element_buffer);
             if (ASL_FIFO_E_OK == fifo_error) {
                 /* Verify data pattern. */
                 for (size_t j = 0; j < ptr_context->element_size; j++) {
@@ -351,7 +351,7 @@ static basic_fifo_error_e basic_fifo_dequeue_and_verify(
                 printf("  - All data validation PASSED\n");
                 
                 /* Verify FIFO is empty again. */
-                fifo_error = asl_fifo_get_count_used(&ptr_context->fifo, &used);
+                fifo_error = asl_fifo__get_count_used(&ptr_context->fifo, &used);
                 if ((ASL_FIFO_E_OK == fifo_error) && (0 == used)) {
                     printf("  - FIFO is empty after dequeue: PASSED\n");
                 } else {
@@ -380,7 +380,7 @@ static basic_fifo_error_e basic_fifo_test_full(basic_fifo_context_s* ptr_context
     
     if (NULL != ptr_context) {
         /* Get actual FIFO capacity. */
-        fifo_error = asl_fifo_get_count_capacity(&ptr_context->fifo, &capacity);
+        fifo_error = asl_fifo__get_count_capacity(&ptr_context->fifo, &capacity);
         if (ASL_FIFO_E_OK != fifo_error) {
             error = BASIC_FIFO_E_TEST_FAIL;
         } else {

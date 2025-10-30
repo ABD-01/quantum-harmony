@@ -49,8 +49,8 @@ config:
 classDiagram
     class ASL_UTIL {
         <<module>>
-        +asl_util_buffer_memset(asl_buffer_s, uint8_t) void
-        +asl_util_buffer_memcpy(asl_buffer_s, asl_buffer_s) void
+        +asl_util__buffer_memset(asl_buffer_s, uint8_t) void
+        +asl_util__buffer_memcpy(asl_buffer_s, asl_buffer_s) void
     }
     
     class MemoryOperations {
@@ -87,8 +87,8 @@ The UTIL module provides buffer-aware memory operations that integrate with ASL'
 **Type Integration**:
 ```c
 // Uses asl_buffer_s for type safety - actual signatures from asl_util.h
-void asl_util_buffer_memset(asl_buffer_s dest, uint8_t value);
-void asl_util_buffer_memcpy(asl_buffer_s dest, asl_buffer_s src);
+void asl_util__buffer_memset(asl_buffer_s dest, uint8_t value);
+void asl_util__buffer_memcpy(asl_buffer_s dest, asl_buffer_s src);
 ```
 
 **Safety Features**:

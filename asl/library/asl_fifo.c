@@ -10,7 +10,7 @@
  *
  *  @version    0.0.1
  *
- *  @date       17 October 2025
+ *  @date       27 October 2025
  *
  *  @brief      Implementation of the 'asl_fifo' Class.
 *******************************************************************************/
@@ -22,7 +22,7 @@
 /* ASL Util. */
 #include "asl_util.h"
 
-asl_fifo_error_e asl_fifo_reset(asl_fifo_s* ptr_fifo) {
+asl_fifo_error_e asl_fifo__reset(asl_fifo_s* ptr_fifo) {
     asl_fifo_error_e error = ASL_FIFO_E_MAX;
     asl_fifo_s* const fifo = ptr_fifo;
     asl_buffer_s paint;
@@ -45,18 +45,18 @@ asl_fifo_error_e asl_fifo_reset(asl_fifo_s* ptr_fifo) {
             for ( size_t i = 0 ; i < k_count_max_elements ; ++i ) {
                 paint.ptr = fifo->elements.ptr + ( i * k_size_element );
                 paint.size = k_size_element;
-                asl_util_buffer_memset(paint, (uint8_t) i);
+                asl_util__buffer_memset(paint, (uint8_t) i);
             }
             paint.ptr = fifo->elements.ptr + ( k_count_max_elements * k_size_element );
             paint.size = fifo->elements.size - ( k_count_max_elements * k_size_element );
-            asl_util_buffer_memset(paint, (uint8_t) 0xFF);
+            asl_util__buffer_memset(paint, (uint8_t) 0xFF);
             error = ASL_FIFO_E_OK;
         }
     }
     return error;
 }
 
-asl_fifo_error_e asl_fifo_get_count_capacity(asl_fifo_s* ptr_fifo, size_t* capacity) {
+asl_fifo_error_e asl_fifo__get_count_capacity(asl_fifo_s* ptr_fifo, size_t* capacity) {
     asl_fifo_error_e error = ASL_FIFO_E_MAX;
     asl_fifo_s* const fifo = ptr_fifo;
     if ( !fifo || !fifo->elements.ptr || !fifo->elements.size || !fifo->size_element || !capacity ) {
@@ -86,7 +86,7 @@ asl_fifo_error_e asl_fifo_get_count_capacity(asl_fifo_s* ptr_fifo, size_t* capac
     return error;
 }
 
-asl_fifo_error_e asl_fifo_get_count_used(asl_fifo_s* ptr_fifo, size_t* used) {
+asl_fifo_error_e asl_fifo__get_count_used(asl_fifo_s* ptr_fifo, size_t* used) {
     asl_fifo_error_e error = ASL_FIFO_E_MAX;
     asl_fifo_s* const fifo = ptr_fifo;
     if ( !fifo || !fifo->elements.ptr || !fifo->elements.size || !fifo->size_element || !used ) {
@@ -111,14 +111,14 @@ asl_fifo_error_e asl_fifo_get_count_used(asl_fifo_s* ptr_fifo, size_t* used) {
             /* Success - tell used count. */
             const size_t index_read = fifo->index_read;
             const size_t index_write = fifo->index_write;
-            *used = available_read(index_read, index_write, k_count_max_elements);
+            *used = asl_fifo__available_read_private(index_read, index_write, k_count_max_elements);
             error = ASL_FIFO_E_OK;
         }
     }
     return error;
 }
 
-asl_fifo_error_e asl_fifo_get_count_free(asl_fifo_s* ptr_fifo, size_t* free) {
+asl_fifo_error_e asl_fifo__get_count_free(asl_fifo_s* ptr_fifo, size_t* free) {
     asl_fifo_error_e error = ASL_FIFO_E_MAX;
     asl_fifo_s* const fifo = ptr_fifo;
     if ( !fifo || !fifo->elements.ptr || !fifo->elements.size || !fifo->size_element || !free ) {
@@ -143,22 +143,22 @@ asl_fifo_error_e asl_fifo_get_count_free(asl_fifo_s* ptr_fifo, size_t* free) {
             /* Success - tell free count. */
             const size_t index_read = fifo->index_read;
             const size_t index_write = fifo->index_write;
-            *free = available_write(index_read, index_write, k_count_max_elements);
+            *free = asl_fifo__available_write_private(index_read, index_write, k_count_max_elements);
             error = ASL_FIFO_E_OK;
         }
     }
     return error;
 }
 
-asl_fifo_error_e asl_fifo_preview(asl_fifo_s* ptr_fifo, asl_buffer_s* element) {
-    return preview_dequeue(ptr_fifo, element, false);
+asl_fifo_error_e asl_fifo__preview(asl_fifo_s* ptr_fifo, asl_buffer_s* element) {
+    return asl_fifo__preview_dequeue_private(ptr_fifo, element, false);
 }
 
-asl_fifo_error_e asl_fifo_dequeue(asl_fifo_s* ptr_fifo, asl_buffer_s* element) {
-    return preview_dequeue(ptr_fifo, element, true);
+asl_fifo_error_e asl_fifo__dequeue(asl_fifo_s* ptr_fifo, asl_buffer_s* element) {
+    return asl_fifo__preview_dequeue_private(ptr_fifo, element, true);
 }
 
-asl_fifo_error_e asl_fifo_enqueue(asl_fifo_s* ptr_fifo, asl_buffer_s element) {
+asl_fifo_error_e asl_fifo__enqueue(asl_fifo_s* ptr_fifo, asl_buffer_s element) {
     asl_fifo_error_e error = ASL_FIFO_E_MAX;
     asl_fifo_s* const fifo = ptr_fifo;
     asl_buffer_s dest;
@@ -187,7 +187,7 @@ asl_fifo_error_e asl_fifo_enqueue(asl_fifo_s* ptr_fifo, asl_buffer_s element) {
             /* Success - perform enqueue. */
             const size_t index_read = fifo->index_read;
             const size_t index_write = fifo->index_write;
-            const size_t free = available_write(index_read, index_write, k_count_max_elements);
+            const size_t free = asl_fifo__available_write_private(index_read, index_write, k_count_max_elements);
             if ( !free ) {
                 /* Found FIFO is full. */
                 error = ASL_FIFO_E_FULL;
@@ -195,9 +195,9 @@ asl_fifo_error_e asl_fifo_enqueue(asl_fifo_s* ptr_fifo, asl_buffer_s element) {
                 dest.ptr = fifo->elements.ptr + ( fifo->index_write * k_size_element );
                 dest.size = k_size_element;
                 /* Actual write. */
-                asl_util_buffer_memcpy(dest, element);
+                asl_util__buffer_memcpy(dest, element);
                 /* Moving write index ahead circularly. */
-                fifo->index_write = circular_next(index_write, 1, k_count_max_elements);
+                fifo->index_write = asl_fifo__circular_next_private(index_write, 1, k_count_max_elements);
                 error = ASL_FIFO_E_OK;
             }
         }
@@ -205,7 +205,7 @@ asl_fifo_error_e asl_fifo_enqueue(asl_fifo_s* ptr_fifo, asl_buffer_s element) {
     return error;
 }
 
-static asl_fifo_error_e preview_dequeue(asl_fifo_s* ptr_fifo, asl_buffer_s* element, bool is_dequeue) {
+static asl_fifo_error_e asl_fifo__preview_dequeue_private(asl_fifo_s* ptr_fifo, asl_buffer_s* element, bool is_dequeue) {
     asl_fifo_error_e error = ASL_FIFO_E_MAX;
     asl_fifo_s* const fifo = ptr_fifo;
     asl_buffer_s src;
@@ -234,7 +234,7 @@ static asl_fifo_error_e preview_dequeue(asl_fifo_s* ptr_fifo, asl_buffer_s* elem
             /* Success - perform enqueue. */
             const size_t index_read = fifo->index_read;
             const size_t index_write = fifo->index_write;
-            const size_t used = available_read(index_read, index_write, k_count_max_elements);
+            const size_t used = asl_fifo__available_read_private(index_read, index_write, k_count_max_elements);
             if ( !used ) {
                 /* Found FIFO is empty. */
                 error = ASL_FIFO_E_EMPTY;
@@ -242,10 +242,10 @@ static asl_fifo_error_e preview_dequeue(asl_fifo_s* ptr_fifo, asl_buffer_s* elem
                 src.ptr = fifo->elements.ptr + ( fifo->index_read * k_size_element );
                 src.size = k_size_element;
                 /* Actual read. */
-                asl_util_buffer_memcpy(*element, src);
+                asl_util__buffer_memcpy(*element, src);
                 /* Moving read index ahead circularly, conditionally. */
                 if ( is_dequeue ) {
-                    fifo->index_read = circular_next(index_read, 1, k_count_max_elements);
+                    fifo->index_read = asl_fifo__circular_next_private(index_read, 1, k_count_max_elements);
                 }
                 error = ASL_FIFO_E_OK;
             }
@@ -254,14 +254,14 @@ static asl_fifo_error_e preview_dequeue(asl_fifo_s* ptr_fifo, asl_buffer_s* elem
     return error;
 }
 
-static size_t circular_next(size_t now, size_t step, size_t capacity) {
+static size_t asl_fifo__circular_next_private(size_t now, size_t step, size_t capacity) {
     return ( ( now + step ) % capacity );
 }
 
-static size_t available_read(size_t index_read, size_t index_write, size_t capacity) {
+static size_t asl_fifo__available_read_private(size_t index_read, size_t index_write, size_t capacity) {
     return ( capacity - 1 - ( ( capacity - index_write + index_read - 1 ) % capacity ) );
 }
 
-static size_t available_write(size_t index_read, size_t index_write, size_t capacity) {
+static size_t asl_fifo__available_write_private(size_t index_read, size_t index_write, size_t capacity) {
     return ( capacity - index_write + index_read - 1 ) % capacity;
 }

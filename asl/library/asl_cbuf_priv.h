@@ -10,7 +10,7 @@
  *
  *  @version    0.0.1
  *
- *  @date       17 October 2025
+ *  @date       27 October 2025
  *
  *  @brief      Private header for the 'asl_cbuf' Class.
 *******************************************************************************/
@@ -47,7 +47,7 @@ extern "C" {
  * @return
  * The index after performing circular next.
  */
-static size_t circular_next(size_t now, size_t step, size_t capacity);
+static size_t asl_cbuf__circular_next_private(size_t now, size_t step, size_t capacity);
 
 /**
  * @brief
@@ -68,7 +68,7 @@ static size_t circular_next(size_t now, size_t step, size_t capacity);
  * @return
  * The number of elements that are already present.
  */
-static size_t available_read(size_t front, size_t rear, size_t capacity);
+static size_t asl_cbuf__available_read_private(size_t front, size_t rear, size_t capacity);
 
 /**
  * @brief
@@ -89,7 +89,7 @@ static size_t available_read(size_t front, size_t rear, size_t capacity);
  * @return
  * Max number of elements that can be written.
  */
-static size_t available_write(size_t front, size_t rear, size_t capacity);
+static size_t asl_cbuf__available_write_private(size_t front, size_t rear, size_t capacity);
 
 #ifdef __cplusplus
 }

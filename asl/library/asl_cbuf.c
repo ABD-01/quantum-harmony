@@ -10,7 +10,7 @@
  *
  *  @version    0.0.1
  *
- *  @date       17 October 2025
+ *  @date       27 October 2025
  *
  *  @brief      Implementation of the 'asl_cbuf' Class.
 *******************************************************************************/
@@ -19,7 +19,7 @@
 #include "asl_cbuf.h"
 #include "asl_cbuf_priv.h"
 
-asl_cbuf_error_e asl_cbuf_init(asl_cbuf_s* ptr_cbuf) {
+asl_cbuf_error_e asl_cbuf__init(asl_cbuf_s* ptr_cbuf) {
     asl_cbuf_error_e error = ASL_CBUF_E_PARAM;
     size_t i = 0;
     #if ASL_CBUF_ENABLE_PARAM_CHECK == 1
@@ -37,7 +37,7 @@ asl_cbuf_error_e asl_cbuf_init(asl_cbuf_s* ptr_cbuf) {
     return error;
 }
 
-asl_cbuf_error_e asl_cbuf_enqueue(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, size_t req_enqueue) {
+asl_cbuf_error_e asl_cbuf__enqueue(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, size_t req_enqueue) {
     asl_cbuf_error_e error = ASL_CBUF_E_PARAM;
     size_t i = 0;
     size_t rear = 0;
@@ -50,12 +50,12 @@ asl_cbuf_error_e asl_cbuf_enqueue(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, siz
     #endif
             rear = ptr_cbuf->rear;
             capacity = ptr_cbuf->size_mem;
-            available_to_write = available_write(ptr_cbuf->front, rear, capacity);
+            available_to_write = asl_cbuf__available_write_private(ptr_cbuf->front, rear, capacity);
             if ( req_enqueue <= available_to_write ) {
-                new_rear = circular_next(rear, req_enqueue, capacity);
+                new_rear = asl_cbuf__circular_next_private(rear, req_enqueue, capacity);
                 do {
                     ptr_cbuf->mem[rear] = buffer.ptr[i++];
-                    rear = circular_next(rear, 1, capacity);
+                    rear = asl_cbuf__circular_next_private(rear, 1, capacity);
                 } while ( rear != new_rear );
                 ptr_cbuf->rear = rear;
                 error = ASL_CBUF_E_OK;
@@ -69,7 +69,7 @@ asl_cbuf_error_e asl_cbuf_enqueue(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, siz
     return error;
 }
 
-asl_cbuf_error_e asl_cbuf_dequeue(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, size_t req_dequeue) {
+asl_cbuf_error_e asl_cbuf__dequeue(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, size_t req_dequeue) {
     asl_cbuf_error_e error = ASL_CBUF_E_PARAM;
     size_t i = 0;
     size_t front = 0;
@@ -82,12 +82,12 @@ asl_cbuf_error_e asl_cbuf_dequeue(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, siz
     #endif
             front = ptr_cbuf->front;
             capacity = ptr_cbuf->size_mem;
-            available_to_read = available_read(front, ptr_cbuf->rear, capacity);
+            available_to_read = asl_cbuf__available_read_private(front, ptr_cbuf->rear, capacity);
             if ( req_dequeue <= available_to_read ) {
-                new_front = circular_next(front, req_dequeue, capacity);
+                new_front = asl_cbuf__circular_next_private(front, req_dequeue, capacity);
                 do {
                     buffer.ptr[i++] = ptr_cbuf->mem[front];
-                    front = circular_next(front, 1, capacity);
+                    front = asl_cbuf__circular_next_private(front, 1, capacity);
                 } while ( front != new_front );
                 ptr_cbuf->front = front;
                 error = ASL_CBUF_E_OK;
@@ -101,7 +101,7 @@ asl_cbuf_error_e asl_cbuf_dequeue(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, siz
     return error;
 }
 
-asl_cbuf_error_e asl_cbuf_preview(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, size_t req_preview) {
+asl_cbuf_error_e asl_cbuf__preview(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, size_t req_preview) {
     asl_cbuf_error_e error = ASL_CBUF_E_PARAM;
     size_t i = 0;
     size_t front = 0;
@@ -114,12 +114,12 @@ asl_cbuf_error_e asl_cbuf_preview(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, siz
     #endif
             front = ptr_cbuf->front;
             capacity = ptr_cbuf->size_mem;
-            available_to_read = available_read(front, ptr_cbuf->rear, capacity);
+            available_to_read = asl_cbuf__available_read_private(front, ptr_cbuf->rear, capacity);
             if ( req_preview <= available_to_read ) {
-                new_front = circular_next(front, req_preview, capacity);
+                new_front = asl_cbuf__circular_next_private(front, req_preview, capacity);
                 do {
                     buffer.ptr[i++] = ptr_cbuf->mem[front];
-                    front = circular_next(front, 1, capacity);
+                    front = asl_cbuf__circular_next_private(front, 1, capacity);
                 } while ( front != new_front );
                 /* We don't update the actual CBUF front since this is just a preview. */
                 error = ASL_CBUF_E_OK;
@@ -133,12 +133,12 @@ asl_cbuf_error_e asl_cbuf_preview(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, siz
     return error;
 }
 
-asl_cbuf_error_e asl_cbuf_available_read(asl_cbuf_s* ptr_cbuf, size_t* available_to_read) {
+asl_cbuf_error_e asl_cbuf__available_read(asl_cbuf_s* ptr_cbuf, size_t* available_to_read) {
     asl_cbuf_error_e error = ASL_CBUF_E_PARAM;
     #if ASL_CBUF_ENABLE_PARAM_CHECK == 1
     if ( ptr_cbuf && ptr_cbuf->mem && ptr_cbuf->size_mem && ( ptr_cbuf->front < ptr_cbuf->size_mem ) && ( ptr_cbuf->rear < ptr_cbuf->size_mem ) && available_to_read ) {
     #endif
-        *available_to_read = available_read(ptr_cbuf->front, ptr_cbuf->rear, ptr_cbuf->size_mem);
+        *available_to_read = asl_cbuf__available_read_private(ptr_cbuf->front, ptr_cbuf->rear, ptr_cbuf->size_mem);
         error = ASL_CBUF_E_OK;
     #if ASL_CBUF_ENABLE_PARAM_CHECK == 1
     }
@@ -146,12 +146,12 @@ asl_cbuf_error_e asl_cbuf_available_read(asl_cbuf_s* ptr_cbuf, size_t* available
     return error;
 }
 
-asl_cbuf_error_e asl_cbuf_available_write(asl_cbuf_s* ptr_cbuf, size_t* available_to_write) {
+asl_cbuf_error_e asl_cbuf__available_write(asl_cbuf_s* ptr_cbuf, size_t* available_to_write) {
     asl_cbuf_error_e error = ASL_CBUF_E_PARAM;
     #if ASL_CBUF_ENABLE_PARAM_CHECK == 1
     if ( ptr_cbuf && ptr_cbuf->mem && ptr_cbuf->size_mem && ( ptr_cbuf->front < ptr_cbuf->size_mem ) && ( ptr_cbuf->rear < ptr_cbuf->size_mem ) && available_to_write ) {
     #endif
-        *available_to_write = available_write(ptr_cbuf->front, ptr_cbuf->rear, ptr_cbuf->size_mem);
+        *available_to_write = asl_cbuf__available_write_private(ptr_cbuf->front, ptr_cbuf->rear, ptr_cbuf->size_mem);
         error = ASL_CBUF_E_OK;
     #if ASL_CBUF_ENABLE_PARAM_CHECK == 1
     }
@@ -159,14 +159,14 @@ asl_cbuf_error_e asl_cbuf_available_write(asl_cbuf_s* ptr_cbuf, size_t* availabl
     return error;
 }
 
-static size_t circular_next(size_t now, size_t step, size_t capacity) {
+static size_t asl_cbuf__circular_next_private(size_t now, size_t step, size_t capacity) {
     return ( ( now + step ) % capacity );
 }
 
-static size_t available_read(size_t front, size_t rear, size_t capacity) {
+static size_t asl_cbuf__available_read_private(size_t front, size_t rear, size_t capacity) {
     return ( capacity - 1 - ( ( capacity - rear + front - 1 ) % capacity ) );
 }
 
-static size_t available_write(size_t front, size_t rear, size_t capacity) {
+static size_t asl_cbuf__available_write_private(size_t front, size_t rear, size_t capacity) {
     return ( capacity - rear + front - 1 ) % capacity;
 }

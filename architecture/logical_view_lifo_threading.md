@@ -36,10 +36,10 @@ sequenceDiagram
     participant S as LIFO Stack
     participant T2 as Thread 2
     
-    T1->>S: asl_lifo_push(element1)
+    T1->>S: asl_lifo__push(element1)
     Note over S: Check capacity<br/>Copy element<br/>Update count
     
-    T2->>S: asl_lifo_pop(buffer)
+    T2->>S: asl_lifo__pop(buffer)
     Note over S: Check if empty<br/>Copy element<br/>Update count
     
     Note right of S: External sync required<br/>for thread safety
@@ -53,7 +53,7 @@ sequenceDiagram
 ```c
 // Example mutex-protected operations
 pthread_mutex_lock(&stack_mutex);
-result = asl_lifo_push(&stack, data);
+result = asl_lifo__push(&stack, data);
 pthread_mutex_unlock(&stack_mutex);
 ```
 
@@ -108,7 +108,7 @@ stateDiagram-v2
 ### 2.3 Error Handling Pattern
 
 ```c
-asl_lifo_error_e result = asl_lifo_push(&stack, data);
+asl_lifo_error_e result = asl_lifo__push(&stack, data);
 switch(result) {
     case ASL_LIFO_E_OK:
         // Success - continue

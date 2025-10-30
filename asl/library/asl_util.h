@@ -10,7 +10,7 @@
  *
  *  @version    0.0.1
  *
- *  @date       17 October 2025
+ *  @date       27 October 2025
  *
  *  @brief      Header for the 'asl_util' Class.
 *******************************************************************************/
@@ -43,7 +43,7 @@ extern "C" {
  * value
  * Fill value.
  */
-void asl_util_buffer_memset(asl_buffer_s dest, uint8_t value);
+void asl_util__buffer_memset(asl_buffer_s dest, uint8_t value);
 
 /**
  * @brief
@@ -57,7 +57,7 @@ void asl_util_buffer_memset(asl_buffer_s dest, uint8_t value);
  * src
  * Source buffer.
  */
-void asl_util_buffer_memcpy(asl_buffer_s dest, asl_buffer_s src);
+void asl_util__buffer_memcpy(asl_buffer_s dest, asl_buffer_s src);
 
 #ifdef __cplusplus
 }

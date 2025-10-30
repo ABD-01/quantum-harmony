@@ -54,12 +54,12 @@ classDiagram
     
     class CBUF_API {
         <<module>>
-        +asl_cbuf_init(asl_cbuf_s*) asl_cbuf_error_n
-        +asl_cbuf_enqueue(asl_cbuf_s*, asl_buffer_s, size_t) asl_cbuf_error_n
-        +asl_cbuf_dequeue(asl_cbuf_s*, asl_buffer_s, size_t) asl_cbuf_error_n
-        +asl_cbuf_preview(asl_cbuf_s*, asl_buffer_s, size_t) asl_cbuf_error_n
-        +asl_cbuf_available_read(asl_cbuf_s*, size_t*) asl_cbuf_error_n
-        +asl_cbuf_available_write(asl_cbuf_s*, size_t*) asl_cbuf_error_n
+        +asl_cbuf__init(asl_cbuf_s*) asl_cbuf_error_e
+        +asl_cbuf__enqueue(asl_cbuf_s*, asl_buffer_s, size_t) asl_cbuf_error_e
+        +asl_cbuf__dequeue(asl_cbuf_s*, asl_buffer_s, size_t) asl_cbuf_error_e
+        +asl_cbuf__preview(asl_cbuf_s*, asl_buffer_s, size_t) asl_cbuf_error_e
+        +asl_cbuf__available_read(asl_cbuf_s*, size_t*) asl_cbuf_error_e
+        +asl_cbuf__available_write(asl_cbuf_s*, size_t*) asl_cbuf_error_e
     }
     
     CBUF_API --> asl_cbuf_s : operates_on
@@ -102,13 +102,13 @@ config:
 ---
 stateDiagram-v2
     [*] --> Uninitialized
-    Uninitialized --> Initialized : asl_cbuf_init()
+    Uninitialized --> Initialized : asl_cbuf__init()
     Initialized --> Ready : Success
     Initialized --> Error : Failed
     
-    Ready --> Writing : asl_cbuf_enqueue()
-    Ready --> Reading : asl_cbuf_dequeue()
-    Ready --> Previewing : asl_cbuf_preview()
+    Ready --> Writing : asl_cbuf__enqueue()
+    Ready --> Reading : asl_cbuf__dequeue()
+    Ready --> Previewing : asl_cbuf__preview()
     Ready --> Querying : available_read/write()
     
     Writing --> Ready : Success

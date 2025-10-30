@@ -10,7 +10,7 @@
  *
  *  @version    0.0.1
  *
- *  @date       17 October 2025
+ *  @date       27 October 2025
  *
  *  @brief      Header for the 'basic_fifo' Example.
  *              Basic FIFO example demonstrating enqueue/dequeue operations

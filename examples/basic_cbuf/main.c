@@ -10,7 +10,7 @@
  *
  *  @version    0.0.1
  *
- *  @date       17 October 2025
+ *  @date       27 October 2025
  *
  *  @brief      Main entry point for basic CBUF example.
  *              Demonstrates simple producer-consumer pattern using ASL CBUF.
@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
     printf("ASL Basic CBUF Example\n");
     printf("======================\n\n");
     
-    // Parse command line arguments
+    /* Parse command line arguments */
     if (argc == 2) {
         cbuf_size = (size_t)atoi(argv[1]);
         
@@ -64,7 +64,7 @@ int main(int argc, char* argv[]) {
     
     printf("CBUF size: %zu bytes\n\n", cbuf_size);
     
-    // Initialize, run test, cleanup
+    /* Initialize, run test, cleanup */
     error = basic_cbuf_init(&context, cbuf_size);
     if (error == BASIC_CBUF_E_OK) {
         error = basic_cbuf_run_test(&context);

@@ -10,11 +10,11 @@
  *
  *  @version    0.0.1
  *
- *  @date       17 October 2025
+ *  @date       27 October 2025
  *
  *  @brief      Header for the 'asl_cbuf' Class.
  *              Generic 8-bit data circular buffer.
- *              This circular buffer is meant to be implemented to be producer-consumer thread-safe only.
+ *              This circular buffer is designed to be producer-consumer thread-safe only.
  *              i.e. only two threads are possible, one of which is producer and another one is consumer.
 *******************************************************************************/
 
@@ -40,7 +40,7 @@ extern "C" {
  * ASL_CBUF_E_OK            - Success.
  * ASL_CBUF_E_PARAM         - NULL pointer or zero sized buffer or other parameter inconsistency.
  */
-asl_cbuf_error_e asl_cbuf_init(asl_cbuf_s* ptr_cbuf);
+asl_cbuf_error_e asl_cbuf__init(asl_cbuf_s* ptr_cbuf);
 
 /**
  * @brief
@@ -63,7 +63,7 @@ asl_cbuf_error_e asl_cbuf_init(asl_cbuf_s* ptr_cbuf);
  * ASL_CBUF_E_PARAM         - NULL pointer or zero sized buffer or other parameter inconsistency.
  * ASL_CBUF_E_FORBID        - Not enough free space in circular buffer for requested number of elements. Prevents overflow.
  */
-asl_cbuf_error_e asl_cbuf_enqueue(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, size_t req_enqueue);
+asl_cbuf_error_e asl_cbuf__enqueue(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, size_t req_enqueue);
 
 /**
  * @brief
@@ -86,7 +86,7 @@ asl_cbuf_error_e asl_cbuf_enqueue(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, siz
  * ASL_CBUF_E_PARAM         - NULL pointer or zero sized buffer or other parameter inconsistency.
  * ASL_CBUF_E_FORBID        - Requested number of elements not present in circular buffer. Prevents underflow.
  */
-asl_cbuf_error_e asl_cbuf_dequeue(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, size_t req_dequeue);
+asl_cbuf_error_e asl_cbuf__dequeue(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, size_t req_dequeue);
 
 /**
  * @brief
@@ -109,7 +109,7 @@ asl_cbuf_error_e asl_cbuf_dequeue(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, siz
  * ASL_CBUF_E_PARAM         - NULL pointer or zero sized buffer or other parameter inconsistency.
  * ASL_CBUF_E_FORBID        - Requested number of elements not present in circular buffer. Prevents underflow.
  */
-asl_cbuf_error_e asl_cbuf_preview(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, size_t req_preview);
+asl_cbuf_error_e asl_cbuf__preview(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, size_t req_preview);
 
 /**
  * @brief
@@ -127,7 +127,7 @@ asl_cbuf_error_e asl_cbuf_preview(asl_cbuf_s* ptr_cbuf, asl_buffer_s buffer, siz
  * ASL_CBUF_E_OK            - Success.
  * ASL_CBUF_E_PARAM         - NULL pointer or zero sized buffer or other parameter inconsistency.
  */
-asl_cbuf_error_e asl_cbuf_available_read(asl_cbuf_s* ptr_cbuf, size_t* available_to_read);
+asl_cbuf_error_e asl_cbuf__available_read(asl_cbuf_s* ptr_cbuf, size_t* available_to_read);
 
 /**
  * @brief
@@ -145,7 +145,7 @@ asl_cbuf_error_e asl_cbuf_available_read(asl_cbuf_s* ptr_cbuf, size_t* available
  * ASL_CBUF_E_OK            - Success.
  * ASL_CBUF_E_PARAM         - NULL pointer or zero sized buffer or other parameter inconsistency.
  */
-asl_cbuf_error_e asl_cbuf_available_write(asl_cbuf_s* ptr_cbuf, size_t* available_to_write);
+asl_cbuf_error_e asl_cbuf__available_write(asl_cbuf_s* ptr_cbuf, size_t* available_to_write);
 
 #ifdef __cplusplus
 }
