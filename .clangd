@@ -1,0 +1,10 @@
+# .clangd (in project root)
+CompileFlags:
+  Add: []
+  C: 
+    - -std=c99
+    - -D_CRT_SECURE_NO_WARNINGS
+  C++: 
+    - -std=c++17
+    - -D_CRT_SECURE_NO_WARNINGS
+

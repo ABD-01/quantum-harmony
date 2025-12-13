@@ -1,0 +1,14 @@
+--target=arm-none-eabi
+-DENABLE_DEBUG
+-mcpu=arm7tdmi
+-mfloat-abi=soft
+-marm
+-march=armv4t
+-isystem
+C:/nxp/MCUXpressoIDE_11.4.0_6224/ide/plugins/com.nxp.mcuxpresso.tools.win32_11.4.0.202103011116/tools/lib/gcc/arm-none-eabi/10.2.1/include
+-isystem
+C:/nxp/MCUXpressoIDE_11.4.0_6224/ide/plugins/com.nxp.mcuxpresso.tools.win32_11.4.0.202103011116/tools/lib/gcc/arm-none-eabi/10.2.1/include-fixed
+-isystem
+C:/nxp/MCUXpressoIDE_11.4.0_6224/ide/plugins/com.nxp.mcuxpresso.tools.win32_11.4.0.202103011116/tools/arm-none-eabi/include
+-I./
+-I./third_party/googletest/install/include
