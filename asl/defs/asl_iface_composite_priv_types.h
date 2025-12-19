@@ -10,7 +10,7 @@
  *
  *  @version    0.0.1
  *
- *  @date       27 October 2025
+ *  @date       27 November 2025
  *
  *  @brief      Header for the 'asl_iface_composite_priv_types' Class.
  *              Composite function pointer prototypes.

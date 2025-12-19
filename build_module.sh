@@ -12,11 +12,15 @@ if [ "$1" == "mc" ]; then
     TARGET_PLATFORM="$1"
 elif [ "$1" == "nxp" ]; then
     TARGET_PLATFORM="$1"
-elif [ "$1" == "st" ]; then
-    TARGET_PLATFORM="$1"
-elif [ "$1" == "ti" ]; then
+elif [ "$1" == "quectel" ]; then
     TARGET_PLATFORM="$1"
 elif [ "$1" == "renesas" ]; then
+    TARGET_PLATFORM="$1"
+elif [ "$1" == "st" ]; then
+    TARGET_PLATFORM="$1"
+elif [ "$1" == "telit" ]; then
+    TARGET_PLATFORM="$1"
+elif [ "$1" == "ti" ]; then
     TARGET_PLATFORM="$1"
 else
     TARGET_PLATFORM="default"
@@ -34,7 +38,7 @@ cmake -Wno-dev -G "MinGW Makefiles" \
 
 # Build the project.
 echo "***** CMake Build *****"
-cmake --build .
+cmake --build . --parallel 4
 
 # Create package using CPack and then publish.
 echo "***** CPack Package *****"

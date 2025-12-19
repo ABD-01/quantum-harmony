@@ -17,8 +17,9 @@ cmake -Wno-dev -G "MinGW Makefiles" \
     -DATP_ROOT=${ATP_ROOT} \
     -DTARGET_PLATFORM=${TARGET_PLATFORM} \
     -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=TRUE \
     ..
 
 # Build the project.
 echo "***** CMake Build *****"
-cmake --build .
+cmake --build . --parallel 4
