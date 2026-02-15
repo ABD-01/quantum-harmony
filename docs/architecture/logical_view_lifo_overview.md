@@ -1,14 +1,6 @@
 # Logical View: LIFO Overview & Structure
 
-**Parent:** [LIFO Module Hub](logical_view_lifo.md) | [Logical View](logical_view.md) | [Architecture Home](README.md)
-
-## Table of Contents
-- [1. Overview](#1-overview)
-- [2. Structure](#2-structure)
-- [3. Operations](#3-operations)
-- [4. References](#4-references)
-
----
+**Parent:** [LIFO Module Hub](logical_view_lifo.md) | [Logical View](logical_view.md) | [Architecture Home](../index.md)
 
 ## 1. Overview
 
@@ -35,16 +27,6 @@ The Last-In-First-Out (LIFO) module implements a generic stack data structure wi
 ```mermaid
 ---
 title: LIFO Internal Structure & API (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
 ---
 classDiagram
     class asl_lifo_s {
@@ -97,16 +79,6 @@ elements.mem -> [Element 0] <- Bottom (index 0)
 ```mermaid
 ---
 title: LIFO Operations Flow (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
 ---
 stateDiagram-v2
     [*] --> Empty

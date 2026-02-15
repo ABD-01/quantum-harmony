@@ -1,18 +1,6 @@
 # Logical View: Basic & Pointer Types
 
-**Parent:** [Types System Hub](logical_view_types.md) | [Logical View](logical_view.md) | [Architecture Home](README.md)
-
-## Table of Contents
-- [1. Overview](#1-overview)
-- [2. Type Hierarchy](#2-type-hierarchy)
-- [3. Basic C99 Types](#3-basic-c99-types)
-- [4. Pointer Type Abstractions](#4-pointer-type-abstractions)
-- [5. Constant Pointer Types](#5-constant-pointer-types)
-- [6. Type Usage Patterns](#6-type-usage-patterns)
-- [7. Design Benefits](#7-design-benefits)
-- [8. References](#8-references)
-
----
+**Parent:** [Types System Hub](logical_view_types.md) | [Logical View](logical_view.md) | [Architecture Home](../index.md)
 
 ## 1. Overview
 
@@ -31,18 +19,6 @@ The ASL Basic & Pointer Types module provides the foundation layer of the type s
 ```mermaid
 ---
 title: ASL Pointer Types Hierarchy (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 classDiagram
     class C99_Types {

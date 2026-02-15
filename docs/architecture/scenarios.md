@@ -4,17 +4,6 @@
 
 # Scenarios View
 
-## Table of Contents
-- [1. Overview](#1-overview)
-- [2. Data Structure Usage](#2-data-structure-usage)
-- [3. Thread Safety Scenarios](#3-thread-safety-scenarios)
-- [4. Memory Management](#4-memory-management)
-- [5. Error Handling](#5-error-handling)
-- [6. Platform Integration](#6-platform-integration)
-- [7. References](#7-references)
-
----
-
 ## 1. Overview
 
 Key usage patterns and interactions with ASL components through concrete examples.
@@ -26,18 +15,6 @@ Key usage patterns and interactions with ASL components through concrete example
 ```mermaid
 ---
 title: CBUF Usage Scenario (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 sequenceDiagram
     participant App as Application
@@ -64,18 +41,6 @@ sequenceDiagram
 ```mermaid
 ---
 title: FIFO Queue Operations (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 sequenceDiagram
     participant P as Producer
@@ -98,18 +63,6 @@ sequenceDiagram
 ```mermaid
 ---
 title: LIFO Stack Scenario (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 sequenceDiagram
     participant App as Application
@@ -134,18 +87,6 @@ sequenceDiagram
 ```mermaid
 ---
 title: Multi-Thread Access Pattern (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 sequenceDiagram
     participant T1 as Thread 1
@@ -171,18 +112,6 @@ sequenceDiagram
 ```mermaid
 ---
 title: Dynamic Memory Management (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 stateDiagram-v2
     [*] --> Unallocated
@@ -199,18 +128,6 @@ stateDiagram-v2
 ```mermaid
 ---
 title: Error Handling Flow (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 graph TD
     A[Operation Start] --> B{Parameter Check}
@@ -237,18 +154,6 @@ graph TD
 ```mermaid
 ---
 title: Platform Integration Scenario (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 sequenceDiagram
     participant App as Application

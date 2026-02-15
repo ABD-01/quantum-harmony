@@ -1,14 +1,6 @@
 # Logical View: Composite Types
 
-**Parent:** [Types System Hub](logical_view_types.md) | [Logical View](logical_view.md) | [Architecture Home](README.md)
-
-## Table of Contents
-- [1. Overview](#1-overview)
-- [2. Core Composite Types](#2-core-composite-types)
-- [3. Composite Interface Types](#3-composite-interface-types)
-- [4. References](#4-references)
-
----
+**Parent:** [Types System Hub](logical_view_types.md) | [Logical View](logical_view.md) | [Architecture Home](../index.md)
 
 ## 1. Overview
 
@@ -31,18 +23,6 @@ Encapsulated abstraction of bounded memory with location and size information:
 ```mermaid
 ---
 title: ASL Buffer Type Structure (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 classDiagram
     class asl_buffer_s {
@@ -70,18 +50,6 @@ Encapsulated abstraction of dynamic memory allocation:
 ```mermaid
 ---
 title: ASL Allocator Type Structure (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 classDiagram
     class asl_allocator_t {
@@ -109,18 +77,6 @@ Encapsulated abstraction of mutual exclusion primitives:
 ```mermaid
 ---
 title: ASL Mutex Type Structure (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 classDiagram
     class asl_mutex_t {
@@ -152,18 +108,6 @@ Composite interface for buffer-based serial operations as defined in actual code
 ```mermaid
 ---
 title: ASL Composite Interface Type (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 classDiagram
     class asl_iface_composite_rx_tx_cb {

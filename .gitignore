@@ -91,3 +91,11 @@ Debug/
 # ------------------------------------------------------------------
 # Add more here if required...
 build/
+.cache/
+
+# ------------------------------------------------------------------
+# Documentation (generated)
+docs/xml/
+docs/html/
+docs/api/
+docs/_build/

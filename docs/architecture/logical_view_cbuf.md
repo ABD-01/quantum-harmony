@@ -1,6 +1,6 @@
 # Logical View: CBUF (Circular Buffer) Hub
 
-**Parent:** [Logical View](logical_view.md) | [Architecture Home](README.md)
+**Parent:** [Logical View](logical_view.md) | [Architecture Home](../index.md)
 
 ## Overview
 
@@ -32,3 +32,11 @@ Concurrency model and error management.
 | `asl_cbuf__enqueue()` | Add data | [Overview](logical_view_cbuf_overview.md) |
 | `asl_cbuf__dequeue()` | Remove data | [Overview](logical_view_cbuf_overview.md) |
 | `asl_cbuf__preview()` | Inspect data | [Overview](logical_view_cbuf_overview.md) |
+
+```{toctree}
+:hidden:
+:maxdepth: 1
+
+logical_view_cbuf_overview
+logical_view_cbuf_threading
+```

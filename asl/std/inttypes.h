@@ -35,7 +35,7 @@ typedef __wchar_t   wchar_t;
 /* fprintf macros for signed integers */
 #define PRId8           "d"         /* int8_t */
 #define PRId16          "d"         /* int16_t */
-#define PRId32          "d"         /* int32_t */
+#define PRId32          "ld"         /* int32_t */
 #define PRId64          "lld"       /* int64_t */
 
 #define PRIdLEAST8      "d"         /* int_least8_t */
@@ -53,7 +53,7 @@ typedef __wchar_t   wchar_t;
 
 #define PRIi8           "i"         /* int8_t */
 #define PRIi16          "i"         /* int16_t */
-#define PRIi32          "i"         /* int32_t */
+#define PRIi32          "li"         /* int32_t */
 #define PRIi64          "lli"       /* int64_t */
 
 #define PRIiLEAST8      "i"         /* int_least8_t */
@@ -72,7 +72,7 @@ typedef __wchar_t   wchar_t;
 /* fprintf macros for unsigned integers */
 #define PRIo8           "o"         /* int8_t */
 #define PRIo16          "o"         /* int16_t */
-#define PRIo32          "o"         /* int32_t */
+#define PRIo32          "lo"         /* int32_t */
 #define PRIo64          "llo"       /* int64_t */
 
 #define PRIoLEAST8      "o"         /* int_least8_t */
@@ -90,7 +90,7 @@ typedef __wchar_t   wchar_t;
 
 #define PRIu8           "u"         /* uint8_t */
 #define PRIu16          "u"         /* uint16_t */
-#define PRIu32          "u"         /* uint32_t */
+#define PRIu32          "lu"         /* uint32_t */
 #define PRIu64          "llu"       /* uint64_t */
 
 #define PRIuLEAST8      "u"         /* uint_least8_t */
@@ -108,7 +108,7 @@ typedef __wchar_t   wchar_t;
 
 #define PRIx8           "x"         /* uint8_t */
 #define PRIx16          "x"         /* uint16_t */
-#define PRIx32          "x"         /* uint32_t */
+#define PRIx32          "lx"         /* uint32_t */
 #define PRIx64          "llx"       /* uint64_t */
 
 #define PRIxLEAST8      "x"         /* uint_least8_t */
@@ -126,7 +126,7 @@ typedef __wchar_t   wchar_t;
 
 #define PRIX8           "X"         /* uint8_t */
 #define PRIX16          "X"         /* uint16_t */
-#define PRIX32          "X"         /* uint32_t */
+#define PRIX32          "lX"         /* uint32_t */
 #define PRIX64          "llX"       /* uint64_t */
 
 #define PRIXLEAST8      "X"         /* uint_least8_t */

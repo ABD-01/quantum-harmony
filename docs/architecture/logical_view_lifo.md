@@ -1,6 +1,6 @@
 # Logical View: LIFO (Last-In-First-Out) Hub
 
-**Parent:** [Logical View](logical_view.md) | [Architecture Home](README.md)
+**Parent:** [Logical View](logical_view.md) | [Architecture Home](../index.md)
 
 ## Overview
 
@@ -27,3 +27,11 @@ Concurrency model and error management.
 ## Quick Reference
 
 | Function | Purpose | Module |
+
+```{toctree}
+:hidden:
+:maxdepth: 1
+
+logical_view_lifo_overview
+logical_view_lifo_threading
+```

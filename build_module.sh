@@ -34,6 +34,7 @@ cmake -Wno-dev -G "MinGW Makefiles" \
     -DTARGET_PLATFORM=${TARGET_PLATFORM} \
     -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} \
     -DCMAKE_EXPORT_COMPILE_COMMANDS=TRUE \
+    -DCMAKE_INSTALL_PREFIX=${ATP_ROOT}/install/${TARGET_PLATFORM} \
     ..
 
 # Build the project.
@@ -43,3 +44,7 @@ cmake --build . --parallel 4
 # Create package using CPack and then publish.
 echo "***** CPack Package *****"
 cmake --build . --target package_and_publish
+
+# install
+echo "***** CMake Install *****"
+cmake --install .

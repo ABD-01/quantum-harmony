@@ -1,13 +1,6 @@
 # Logical View: LIFO Thread Safety & Error Handling
 
-**Parent:** [LIFO Module Hub](logical_view_lifo.md) | [Logical View](logical_view.md) | [Architecture Home](README.md)
-
-## Table of Contents
-- [1. Thread Safety](#1-thread-safety)
-- [2. Error Handling](#2-error-handling)
-- [3. Best Practices](#3-best-practices)
-
----
+**Parent:** [LIFO Module Hub](logical_view_lifo.md) | [Logical View](logical_view.md) | [Architecture Home](../index.md)
 
 ## 1. Thread Safety
 
@@ -18,18 +11,6 @@ The LIFO implementation provides parameter validation but requires external sync
 ```mermaid
 ---
 title: LIFO Thread Safety Considerations (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 sequenceDiagram
     participant T1 as Thread 1
@@ -66,18 +47,6 @@ pthread_mutex_unlock(&stack_mutex);
 ```mermaid
 ---
 title: LIFO Error Handling Flow (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 stateDiagram-v2
     [*] --> ValidCall

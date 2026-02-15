@@ -4,17 +4,6 @@
 
 # Development View
 
-## Table of Contents
-- [1. Overview](#1-overview)
-- [2. Directory Structure](#2-directory-structure)
-- [3. Package Organization](#3-package-organization)
-- [4. Build System](#4-build-system)
-- [5. Platform Support](#5-platform-support)
-- [6. Dependencies](#6-dependencies)
-- [7. References](#7-references)
-
----
-
 ## 1. Overview
 
 The Development View organizes the ASL codebase into clear layers: type definitions, library implementations, and build system integration. This structure enables clean separation of interfaces and implementations while supporting multiple platforms.
@@ -24,16 +13,6 @@ The Development View organizes the ASL codebase into clear layers: type definiti
 ```mermaid
 ---
 title: ASL Directory Structure (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
 ---
 graph TD
     subgraph ASL[ASL Root]
@@ -57,16 +36,6 @@ graph TD
 ```mermaid
 ---
 title: ASL Package Dependencies (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
 ---
 classDiagram
     %% Type System
@@ -132,16 +101,6 @@ The ASL build system supports multiple platforms through a flexible toolchain co
 ```mermaid
 ---
 title: ASL Platform Support Architecture (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
 ---
 classDiagram
     class ASL_Core {
@@ -207,4 +166,4 @@ ASL is designed to be self-contained with minimal external dependencies:
 - [Physical View](physical_view.md) - Platform-specific builds
 
 ### Documentation Hub
-- [Architecture Home](README.md) - Documentation structure and navigation
+- [Architecture Home](../index.md) - Documentation structure and navigation

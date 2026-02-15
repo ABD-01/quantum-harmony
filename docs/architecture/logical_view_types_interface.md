@@ -1,17 +1,6 @@
 # Logical View: Interface Types
 
-**Parent:** [Types System Hub](logical_view_types.md) | [Logical View](logical_view.md) | [Architecture Home](README.md)
-
-## Table of Contents
-- [1. Overview](#1-overview)
-- [2. Interface Architecture](#2-interface-architecture)
-- [3. Function Pointer Patterns](#3-function-pointer-patterns)
-- [4. Public vs Private Interfaces](#4-public-vs-private-interfaces)
-- [5. Pattern Classification](#5-pattern-classification)
-- [6. Usage Examples](#6-usage-examples)
-- [7. References](#7-references)
-
----
+**Parent:** [Types System Hub](logical_view_types.md) | [Logical View](logical_view.md) | [Architecture Home](../index.md)
 
 ## 1. Overview
 
@@ -30,18 +19,6 @@ The ASL Interface Types module defines comprehensive function pointer patterns u
 ```mermaid
 ---
 title: ASL Interface Function Types (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 classDiagram
     class asl_iface_types {
@@ -95,16 +72,6 @@ ASL follows systematic naming: `asl_iface_[return]_[param]_cb`
 ```mermaid
 ---
 title: ASL Basic Function Pointer Patterns (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6ffe6"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#006600"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
 ---
 classDiagram
     class Void_Return_Functions {

@@ -10,7 +10,7 @@ message(STATUS "CMAKE_TOOLCHAIN_FILE is ${CMAKE_TOOLCHAIN_FILE}")
 # Derive a reusable module name from the project name.
 set(MOD_NAME "${PROJECT_NAME}")
 # Namespace used for export.
-set(MOD_NAMESPACE "${MOD_NAME}::")
+set(MOD_NAMESPACE "ATP::")
 
 # Include tools.
 set(CPACK_GENERATOR "TGZ")
@@ -118,6 +118,9 @@ write_basic_package_version_file(
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${MOD_NAME}ConfigVersion.cmake"
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${MOD_NAME}
 )
+
+# Documentation.
+add_subdirectory(docs)
 
 # Custom target to package and publish
 add_custom_target(package_and_publish

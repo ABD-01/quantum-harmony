@@ -1,14 +1,6 @@
 # Logical View: CBUF Overview & Structure
 
-**Parent:** [CBUF Module Hub](logical_view_cbuf.md) | [Logical View](logical_view.md) | [Architecture Home](README.md)
-
-## Table of Contents
-- [1. Overview](#1-overview)
-- [2. Structure](#2-structure)
-- [3. Operations](#3-operations)
-- [4. References](#4-references)
-
----
+**Parent:** [CBUF Module Hub](logical_view_cbuf.md) | [Logical View](logical_view.md) | [Architecture Home](../index.md)
 
 ## 1. Overview
 
@@ -34,14 +26,6 @@ The Circular Buffer (CBUF) module implements a generic 8-bit data circular buffe
 ```mermaid
 ---
 title: CBUF Internal Structure & API (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
 ---
 classDiagram
     class asl_cbuf_s {
@@ -91,14 +75,6 @@ front              rear
 ```mermaid
 ---
 title: CBUF Operations Flow (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
 ---
 stateDiagram-v2
     [*] --> Uninitialized

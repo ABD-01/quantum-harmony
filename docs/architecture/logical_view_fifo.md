@@ -1,6 +1,6 @@
 # Logical View: FIFO (First-In-First-Out) Hub
 
-**Parent:** [Logical View](logical_view.md) | [Architecture Home](README.md)
+**Parent:** [Logical View](logical_view.md) | [Architecture Home](../index.md)
 
 ## Overview
 
@@ -22,3 +22,11 @@ Core queue concepts, internal structure, and operation flow.
 |----------|---------|--------|
 | `asl_fifo__reset()` | Clear queue | [Overview](logical_view_fifo_overview.md) |
 | `asl_fifo__enqueue()` | Add element | [Overview](logical_view_fifo_overview.md) |
+
+
+```{toctree}
+:hidden:
+:maxdepth: 1
+
+logical_view_fifo_overview
+```

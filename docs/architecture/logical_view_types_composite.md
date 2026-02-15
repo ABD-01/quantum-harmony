@@ -1,6 +1,6 @@
 # Logical View: Composite Types Hub
 
-**Parent:** [Types System Hub](logical_view_types.md) | [Logical View](logical_view.md) | [Architecture Home](README.md)
+**Parent:** [Types System Hub](logical_view_types.md) | [Logical View](logical_view.md) | [Architecture Home](../index.md)
 
 ## Overview
 

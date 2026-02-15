@@ -1,6 +1,6 @@
 # Logical View: UTIL (Utilities) Hub
 
-**Parent:** [Logical View](logical_view.md) | [Architecture Home](README.md)
+**Parent:** [Logical View](logical_view.md) | [Architecture Home](../index.md)
 
 ## Overview
 
@@ -30,3 +30,12 @@ Integration patterns and advanced usage scenarios.
 **Key Topics**:
 - Data structure integration
 - Memory management patterns  
+
+```{toctree}
+:hidden:
+:maxdepth: 1
+
+logical_view_util_overview
+logical_view_util_api
+logical_view_util_patterns
+```

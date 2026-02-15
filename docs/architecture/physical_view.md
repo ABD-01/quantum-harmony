@@ -4,15 +4,6 @@
 
 # Physical View
 
-## Table of Contents
-- [1. Overview](#1-overview)
-- [2. Deployment Architecture](#2-deployment-architecture)
-- [3. Platform Integration](#3-platform-integration)
-- [4. Resource Requirements](#4-resource-requirements)
-- [5. Build Artifacts](#5-build-artifacts)
-- [6. Platform-Specific Considerations](#6-platform-specific-considerations)
-- [7. References](#7-references)
-
 ## 1. Overview
 
 ASL deployment across different hardware platforms and integration with various microcontroller architectures.
@@ -22,18 +13,6 @@ ASL deployment across different hardware platforms and integration with various 
 ```mermaid
 ---
 title: ASL Deployment Architecture (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 C4Deployment
     title ASL Library Deployment Architecture
@@ -64,18 +43,6 @@ C4Deployment
 ```mermaid
 ---
 title: ASL Platform Integration (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 classDiagram
     class ApplicationCode {
@@ -124,18 +91,6 @@ For each supported platform, ASL produces:
 ```mermaid
 ---
 title: ASL Platform-Specific Features (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 classDiagram
     class STM32_Platform {

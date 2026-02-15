@@ -1,14 +1,6 @@
 # Logical View: CBUF Thread Safety & Error Handling
 
-**Parent:** [CBUF Module Hub](logical_view_cbuf.md) | [Logical View](logical_view.md) | [Architecture Home](README.md)
-
-## Table of Contents
-- [1. Thread Safety](#1-thread-safety)
-- [2. Error Handling](#2-error-handling)
-- [3. Error Recovery](#3-error-recovery)
-- [4. References](#4-references)
-
----
+**Parent:** [CBUF Module Hub](logical_view_cbuf.md) | [Logical View](logical_view.md) | [Architecture Home](../index.md)
 
 ## 1. Thread Safety
 
@@ -19,18 +11,6 @@ The CBUF implementation provides thread-safe operations for concurrent producer-
 ```mermaid
 ---
 title: CBUF Thread Safety Model (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 sequenceDiagram
     participant P as Producer

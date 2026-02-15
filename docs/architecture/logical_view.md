@@ -1,19 +1,8 @@
 [Logical View](logical_view.md) | [Development View](development_view.md) | [Process View](process_view.md) | [Physical View](physical_view.md) | [Scenarios](scenarios.md)
 
----
 
 # Logical View
 
-## Table of Contents
-- [1. Main Components](#1-main-components)
-- [2. Component Relationships](#2-component-relationships)
-- [3. Core Type System](#3-core-type-system)
-- [4. Module Documentation](#4-module-documentation)
-- [5. Interface Architecture](#5-interface-architecture)
-- [6. Cross-Module Features](#6-cross-module-features)
-- [7. References](#7-references)
-
----
 
 This document outlines the ASL system's main abstractions and their relationships.
 
@@ -27,19 +16,11 @@ This document outlines the ASL system's main abstractions and their relationship
 
 ## 2. Component Relationships
 
+
+
 ```mermaid
 ---
 title: Component Relationships - ASL Main Architecture (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
 ---
 classDiagram
     class ASL_Types {
@@ -153,4 +134,18 @@ Common features across all modules:
 - [Scenarios](scenarios.md) - Usage examples and patterns
 
 ### Documentation Hub
-- [Architecture Home](README.md) - Documentation structure and navigation
+- [Architecture Home](../index.md) - Documentation structure and navigation
+
+## Logical View Modules
+
+```{toctree}
+:hidden:
+:maxdepth: 1
+:caption: Logical View Modules
+
+logical_view_types
+logical_view_cbuf
+logical_view_fifo
+logical_view_lifo
+logical_view_util
+```

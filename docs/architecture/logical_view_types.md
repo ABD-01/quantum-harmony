@@ -1,14 +1,7 @@
 # Logical View: Core Type System
 
-**Parent:** [Logical View](logical_view.md) | [Architecture Home](README.md)
+**Parent:** [Logical View](logical_view.md) | [Architecture Home](../index.md)
 
-## Table of Contents
-- [1. Overview](#1-overview)
-- [2. Type System Modules](#2-type-system-modules)
-- [3. Navigation](#3-navigation)
-- [4. References](#4-references)
-
----
 
 ## 1. Overview
 
@@ -79,3 +72,14 @@ The ASL Type System is organized into three logical modules for maintainability 
 ### Requirements Traceability
 - **Functional Requirements**: [../requirements/functional_requirements.md](../requirements/functional_requirements.md)
 - **Architecture Requirements**: [../requirements/architecture_requirements.md](../requirements/architecture_requirements.md)
+
+```{toctree}
+:hidden:
+:maxdepth: 1
+
+logical_view_types_basic
+logical_view_types_interface
+logical_view_types_composite
+logical_view_types_advanced
+logical_view_types_memory
+```

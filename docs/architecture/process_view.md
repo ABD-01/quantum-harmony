@@ -4,17 +4,6 @@
 
 # Process View
 
-## Table of Contents
-- [1. Overview](#1-overview)
-- [2. Thread Safety Model](#2-thread-safety-model)
-- [3. Memory Management](#3-memory-management)
-- [4. Control Flow](#4-control-flow)
-- [5. Data Flow](#5-data-flow)
-- [6. State Management](#6-state-management)
-- [7. References](#7-references)
-
----
-
 ## 1. Overview
 
 Runtime behavior of ASL components, focusing on concurrency, memory management, and data flow patterns.
@@ -24,18 +13,6 @@ Runtime behavior of ASL components, focusing on concurrency, memory management, 
 ```mermaid
 ---
 title: ASL Thread Safety Model (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 classDiagram
     class asl_mutex_t {
@@ -86,18 +63,6 @@ ASL implements thread safety through:
 ```mermaid
 ---
 title: ASL Memory Management Flow (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 sequenceDiagram
     participant App as Application
@@ -127,18 +92,6 @@ Standard operation flow: Parameter validation → Resource check → Lock acquis
 ```mermaid
 ---
 title: ASL Data Structure Flow Patterns (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 flowchart LR
     subgraph CBUF[Circular Buffer]
@@ -166,18 +119,6 @@ flowchart LR
 ```mermaid
 ---
 title: ASL Component Lifecycle (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 stateDiagram-v2
     [*] --> Uninitialized

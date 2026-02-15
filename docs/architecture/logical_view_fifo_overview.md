@@ -1,14 +1,6 @@
 # Logical View: FIFO Overview & Structure
 
-**Parent:** [FIFO Module Hub](logical_view_fifo.md) | [Logical View](logical_view.md) | [Architecture Home](README.md)
-
-## Table of Contents
-- [1. Overview](#1-overview)
-- [2. Structure](#2-structure)
-- [3. Operations](#3-operations)
-- [4. References](#4-references)
-
----
+**Parent:** [FIFO Module Hub](logical_view_fifo.md) | [Logical View](logical_view.md) | [Architecture Home](../index.md)
 
 ## 1. Overview
 
@@ -35,16 +27,6 @@ The First-In-First-Out (FIFO) module implements a generic queue data structure w
 ```mermaid
 ---
 title: FIFO Internal Structure & API (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
 ---
 classDiagram
     class asl_fifo_s {
@@ -99,16 +81,6 @@ elements.mem -> [0][1][2][3][4][5][6][7]...
 ```mermaid
 ---
 title: FIFO Operations Flow (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
 ---
 stateDiagram-v2
     [*] --> Empty

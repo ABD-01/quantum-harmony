@@ -1,15 +1,6 @@
 # Logical View: UTIL API Reference
 
-**Parent:** [Utilities Module Hub](logical_view_util.md) | [Logical View](logical_view.md) | [Architecture Home](README.md)
-
-## Table of Contents
-- [1. Memory Fill Operations](#1-memory-fill-operations)
-- [2. Memory Copy Operations](#2-memory-copy-operations)
-- [3. Helper Functions](#3-helper-functions)
-- [4. Usage Examples](#4-usage-examples)
-- [5. References](#5-references)
-
----
+**Parent:** [Utilities Module Hub](logical_view_util.md) | [Logical View](logical_view.md) | [Architecture Home](../index.md)
 
 ## 1. Memory Fill Operations
 

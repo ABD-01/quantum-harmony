@@ -1,14 +1,6 @@
 # Logical View: UTIL Overview & Core Functions
 
-**Parent:** [Utilities Module Hub](logical_view_util.md) | [Logical View](logical_view.md) | [Architecture Home](README.md)
-
-## Table of Contents
-- [1. Overview](#1-overview)
-- [2. Core Functions](#2-core-functions)
-- [3. Memory Operations](#3-memory-operations)
-- [4. References](#4-references)
-
----
+**Parent:** [Utilities Module Hub](logical_view_util.md) | [Logical View](logical_view.md) | [Architecture Home](../index.md)
 
 ## 1. Overview
 
@@ -33,18 +25,6 @@ The ASL Utility (UTIL) module provides essential helper functions and memory ope
 ```mermaid
 ---
 title: ASL Utility Functions (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 classDiagram
     class ASL_UTIL {

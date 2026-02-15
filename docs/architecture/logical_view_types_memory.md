@@ -1,15 +1,6 @@
 # Logical View: Memory Management Types
 
-**Parent:** [Types System Hub](logical_view_types.md) | [Logical View](logical_view.md) | [Architecture Home](README.md)
-
-## Table of Contents
-- [1. Overview](#1-overview)
-- [2. Buffer Type](#2-buffer-type)
-- [3. Allocator Type](#3-allocator-type)
-- [4. Usage Patterns](#4-usage-patterns)
-- [5. References](#5-references)
-
----
+**Parent:** [Types System Hub](logical_view_types.md) | [Logical View](logical_view.md) | [Architecture Home](../index.md)
 
 ## 1. Overview
 
@@ -32,18 +23,6 @@ Encapsulated abstraction of bounded memory with location and size information:
 ```mermaid
 ---
 title: ASL Buffer Type (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 classDiagram
     class asl_buffer_s {
@@ -103,18 +82,6 @@ Encapsulated abstraction of dynamic memory allocation:
 ```mermaid
 ---
 title: ASL Allocator Type (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 classDiagram
     class asl_allocator_t {

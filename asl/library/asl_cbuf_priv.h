@@ -67,6 +67,8 @@ static size_t asl_cbuf__circular_next_private(size_t now, size_t step, size_t ca
  * 
  * @return
  * The number of elements that are already present.
+ * 
+ * @sa asl_cbuf__available_read
  */
 static size_t asl_cbuf__available_read_private(size_t front, size_t rear, size_t capacity);
 
@@ -88,6 +90,8 @@ static size_t asl_cbuf__available_read_private(size_t front, size_t rear, size_t
  * 
  * @return
  * Max number of elements that can be written.
+ *
+ * @sa asl_cbuf__available_write
  */
 static size_t asl_cbuf__available_write_private(size_t front, size_t rear, size_t capacity);
 

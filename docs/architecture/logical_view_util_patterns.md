@@ -1,14 +1,6 @@
 # Logical View: UTIL Usage Patterns
 
-**Parent:** [Utilities Module Hub](logical_view_util.md) | [Logical View](logical_view.md) | [Architecture Home](README.md)
-
-## Table of Contents
-- [1. Integration Patterns](#1-integration-patterns)
-- [2. Memory Management](#2-memory-management)
-- [3. Common Use Cases](#3-common-use-cases)
-- [4. References](#4-references)
-
----
+**Parent:** [Utilities Module Hub](logical_view_util.md) | [Logical View](logical_view.md) | [Architecture Home](../index.md)
 
 ## 1. Integration Patterns
 
@@ -17,18 +9,6 @@
 ```mermaid
 ---
 title: UTIL Integration Patterns (A5)
-config:
-  theme: base
-  themeVariables:
-    background: "#ffffff"
-    primaryColor: "#e6f3ff"
-    primaryTextColor: "#000000"
-    primaryBorderColor: "#0066cc"
-    lineColor: "#000000"
-    secondaryColor: "#f0f0f0"
-    tertiaryColor: "#cccccc"
-    fontFamily: "arial"
-    fontSize: "12px"
 ---
 classDiagram
     class ASL_UTIL {
