@@ -48,7 +48,7 @@ def post_process(root_dir):
             modified = modified or changed
 
             # 2) Add :maxdepth: 1 to toctree directives (filelist / structlist)
-            if filename in ("filelist.rst", "structlist.rst"):
+            if filename in ("classlist.rst", "filelist.rst", "grouplist.rst", "structlist.rst"):
                 lines, changed = _inject_option(
                     lines, ".. toctree::", "   :maxdepth: 1"
                 )
