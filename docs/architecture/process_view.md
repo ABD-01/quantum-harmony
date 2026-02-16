@@ -153,4 +153,4 @@ Key States:
 - [Scenarios](scenarios.md) - Concrete threading examples
 
 ### Documentation Hub
-- [Architecture Home](README.md) - Documentation structure and navigation
+- [Architecture Home](../index.md) - Documentation structure and navigation
