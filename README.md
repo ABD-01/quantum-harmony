@@ -128,3 +128,13 @@ union {
 
 ## License
 (c) 2024–2025 Accolade Electronics Pvt. Ltd.
+
+## Temp (Dev Note) The entire activity via command line
+
+```sh
+srec_cat ti_firmware.hex -Intel -Bit_Reverse  -CRC32_Little_Endian 0xE170 -Bit_Reverse -XOR 0xFF -crop 0xE170 0xE174 -Output firmware_3.hex -Intel
+srec_cat ti_firmware.hex -Intel app_crc32.hex -Intel -Output firmware_3.hex -Intel
+srec_cat firmware_3.hex -Intel -offset -0x00009400 -o firmware_5.bin -Binary
+
+#  ti_firmware.hex -Intel -offset -0x00009400 crc32.bin -Binary -offset 19824  -o firmware_3.bin -Binary
+```
