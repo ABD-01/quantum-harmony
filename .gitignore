@@ -1,0 +1,24 @@
+# Ignoring reason: Created by python
+__pycache__/
+__temp__/
+*.pydevproject
+*.spec
+
+# Ignoring reason: Created by notepad++
+*.bak
+
+# VSCode: Should be able to work in VSCode IDE.
+.vscode/
+
+# Ignore Open Office locked documents
+.~lock.*
+
+# Ignore file created by git bash
+*.stackdump
+
+# Ignore file created by beyond compare
+*.orig
+
+# Ignore file created by during patch
+*.patch
+*.rej

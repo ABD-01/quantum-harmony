@@ -1,0 +1,71 @@
+
+/* @author  : Eshwar J
+ * @date    : 4 May 2023
+ * @project : ATCU
+ * @desc    : service tool echo script for DEVICE
+ *            uncomment pause to allow human delay
+ */
+
+timeout = 99999
+
+/* 1st login packet received */
+wait '55AA,3,2,0,5.2.4,1,1,0,2132,0,1024,FF'
+
+/*pause 1*/ 
+
+/* send 1st chunk request */
+send '55AA,4,0,1024,FF'#10#13
+wait '6csCM,'
+
+/*pause 1*/ 
+
+/* send 2nd chunk request */
+send '55AA,4,1024,1024,FF'#10#13
+/*pause 1*/ 
+
+/* send 3rd chunk request */
+send '55AA,4,2048,84,FF'#10#13
+wait ',
+
+/* 2nd login packet received */
+wait '55AA,3,2,0,5.2.4,1,2,0,1962,0,1024,FF'
+
+/*pause 1*/ 
+
+/* send 1st chunk request */
+send '55AA,4,0,1024,FF'#10#13
+wait 'DdamO,
+
+/*pause 1*/ 
+
+/* send 2nd chunk request */
+send '55AA,4,1024,938,FF'#10#13
+wait ',
+
+/* 3rd login packet received */
+wait '55AA,3,2,0,5.2.4,1,3,0,3298,0,1024,FF'
+
+/*pause 1*/ 
+
+/* send 1st chunk request */
+send '55AA,4,0,1024,FF'#10#13
+wait 'w,
+
+/*pause 1*/ 
+
+/* send 2nd chunk request */
+send '55AA,4,1024,1024,FF'#10#13
+wait 'T8YE2,
+
+/*pause 1*/ 
+
+/* send 3rd chunk request */
+send '55AA,4,2048,1024,FF'#10#13
+wait 'mJt,
+
+/*pause 1*/ 
+
+/* send 4th chunk request */
+send '55AA,4,3072,226,FF'#10#13
+wait ',
+
